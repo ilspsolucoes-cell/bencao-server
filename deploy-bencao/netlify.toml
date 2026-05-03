@@ -1,6 +1,7 @@
 [build]
-  publish = "."
-  functions = "netlify/functions"
+  base = "implantar-bencao"
+  publish = "implantar-bencao"
+  functions = "implantar-bencao/netlify/functions"
 
 [[redirects]]
   from = "/api/*"
