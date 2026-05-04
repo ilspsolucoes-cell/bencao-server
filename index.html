@@ -1064,12 +1064,41 @@ async function gen(){
   const tTxt=theme==='automatico'?'Escolha o tema mais adequado.':`Tema: ${theme}.`;
 
   const prompts={
-    versiculo:`Hoje é ${dFull}. Card católico de "${md.title}". ${tTxt}\nUse a Bíblia de Jerusalém. Máx 3 linhas. NÃO inicie com "${md.title}".\nRetorne APENAS JSON: {"text":"versículo curto","ref":"Livro Cap:Ver (Bíblia de Jerusalém)","sig":"${sig}"}`,
-    mensagem:`Hoje é ${dFull}. Mensagem inspiradora católica de "${md.title}". ${tTxt}\nMáx 3 linhas simples. NÃO inicie com "${md.title}".\nRetorne APENAS JSON: {"text":"mensagem","ref":"","sig":"${sig}"}`,
-    santo:`Hoje é ${dFull}. Santo católico celebrado hoje. Mensagem de "${md.title}".\nMáx 3 linhas. NÃO inicie com "${md.title}".\nRetorne APENAS JSON: {"text":"mensagem sobre o santo","ref":"Santo do Dia: [Nome]","sig":"${sig}"}`,
-    mariana:`Hoje é ${dFull}. Mensagem mariana de "${md.title}". ${tTxt}\nMáx 3 linhas. Tom devocional. NÃO inicie com "${md.title}".\nRetorne APENAS JSON: {"text":"mensagem mariana","ref":"💙 Nossa Senhora","sig":"${sig}"}`,
-    terico:`Hoje é ${dFull}. Incentivo para o Terço de "${md.title}". Inclua o mistério do dia.\nMáx 3 linhas. NÃO inicie com "${md.title}".\nRetorne APENAS JSON: {"text":"mensagem do terço","ref":"📿 [Mistério]","sig":"${sig}"}`,
-    liturgia:`Hoje é ${dFull}. Liturgia Católica do dia para "${md.title}".\nMáx 3 linhas. NÃO inicie com "${md.title}".\nRetorne APENAS JSON: {"text":"mensagem litúrgica","ref":"✝️ Liturgia de ${dShort}","sig":"${sig}"}`,
+    versiculo:`Hoje é ${dFull}. Card católico de "${md.title}". ${tTxt}
+Use a Bíblia da CNBB (Conferência Nacional dos Bispos do Brasil).
+Máx 3 linhas simples e diretas. NÃO inicie com "${md.title}".
+
+REGRAS OBRIGATÓRIAS para a citação bíblica (padrão CNBB):
+- Use abreviações oficiais da CNBB (ex: Jo, Mt, Lc, Sl, Gn, Ex, Rm, etc.)
+- Separe capítulo e versículo com VÍRGULA: Jo 3,16 (NÃO use dois pontos)
+- Intervalo de versículos com hífen: Jo 3,16-17
+- Vários versículos: Sl 23,1.3.5
+- Exemplo correto: Jo 10,10 — Exemplo ERRADO: João 3:16
+
+Retorne APENAS JSON: {"text":"versículo curto","ref":"Ab Cap,Ver (CNBB)","sig":"${sig}"}`,
+
+    mensagem:`Hoje é ${dFull}. Mensagem inspiradora católica de "${md.title}". ${tTxt}
+Máx 3 linhas simples. NÃO inicie com "${md.title}".
+Retorne APENAS JSON: {"text":"mensagem","ref":"","sig":"${sig}"}`,
+
+    santo:`Hoje é ${dFull}. Santo católico celebrado hoje. Mensagem de "${md.title}".
+Máx 3 linhas. NÃO inicie com "${md.title}".
+Se incluir citação bíblica use padrão CNBB com vírgula: Jo 10,10
+Retorne APENAS JSON: {"text":"mensagem sobre o santo","ref":"Santo do Dia: [Nome]","sig":"${sig}"}`,
+
+    mariana:`Hoje é ${dFull}. Mensagem mariana de "${md.title}". ${tTxt}
+Máx 3 linhas. Tom devocional. NÃO inicie com "${md.title}".
+Se incluir citação bíblica use padrão CNBB com vírgula: Lc 1,28
+Retorne APENAS JSON: {"text":"mensagem mariana","ref":"💙 Nossa Senhora","sig":"${sig}"}`,
+
+    terico:`Hoje é ${dFull}. Incentivo para o Terço de "${md.title}". Inclua o mistério do dia.
+Máx 3 linhas. NÃO inicie com "${md.title}".
+Retorne APENAS JSON: {"text":"mensagem do terço","ref":"📿 [Mistério do Rosário]","sig":"${sig}"}`,
+
+    liturgia:`Hoje é ${dFull}. Liturgia Católica do dia para "${md.title}".
+Máx 3 linhas. NÃO inicie com "${md.title}".
+Se incluir citação bíblica use padrão CNBB com vírgula: Mt 5,1-12
+Retorne APENAS JSON: {"text":"mensagem litúrgica","ref":"✝️ Liturgia de ${dShort}","sig":"${sig}"}`,
   };
 
   try{
