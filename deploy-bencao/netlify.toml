@@ -1,6 +1,5 @@
 [build]
-  base = "deploy-bencao"
-  publish = "deploy-bencao"
+  publish = "."
   functions = "deploy-bencao/netlify/functions"
 
 [[redirects]]
