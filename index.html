@@ -20,17 +20,17 @@ body.tr{--bg:#1a0f14;--bg2:#2a1820;--bg3:#35202a;--primary:#e88aac;--primary2:#f
 body.tg{--bg:#081410;--bg2:#0f2018;--bg3:#162c20;--primary:#4caf80;--primary2:#a0dfc0;--accent:#66bb6a;--text:#a0c8b0;--text2:#e8f5ee;--text3:#406050;--border:rgba(76,175,128,.2);--border2:rgba(76,175,128,.5);--shadow:rgba(76,175,128,.15)}
 body.tp{--bg:#100a1a;--bg2:#1a1028;--bg3:#221535;--primary:#9c6fd6;--primary2:#cca8f0;--accent:#ab47bc;--text:#c0a8d8;--text2:#f0e8ff;--text3:#604880;--border:rgba(156,111,214,.2);--border2:rgba(156,111,214,.5);--shadow:rgba(156,111,214,.15)}
 body.tl{--bg:#f0ede8;--bg2:#fff;--bg3:#f8f5f0;--primary:#8b5e2a;--primary2:#c9903c;--accent:#e07020;--text:#5a4030;--text2:#2a1a10;--text3:#a08060;--border:rgba(139,94,42,.18);--border2:rgba(139,94,42,.45);--shadow:rgba(139,94,42,.12)}
- 
+
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{font-size:17px;-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden;transition:background .4s,color .4s}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
- 
+
 /* ── SCREENS ── */
 .screen{display:none!important}
 .screen.on{display:block!important}
 #sLogin.on{display:flex!important;flex-direction:column}
- 
+
 /* ── LOGIN ── */
 #sLogin{min-height:100vh;background:var(--bg);position:relative;overflow:hidden}
 #sLogin::before{content:'';position:absolute;top:-120px;left:-120px;width:400px;height:400px;background:radial-gradient(circle,rgba(201,168,76,.12) 0%,transparent 70%);pointer-events:none}
@@ -62,7 +62,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-
 .btn-p:active{opacity:.85;transform:scale(.99)}
 .lnote{text-align:center;margin-top:16px;font-size:12px;color:var(--text3);line-height:1.6}
 .llink{color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline}
- 
+
 /* Código de cortesia */
 .code-box{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
 .code-row{display:flex;gap:8px;align-items:stretch}
@@ -70,7 +70,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-
 .code-input:focus{border-color:var(--primary)}
 .code-input::placeholder{letter-spacing:0;font-weight:400;text-transform:none;font-size:13px}
 .btn-code{flex-shrink:0;padding:12px 14px;background:var(--border);border:1px solid var(--border2);border-radius:10px;color:var(--primary);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;min-height:48px}
- 
+
 /* ── TOPBAR ── */
 .topbar{position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--border);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;backdrop-filter:blur(12px)}
 .tlogo{font-family:'Dancing Script',cursive;font-size:clamp(17px,5vw,22px);font-weight:700;color:var(--primary);line-height:1;white-space:nowrap}
@@ -82,7 +82,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-
 .ibtn{width:38px;height:38px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:all .2s}
 .ibtn:active{transform:scale(.9)}
 .avbtn{width:38px;height:38px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--bg);cursor:pointer;flex-shrink:0;border:2px solid var(--border2)}
- 
+
 /* ── THEME PANEL ── */
 .tpanel{display:none;position:fixed;top:64px;right:10px;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:18px;z-index:200;box-shadow:0 8px 40px rgba(0,0,0,.4);min-width:250px;animation:slideDown .25s ease}
 .tpanel.on{display:block}
@@ -92,18 +92,18 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-
 .topt:hover,.topt.on{border-color:var(--primary);background:var(--border)}
 .tswatch{width:36px;height:36px;border-radius:50%;border:3px solid rgba(255,255,255,.15)}
 .tname{font-size:11px;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
- 
+
 /* ── PLANOS ── */
 #sPlanos{padding:24px 16px 60px;max-width:700px;margin:0 auto;background:var(--bg);min-height:100vh}
 .ph{text-align:center;margin-bottom:28px;padding-top:8px}
 .ph h2{font-family:'Dancing Script',cursive;font-size:clamp(26px,7vw,36px);color:var(--primary);font-weight:700}
 .ph p{font-size:15px;color:var(--text3);margin-top:6px;line-height:1.5}
- 
+
 /* Trial banner */
 .trial-banner{background:linear-gradient(135deg,rgba(37,211,102,.12),rgba(37,211,102,.05));border:1px solid rgba(37,211,102,.3);border-radius:14px;padding:16px 20px;margin-bottom:20px;text-align:center}
 .trial-banner h3{font-size:18px;font-weight:800;color:var(--green);margin-bottom:6px}
 .trial-banner p{font-size:14px;color:var(--text);line-height:1.5}
- 
+
 .pgrid{display:flex;flex-direction:column;gap:14px;margin-bottom:20px}
 .pcard{background:var(--bg2);border:2px solid var(--border);border-radius:16px;padding:22px 20px;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden;transition:all .2s}
 .pcard.pop{border-color:var(--primary);box-shadow:0 0 30px var(--shadow)}
@@ -118,13 +118,13 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-
 .btn-plan{width:100%;padding:14px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;cursor:pointer;border:2px solid var(--border2);background:transparent;color:var(--primary);transition:all .2s;min-height:50px}
 .pcard.pop .btn-plan{background:linear-gradient(135deg,var(--accent),var(--primary));color:var(--bg);border-color:transparent}
 .btn-skip{width:100%;padding:14px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text3);font-family:'Nunito',sans-serif;font-size:15px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
- 
+
 /* Trial countdown */
 .trial-info{background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.25);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
 .trial-info .icon{font-size:26px;flex-shrink:0}
 .trial-info p{font-size:14px;font-weight:600;color:var(--text);line-height:1.5}
 .trial-info strong{color:var(--green)}
- 
+
 /* ── APP ── */
 #sApp{background:var(--bg);min-height:100vh}
 .abody{padding:16px 16px 70px;max-width:700px;margin:0 auto}
@@ -155,13 +155,13 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 .genbtn{width:100%;padding:18px;background:linear-gradient(135deg,var(--accent) 0%,var(--primary) 50%,var(--accent) 100%);background-size:200% 100%;border:none;border-radius:14px;color:var(--bg);font-family:'Nunito',sans-serif;font-size:18px;font-weight:800;cursor:pointer;margin-top:20px;-webkit-tap-highlight-color:transparent;transition:opacity .2s,transform .1s;min-height:58px}
 .genbtn:active{opacity:.85;transform:scale(.99)}
 .genbtn:disabled{opacity:.35;cursor:not-allowed;transform:none}
- 
+
 /* Loading */
 .load{display:none;text-align:center;padding:50px 20px}
 .load.on{display:block;animation:fadeUp .4s ease both}
 .lic{font-size:42px;animation:pulse 1.5s ease infinite;display:block;margin-bottom:14px}
 .load p{font-size:18px;color:var(--primary);font-style:italic;font-weight:600}
- 
+
 /* Card visual */
 .rcard{display:none;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden}
 .rcard.on{display:block;animation:fadeUp .5s ease both}
@@ -181,7 +181,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 .cref{font-size:clamp(11px,3vw,14px);font-weight:700;color:rgba(255,220,120,.95);letter-spacing:2px;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,.7);font-family:'Nunito',sans-serif}
 .csig{font-family:'Dancing Script',cursive;font-size:clamp(20px,6vw,30px);font-weight:600;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.7);opacity:.92}
 .clogo{max-width:80px;max-height:50px;object-fit:contain;border-radius:6px;opacity:.9}
- 
+
 .snote{background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:12px;padding:14px 16px;margin-bottom:18px;font-size:14px;font-weight:600;color:var(--text);line-height:1.6}
 .snote strong{color:var(--green);display:block;margin-bottom:4px;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
 .arow{display:flex;flex-direction:column;gap:12px}
@@ -189,17 +189,17 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 .abtn-s{background:linear-gradient(135deg,var(--border),var(--bg3));border:2px solid var(--border2)!important;color:var(--primary)}
 .abtn-n{background:transparent;border:2px solid var(--border)!important;color:var(--text3)}
 .abtn:active{opacity:.65}
- 
+
 /* Limite */
 .lbanner{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border:1px solid var(--border2);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
 .lbanner .ic{font-size:26px;flex-shrink:0}
 .lbanner p{font-size:14px;font-weight:600;color:var(--text);line-height:1.5}
 .lbanner strong{color:var(--primary)}
 .btn-up{margin-top:8px;padding:8px 16px;background:linear-gradient(135deg,var(--accent),var(--primary));border:none;border-radius:8px;color:var(--bg);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer}
- 
+
 .errbox{display:none;background:rgba(180,40,40,.12);border:1px solid rgba(180,40,40,.35);border-radius:10px;padding:14px;margin-top:14px;color:#e8a0a0;font-size:14px;line-height:1.5;font-weight:600}
 .errbox.on{display:block}
- 
+
 /* ── ADMIN ── */
 #sAdmin{background:var(--bg);min-height:100vh;padding:16px 16px 60px;max-width:700px;margin:0 auto}
 .admin-head{text-align:center;margin-bottom:24px;padding-top:8px}
@@ -223,17 +223,17 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 .user-email{font-size:14px;color:var(--text2);font-weight:600}
 .user-plan{font-size:12px;padding:3px 10px;border-radius:20px;font-weight:800;background:var(--border);color:var(--primary)}
 .btn-back{width:100%;padding:14px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text3);font-family:'Nunito',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}
- 
+
 /* Toast */
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--bg2);border:2px solid var(--border2);color:var(--primary);padding:12px 24px;border-radius:12px;font-size:14px;font-weight:800;opacity:0;transition:all .35s ease;z-index:999;pointer-events:none;white-space:nowrap;max-width:92vw;box-shadow:0 8px 30px rgba(0,0,0,.3)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
- 
+
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes floatUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.85)}}
- 
+
 @media(min-width:480px){
   .abody{padding:20px 24px 72px}.sect{padding:24px}.rbody{padding:22px 24px}
   .fst{flex-direction:row}.fst>div{flex:1}
@@ -246,7 +246,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 </style>
 </head>
 <body>
- 
+
 <!-- TOPBAR -->
 <div class="topbar" id="topbar" style="display:none">
   <div class="tlogo">✝️ Bênção do Dia<span>Cards Católicos</span></div>
@@ -256,7 +256,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
     <div class="avbtn" id="avbtn" onclick="goAdmin()">?</div>
   </div>
 </div>
- 
+
 <!-- THEME PANEL -->
 <div class="tpanel" id="tpanel">
   <h3>🎨 Escolha o tema</h3>
@@ -269,7 +269,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
     <div class="topt" onclick="setTheme('tl',this)"><div class="tswatch" style="background:linear-gradient(135deg,#f5f0e8,#c9903c)"></div><span class="tname">Branco</span></div>
   </div>
 </div>
- 
+
 <!-- ══ LOGIN ══ -->
 <div id="sLogin" class="screen on">
   <div class="lhero">
@@ -280,16 +280,13 @@ select:focus,.iapp:focus{border-color:var(--primary)}
   </div>
   <div class="lbox">
     <div class="lcard">
-      <div class="ltitle">Entrar ou criar conta</div>
-      <div class="sbtns">
-        <button class="sbtn sg" onclick="loginWith('Google')">🔴 &nbsp;Continuar com Google</button>
-        <button class="sbtn sa" onclick="loginWith('Apple')">🍎 &nbsp;Continuar com Apple</button>
-        <button class="sbtn se" onclick="toggleEF()">✉️ &nbsp;Continuar com E-mail</button>
-      </div>
-      <div class="eform" id="eform">
-        <div class="div-or">ou preencha abaixo</div>
+      <div class="ltitle">Entre ou crie sua conta</div>
+      <div class="eform on" id="eform">
         <input type="email" class="ifield" id="ei" placeholder="Seu e-mail">
-        <input type="password" class="ifield" id="pi" placeholder="Senha (mín. 4 caracteres)">
+        <div style="position:relative">
+          <input type="password" class="ifield" id="pi" placeholder="Senha (mín. 4 caracteres)" style="padding-right:50px">
+          <button onclick="togglePass()" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:20px;color:var(--text3);padding:0;line-height:1" id="eyeBtn">👁️</button>
+        </div>
         <button class="btn-p" id="btnE" onclick="loginEmail()">Entrar / Cadastrar</button>
         <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:10px;line-height:1.6">Primeira vez? Só digitar e-mail e criar uma senha.</p>
       </div>
@@ -305,19 +302,19 @@ select:focus,.iapp:focus{border-color:var(--primary)}
     </div>
   </div>
 </div>
- 
+
 <!-- ══ PLANOS ══ -->
 <div id="sPlanos" class="screen">
   <div class="ph">
     <h2>✝️ Experimente Grátis</h2>
     <p>3 dias grátis com acesso completo — sem cartão</p>
   </div>
- 
+
   <div class="trial-banner">
     <h3>🎁 3 dias grátis para você!</h3>
     <p>Experimente todas as funcionalidades sem pagar nada.<br>Depois escolha o plano que cabe no seu bolso.</p>
   </div>
- 
+
   <div class="pgrid">
     <div class="pcard pop" onclick="startTrial()">
       <div class="ptop"><div><div class="pname">Trial Grátis</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Experimente tudo</div></div><div class="pemoji">🎁</div></div>
@@ -331,7 +328,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       </div>
       <button class="btn-plan">Começar grátis agora</button>
     </div>
- 
+
     <div class="pcard" onclick="goMP('fiel')">
       <div class="ptop"><div><div class="pname">Fiel</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Uso pessoal</div></div><div class="pemoji">⭐</div></div>
       <div class="ptop"><div><div class="pval">R$47</div><div class="pper">/ano — R$3,90/mês</div></div></div>
@@ -344,7 +341,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       </div>
       <button class="btn-plan">Assinar por R$47/ano</button>
     </div>
- 
+
     <div class="pcard" onclick="goMP('paroquia')">
       <div class="ptop"><div><div class="pname">Paróquia</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Igrejas e empresas</div></div><div class="pemoji">⛪</div></div>
       <div class="ptop"><div><div class="pval">R$57</div><div class="pper">/mês</div></div></div>
@@ -358,28 +355,28 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       <button class="btn-plan">Assinar Paróquia</button>
     </div>
   </div>
- 
+
   <div style="text-align:center;margin-top:8px">
     <button onclick="verificarPagamento()" style="background:transparent;border:none;color:var(--primary);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;text-decoration:underline;padding:10px">
       ✅ Já paguei — Verificar minha assinatura
     </button>
   </div>
 </div>
- 
+
 <!-- ══ APP ══ -->
 <div id="sApp" class="screen">
   <div class="abody">
- 
+
     <div class="trial-info" id="trialInfo" style="display:none">
       <span class="ic">⏳</span>
       <div><p>Você está no período de teste gratuito.<br><strong id="trialDays">3 dias restantes</strong> — <span style="color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="goScreen('sPlanos')">Assinar agora →</span></p></div>
     </div>
- 
+
     <div class="lbanner" id="lbanner" style="display:none">
       <span class="ic">⚡</span>
       <div><p>Seu período de teste <strong>expirou</strong>.<br>Assine para continuar usando.</p><button class="btn-up" onclick="goScreen('sPlanos')">Ver planos →</button></div>
     </div>
- 
+
     <div class="sect" id="cfg">
       <div class="stit">Momento do dia</div>
       <div class="g3">
@@ -387,7 +384,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
         <button class="selbtn" onclick="setMode('tarde',this)"><span class="ic">🌤️</span>Boa Tarde</button>
         <button class="selbtn" onclick="setMode('noite',this)"><span class="ic">🌙</span>Boa Noite</button>
       </div>
- 
+
       <div class="stit" style="margin-top:22px">Tipo de mensagem</div>
       <div class="g2" style="margin-bottom:10px">
         <button class="selbtn on" onclick="setType('versiculo',this)"><span class="ic">📖</span>Versículo Bíblico</button>
@@ -401,7 +398,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
         <button class="selbtn" onclick="setType('terico',this)"><span class="ic">📿</span>Para o Terço</button>
         <button class="selbtn" onclick="setType('liturgia',this)"><span class="ic">✝️</span>Liturgia do Dia</button>
       </div>
- 
+
       <div class="fst">
         <div>
           <span class="flbl">Tema</span>
@@ -426,7 +423,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
           <input type="text" class="iapp" id="sig" value="🙏 Paz e Bem!" placeholder="Ex: Grupo de Oração">
         </div>
       </div>
- 
+
       <div class="stit" style="margin-top:22px">Imagem de fundo</div>
       <div class="upz" id="upz">
         <input type="file" id="imgInput" accept="image/*" onchange="handleImg(event)">
@@ -437,7 +434,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
         <img id="pvwi" class="pvwi" src="" alt="">
         <button class="rmbtn" onclick="removeImg()">✕ Remover</button>
       </div>
- 
+
       <!-- Logo (só plano Paróquia) -->
       <div id="logoSection" style="display:none;margin-top:16px">
         <div class="stit">Logo da paróquia/empresa</div>
@@ -451,16 +448,16 @@ select:focus,.iapp:focus{border-color:var(--primary)}
           <button class="rmbtn" onclick="removeLogo()">✕ Remover</button>
         </div>
       </div>
- 
+
       <div class="errbox" id="err"></div>
       <button class="genbtn" id="genbtn" onclick="gen()">✝️ &nbsp;Criar Card Agora</button>
     </div>
- 
+
     <div class="load" id="load">
       <span class="lic">🙏</span>
       <p>Criando sua mensagem...</p>
     </div>
- 
+
     <div class="rcard" id="rcard">
       <div class="rhead">
         <h2>✝️ Card Pronto!</h2>
@@ -491,17 +488,17 @@ select:focus,.iapp:focus{border-color:var(--primary)}
         </div>
       </div>
     </div>
- 
+
   </div>
 </div>
- 
+
 <!-- ══ ADMIN ══ -->
 <div id="sAdmin" class="screen">
   <div class="admin-head">
     <h2>⚙️ Painel Admin</h2>
     <p>Gerenciamento do Bênção do Dia</p>
   </div>
- 
+
   <!-- Gerar códigos -->
   <div class="admin-sect">
     <h3>🎟️ Gerar Códigos de Cortesia</h3>
@@ -519,7 +516,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       <p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum código gerado ainda.</p>
     </div>
   </div>
- 
+
   <!-- Usuários -->
   <div class="admin-sect">
     <h3>👥 Usuários Cadastrados</h3>
@@ -527,19 +524,19 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       <p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Carregando...</p>
     </div>
   </div>
- 
+
   <!-- Stats -->
   <div class="admin-sect">
     <h3>📊 Estatísticas</h3>
     <div id="stats" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
     </div>
   </div>
- 
+
   <button class="btn-back" onclick="goScreen('sApp')">← Voltar ao App</button>
 </div>
- 
+
 <div class="toast" id="toast"></div>
- 
+
 <script>
 // ════════════════════════════════════════
 // CONFIGURAÇÕES
@@ -550,22 +547,22 @@ const MP_LINKS = {
   paroquia: 'https://pay.hotmart.com/O105656518E?off=j94c3ez1',
 };
 const TRIAL_DAYS = 3;
- 
+
 const today    = new Date();
 const dShort   = today.toLocaleDateString('pt-BR');
 const dFull    = today.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
- 
+
 // Estado
 let curUser = {name:'',email:'',plan:'',trialStart:null,cardsToday:0};
 let curMode = 'dia', curType = 'versiculo';
 let imgDataUrl = null, logoDataUrl = null;
- 
+
 const modeData = {
   dia:  {title:'Bom Dia',   emoji:'☀️', cor:'#f5d78a'},
   tarde:{title:'Boa Tarde', emoji:'🌤️', cor:'#f5c46a'},
   noite:{title:'Boa Noite', emoji:'🌙', cor:'#c5b8f5'},
 };
- 
+
 // ════════════════════════════════════════
 // TELAS
 // ════════════════════════════════════════
@@ -574,7 +571,7 @@ function goScreen(id){
   document.getElementById(id).classList.add('on');
   window.scrollTo({top:0,behavior:'smooth'});
 }
- 
+
 // ════════════════════════════════════════
 // TEMA
 // ════════════════════════════════════════
@@ -600,7 +597,22 @@ document.addEventListener('click',e=>{
     });
   }
 })();
- 
+
+// ════════════════════════════════════════
+// TOGGLE SENHA
+// ════════════════════════════════════════
+function togglePass(){
+  const p=document.getElementById('pi');
+  const btn=document.getElementById('eyeBtn');
+  if(p.type==='password'){
+    p.type='text';
+    btn.textContent='🙈';
+  } else {
+    p.type='password';
+    btn.textContent='👁️';
+  }
+}
+
 // ════════════════════════════════════════
 // LOGIN
 // ════════════════════════════════════════
@@ -614,32 +626,32 @@ function loginWith(provider){
   document.getElementById('btnE').textContent=`Entrar com ${provider}`;
   toast(`Toque em "Entrar com ${provider}"`);
 }
- 
+
 function toggleEF(){
   document.getElementById('eform').classList.toggle('on');
   document.getElementById('ei').removeAttribute('readonly');
   document.getElementById('pi').style.display='block';
   document.getElementById('btnE').textContent='Entrar / Cadastrar';
 }
- 
+
 function loginEmail(){
   const eEl=document.getElementById('ei');
   const pEl=document.getElementById('pi');
   const e=eEl.value.trim(), p=pEl.value.trim();
   const isRO=eEl.hasAttribute('readonly');
- 
+
   // Verifica senha admin
   if(!isRO && p === ADMIN_PASS){
     curUser={name:'Admin',email:e,plan:'Admin',trialStart:null,cardsToday:0};
     afterLogin(true);
     return;
   }
- 
+
   if(!e){toast('⚠️ Informe seu e-mail.');eEl.focus();return;}
   if(!isRO&&!p){toast('⚠️ Informe sua senha.');pEl.focus();return;}
- 
+
   const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
- 
+
   if(!isRO){
     if(contas[e]){
       if(contas[e].senha!==btoa(p)){toast('⚠️ Senha incorreta.');pEl.value='';pEl.focus();return;}
@@ -669,30 +681,26 @@ function loginEmail(){
       curUser.trialStart=contas[e].trialStart||null;
     }
   }
- 
+
   curUser.email=e;
   afterLogin(false);
 }
- 
+
 function afterLogin(isAdmin){
   document.getElementById('avbtn').textContent=curUser.name.charAt(0).toUpperCase();
   document.getElementById('topbar').style.display='flex';
- 
+
   if(isAdmin){
-    updateBadge('Admin');
-    goScreen('sAdmin');
-    loadAdmin();
-    return;
-  }
- 
-  // Verifica trial
-  const trialStatus=checkTrial();
- 
-  if(curUser.plan==='Admin'){
     updateBadge('Admin');
     goScreen('sApp');
     updateAppUI();
-  } else if(curUser.plan==='Paróquia'||curUser.plan==='Fiel'){
+    document.getElementById('avbtn').onclick=()=>{goScreen('sAdmin');loadAdmin();};
+    return;
+  }
+
+  const trialStatus=checkTrial();
+
+  if(curUser.plan==='Paróquia'||curUser.plan==='Fiel'){
     updateBadge(curUser.plan);
     goScreen('sApp');
     updateAppUI();
@@ -705,28 +713,29 @@ function afterLogin(isAdmin){
     goScreen('sApp');
     updateAppUI();
   } else if(trialStatus==='expired'){
+    // Trial expirado — redireciona automaticamente para planos
     updateBadge('Trial Expirado');
-    goScreen('sApp');
-    updateAppUI();
+    toast('⏰ Seu período de teste expirou. Escolha um plano para continuar!');
+    setTimeout(()=>goScreen('sPlanos'),1500);
   } else {
     goScreen('sPlanos');
   }
 }
- 
+
 function checkTrial(){
   if(!curUser.trialStart) return 'none';
   const start=new Date(curUser.trialStart);
   const diff=(new Date()-start)/(1000*60*60*24);
   return diff<=TRIAL_DAYS?'active':'expired';
 }
- 
+
 function trialDaysLeft(){
   if(!curUser.trialStart) return 0;
   const start=new Date(curUser.trialStart);
   const diff=(new Date()-start)/(1000*60*60*24);
   return Math.max(0,Math.ceil(TRIAL_DAYS-diff));
 }
- 
+
 function updateBadge(txt){
   const b=document.getElementById('pbadge');
   b.textContent=txt;
@@ -734,22 +743,22 @@ function updateBadge(txt){
   if(txt.includes('Trial')) b.classList.add('trial');
   if(txt==='Admin') b.classList.add('admin');
 }
- 
+
 function updateAppUI(){
   const ti=document.getElementById('trialInfo');
   const lb=document.getElementById('lbanner');
   const ls=document.getElementById('logoSection');
   const ts=checkTrial();
- 
+
   ti.style.display='none';
   lb.style.display='none';
- 
-  if(curUser.plan==='Paróquia'||curUser.plan==='Admin'){
+
+  if(curUser.plan==='Paróquia'||curUser.plan==='Admin'||curUser.plan==='Fiel'||curUser.plan==='Cortesia'){
     ls.style.display='block';
   } else {
     ls.style.display='none';
   }
- 
+
   if(curUser.plan==='Trial'||!curUser.plan){
     if(ts==='active'){
       ti.style.display='flex';
@@ -759,45 +768,45 @@ function updateAppUI(){
     }
   }
 }
- 
+
 function canUseApp(){
   if(curUser.plan==='Admin') return true;
   if(curUser.plan==='Fiel'||curUser.plan==='Paróquia'||curUser.plan==='Cortesia') return true;
   const ts=checkTrial();
   return ts==='active';
 }
- 
+
 // ════════════════════════════════════════
 // CÓDIGO DE CORTESIA
 // ════════════════════════════════════════
 function useCode(){
   const code=document.getElementById('codeInput').value.trim().toUpperCase();
   if(!code){toast('⚠️ Digite o código.');return;}
- 
+
   const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
   const c=codes[code];
- 
+
   if(!c){toast('❌ Código inválido.');return;}
   if(c.used&&c.singleUse){toast('❌ Código já utilizado.');return;}
   if(new Date()>new Date(c.expires)){toast('❌ Código expirado.');return;}
- 
+
   // Aplica o código
   const email=document.getElementById('ei').value.trim()||'cortesia@bencaododia.app.br';
   curUser.email=email;
   curUser.name='Usuário';
   curUser.plan='Cortesia';
   curUser.trialStart=null;
- 
+
   if(c.singleUse){
     codes[code].used=true;
     localStorage.setItem('bd_codes',JSON.stringify(codes));
   }
- 
+
   // Salva conta
   const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
   contas[email]={nome:'Usuário',senha:'',plano:'Cortesia',trialStart:null,codeUsed:code};
   localStorage.setItem('bd_contas',JSON.stringify(contas));
- 
+
   document.getElementById('topbar').style.display='flex';
   document.getElementById('avbtn').textContent='U';
   updateBadge('Cortesia 🎁');
@@ -805,7 +814,7 @@ function useCode(){
   goScreen('sApp');
   updateAppUI();
 }
- 
+
 // ════════════════════════════════════════
 // PLANOS / PAGAMENTO
 // ════════════════════════════════════════
@@ -829,14 +838,14 @@ function startTrial(){
   goScreen('sApp');
   updateAppUI();
 }
- 
+
 function goMP(plano){
   const email=encodeURIComponent(curUser.email||'');
   const base=MP_LINKS[plano]||MP_LINKS.fiel;
   window.open(email?`${base}&email=${email}`:base,'_blank');
   toast('✦ Abrindo pagamento seguro...');
 }
- 
+
 async function verificarPagamento(){
   toast('🔍 Verificando assinatura...');
   try{
@@ -854,7 +863,7 @@ async function verificarPagamento(){
     }
   }catch(e){toast('⚠️ Erro ao verificar. Tente novamente.');}
 }
- 
+
 function goAdmin(){
   if(curUser.plan==='Admin'){
     goScreen('sAdmin');
@@ -863,7 +872,7 @@ function goAdmin(){
     goScreen('sPlanos');
   }
 }
- 
+
 // ════════════════════════════════════════
 // ADMIN — Gerar códigos
 // ════════════════════════════════════════
@@ -871,25 +880,25 @@ function genCode(){
   const days=parseInt(document.getElementById('codeDays').value);
   const code='BENCAO-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-'+Math.random().toString(36).substr(2,4).toUpperCase();
   const expires=new Date(Date.now()+days*24*60*60*1000).toISOString();
- 
+
   const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
   codes[code]={expires,days,used:false,singleUse:true,createdAt:new Date().toISOString()};
   localStorage.setItem('bd_codes',JSON.stringify(codes));
- 
+
   renderCodes();
   toast(`✦ Código gerado: ${code}`);
 }
- 
+
 function renderCodes(){
   const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
   const el=document.getElementById('codeList');
   const entries=Object.entries(codes).reverse();
- 
+
   if(!entries.length){
     el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum código gerado ainda.</p>';
     return;
   }
- 
+
   el.innerHTML=entries.map(([code,c])=>{
     const expired=new Date()>new Date(c.expires);
     const exp=new Date(c.expires).toLocaleDateString('pt-BR');
@@ -906,14 +915,14 @@ function renderCodes(){
     </div>`;
   }).join('');
 }
- 
+
 function copyCode(code){
   navigator.clipboard?.writeText(code).then(()=>toast('✦ Código copiado!'));
 }
- 
+
 function loadAdmin(){
   renderCodes();
- 
+
   // Usuários
   const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
   const ul=document.getElementById('userList');
@@ -921,13 +930,39 @@ function loadAdmin(){
   if(!entries.length){
     ul.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum usuário ainda.</p>';
   } else {
-    ul.innerHTML=entries.map(([email,c])=>`
-      <div class="user-item">
-        <div><div class="user-email">${email}</div><div style="font-size:12px;color:var(--text3)">${c.nome}</div></div>
+    ul.innerHTML=entries.map(([email,c])=>{
+      let prazo='';
+      let prazoColor='var(--text3)';
+      if(c.plano==='Trial'&&c.trialStart){
+        const start=new Date(c.trialStart);
+        const diff=TRIAL_DAYS-((new Date()-start)/(1000*60*60*24));
+        if(diff>0){
+          prazo=`⏳ ${Math.ceil(diff)} dia(s) restante(s)`;
+          prazoColor='var(--green)';
+        } else {
+          prazo='❌ Trial expirado';
+          prazoColor='#e8a0a0';
+        }
+      } else if(c.plano==='Fiel'){
+        prazo='✅ Anual ativo';
+        prazoColor='var(--green)';
+      } else if(c.plano==='Paróquia'){
+        prazo='✅ Mensal ativo';
+        prazoColor='var(--green)';
+      } else if(c.plano==='Cortesia'){
+        prazo='🎁 Cortesia';
+        prazoColor='var(--primary)';
+      }
+      return `<div class="user-item">
+        <div style="flex:1;min-width:0">
+          <div class="user-email" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${email}</div>
+          <div style="font-size:12px;color:${prazoColor};margin-top:3px;font-weight:700">${prazo}</div>
+        </div>
         <span class="user-plan">${c.plano||'Trial'}</span>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   }
- 
+
   // Stats
   const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
   const totalCodes=Object.keys(codes).length;
@@ -950,7 +985,7 @@ function loadAdmin(){
       <div style="font-size:13px;color:var(--text3);margin-top:4px">Códigos livres</div>
     </div>`;
 }
- 
+
 // ════════════════════════════════════════
 // APP — Modo / Tipo
 // ════════════════════════════════════════
@@ -964,7 +999,7 @@ function setType(t,btn){
   document.querySelectorAll('.g2 .selbtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
 }
- 
+
 // ════════════════════════════════════════
 // IMAGENS
 // ════════════════════════════════════════
@@ -1004,7 +1039,7 @@ function removeLogo(){
   document.getElementById('pvwLogo').classList.remove('on');
   document.getElementById('upzLogo').classList.remove('has');
 }
- 
+
 // ════════════════════════════════════════
 // GERAR CARD
 // ════════════════════════════════════════
@@ -1013,18 +1048,18 @@ async function gen(){
     setErr('Seu período de teste expirou. Assine para continuar.');
     return;
   }
- 
+
   const theme=document.getElementById('theme').value;
   const sig=document.getElementById('sig').value.trim()||'🙏 Paz e Bem!';
   const md=modeData[curMode];
- 
+
   setErr('');
   document.getElementById('cfg').style.display='none';
   document.getElementById('load').classList.add('on');
   document.getElementById('genbtn').disabled=true;
- 
+
   const tTxt=theme==='automatico'?'Escolha o tema mais adequado.':`Tema: ${theme}.`;
- 
+
   const prompts={
     versiculo:`Hoje é ${dFull}. Card católico de "${md.title}". ${tTxt}\nUse a Bíblia de Jerusalém. Máx 3 linhas. NÃO inicie com "${md.title}".\nRetorne APENAS JSON: {"text":"versículo curto","ref":"Livro Cap:Ver (Bíblia de Jerusalém)","sig":"${sig}"}`,
     mensagem:`Hoje é ${dFull}. Mensagem inspiradora católica de "${md.title}". ${tTxt}\nMáx 3 linhas simples. NÃO inicie com "${md.title}".\nRetorne APENAS JSON: {"text":"mensagem","ref":"","sig":"${sig}"}`,
@@ -1033,7 +1068,7 @@ async function gen(){
     terico:`Hoje é ${dFull}. Incentivo para o Terço de "${md.title}". Inclua o mistério do dia.\nMáx 3 linhas. NÃO inicie com "${md.title}".\nRetorne APENAS JSON: {"text":"mensagem do terço","ref":"📿 [Mistério]","sig":"${sig}"}`,
     liturgia:`Hoje é ${dFull}. Liturgia Católica do dia para "${md.title}".\nMáx 3 linhas. NÃO inicie com "${md.title}".\nRetorne APENAS JSON: {"text":"mensagem litúrgica","ref":"✝️ Liturgia de ${dShort}","sig":"${sig}"}`,
   };
- 
+
   try{
     const res=await fetch('/.netlify/functions/gerar',{
       method:'POST',
@@ -1042,19 +1077,19 @@ async function gen(){
     });
     const data=await res.json();
     if(!res.ok) throw new Error(data?.error?.message||`HTTP ${res.status}`);
- 
+
     let txt=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim();
     const m=txt.match(/\{[\s\S]*\}/);
     if(!m) throw new Error('Formato inválido.');
     const p=JSON.parse(m[0]);
- 
+
     document.getElementById('cTit').textContent=md.title;
     document.getElementById('cTit').style.color=md.cor;
     document.getElementById('cTxt').textContent=p.text||'';
     document.getElementById('cRef').textContent=p.ref||'';
     document.getElementById('cRef').style.display=p.ref?'block':'none';
     document.getElementById('cSig').textContent=p.sig||sig;
- 
+
     // Logo
     const logoEl=document.getElementById('cLogo');
     if(logoDataUrl&&(curUser.plan==='Paróquia'||curUser.plan==='Admin')){
@@ -1062,7 +1097,7 @@ async function gen(){
     } else {
       logoEl.style.display='none';
     }
- 
+
     // Fundo
     if(imgDataUrl){
       const bg=document.getElementById('cardBg');
@@ -1075,12 +1110,12 @@ async function gen(){
         noite:'linear-gradient(160deg,#0a0a2a,#1a1050,#0a0820)'
       }[curMode];
     }
- 
+
     document.getElementById('load').classList.remove('on');
     document.getElementById('ddisp').textContent=`${md.emoji} ${dShort}`;
     document.getElementById('rcard').classList.add('on');
     window.scrollTo({top:0,behavior:'smooth'});
- 
+
   }catch(e){
     document.getElementById('load').classList.remove('on');
     document.getElementById('cfg').style.display='block';
@@ -1089,7 +1124,7 @@ async function gen(){
     console.error(e);
   }
 }
- 
+
 // ════════════════════════════════════════
 // SALVAR CARD
 // ════════════════════════════════════════
@@ -1113,14 +1148,14 @@ async function saveCard(){
     }catch{setErr('Faça uma captura de tela do card.');}
   }
 }
- 
+
 function rst(){
   document.getElementById('rcard').classList.remove('on');
   document.getElementById('cfg').style.display='block';
   document.getElementById('genbtn').disabled=false;
   window.scrollTo({top:0,behavior:'smooth'});
 }
- 
+
 function toast(m){
   const t=document.getElementById('toast');
   t.textContent=m;t.classList.add('on');
