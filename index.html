@@ -174,13 +174,14 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 #cardBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
 #cardBg.on{display:block}
 #cardOv{position:absolute;inset:0;background:var(--card-ov);z-index:1}
-#cardCt{position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:28px 22px 24px;text-align:center}
-.ctit{font-family:'Dancing Script',cursive;font-size:clamp(36px,10vw,52px);font-weight:700;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7);line-height:1.1}
-.cbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px 0}
-.ctxt{font-family:'Lora',serif;font-size:clamp(16px,5vw,22px);color:#fff;line-height:1.7;text-shadow:0 2px 12px rgba(0,0,0,.8);font-weight:400}
-.cref{font-size:clamp(11px,3vw,14px);font-weight:700;color:rgba(255,220,120,.95);letter-spacing:2px;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,.7);font-family:'Nunito',sans-serif}
-.csig{font-family:'Dancing Script',cursive;font-size:clamp(20px,6vw,30px);font-weight:600;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.7);opacity:.92}
-.clogo{max-width:80px;max-height:50px;object-fit:contain;border-radius:6px;opacity:.9}
+#cardCt{position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:24px 20px 20px;text-align:center}
+.ctit{font-family:'Dancing Script',cursive;font-size:clamp(32px,9vw,48px);font-weight:700;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7);line-height:1.1}
+.cbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:8px 0}
+.ctxt{font-family:'Lora',serif;font-size:clamp(15px,4.5vw,21px);color:#fff;line-height:1.7;text-shadow:0 2px 12px rgba(0,0,0,.8);font-weight:400}
+.cref{font-size:clamp(10px,2.8vw,13px);font-weight:700;color:rgba(255,220,120,.95);letter-spacing:2px;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,.7);font-family:'Nunito',sans-serif}
+.cfoot{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+.csig{font-family:'Dancing Script',cursive;font-size:clamp(18px,5.5vw,28px);font-weight:600;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.7);opacity:.92}
+.clogo{max-width:70px;max-height:44px;object-fit:contain;border-radius:6px;opacity:.9}
 
 .snote{background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:12px;padding:14px 16px;margin-bottom:18px;font-size:14px;font-weight:600;color:var(--text);line-height:1.6}
 .snote strong{color:var(--green);display:block;margin-bottom:4px;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
@@ -471,11 +472,13 @@ select:focus,.iapp:focus{border-color:var(--primary)}
           <div id="cardCt">
             <div class="ctit" id="cTit">Bom Dia</div>
             <div class="cbody">
-              <img id="cLogo" class="clogo" src="" alt="" style="display:none">
               <div class="ctxt" id="cTxt"></div>
               <div class="cref" id="cRef"></div>
             </div>
-            <div class="csig" id="cSig"></div>
+            <div class="cfoot">
+              <img id="cLogo" class="clogo" src="" alt="" style="display:none">
+              <div class="csig" id="cSig"></div>
+            </div>
           </div>
         </div>
         <div class="snote">
