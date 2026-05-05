@@ -330,17 +330,30 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       <button class="btn-plan">Começar grátis agora</button>
     </div>
 
-    <div class="pcard" onclick="goMP('fiel')">
-      <div class="ptop"><div><div class="pname">Fiel</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Uso pessoal</div></div><div class="pemoji">⭐</div></div>
-      <div class="ptop"><div><div class="pval">R$47</div><div class="pper">/ano — R$3,90/mês</div></div></div>
+    <div class="pcard" onclick="goMP('fiel_mensal')">
+      <div class="ptop"><div><div class="pname">Fiel Mensal</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Uso pessoal</div></div><div class="pemoji">⭐</div></div>
+      <div class="ptop"><div><div class="pval">R$10</div><div class="pper">/mês</div></div></div>
       <div class="pfeats">
         <div class="feat">✅ Tudo do Trial</div>
-        <div class="feat">✅ Acesso por 1 ano</div>
+        <div class="feat">✅ Acesso completo</div>
         <div class="feat">✅ PIX, cartão ou boleto</div>
-        <div class="feat">✅ Suporte por e-mail</div>
+        <div class="feat">✅ Cancele quando quiser</div>
         <div class="feat" style="opacity:.4">❌ Logo personalizada</div>
       </div>
-      <button class="btn-plan">Assinar por R$47/ano</button>
+      <button class="btn-plan">Assinar por R$10/mês</button>
+    </div>
+
+    <div class="pcard pop" onclick="goMP('fiel_anual')">
+      <div class="ptop"><div><div class="pname">Fiel Anual</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Melhor custo-benefício</div></div><div class="pemoji">🌟</div></div>
+      <div class="ptop"><div><div class="pval">R$99</div><div class="pper">/ano — R$8,25/mês</div></div></div>
+      <div class="pfeats">
+        <div class="feat">✅ Tudo do Fiel Mensal</div>
+        <div class="feat">✅ Economia de R$21/ano</div>
+        <div class="feat">✅ PIX, cartão ou boleto</div>
+        <div class="feat">✅ Suporte prioritário</div>
+        <div class="feat" style="opacity:.4">❌ Logo personalizada</div>
+      </div>
+      <button class="btn-plan">Assinar por R$99/ano</button>
     </div>
 
     <div class="pcard" onclick="goMP('paroquia')">
@@ -844,9 +857,9 @@ function startTrial(){
 
 function goMP(plano){
   const email=encodeURIComponent(curUser.email||'');
-  const base=MP_LINKS[plano]||MP_LINKS.fiel;
-  window.open(email?`${base}&email=${email}`:base,'_blank');
-  toast('✦ Abrindo pagamento seguro...');
+  const url=`/.netlify/functions/assinar?plano=${plano}&email=${email}`;
+  window.open(url,'_blank');
+  toast('✦ Abrindo pagamento seguro do Mercado Pago...');
 }
 
 async function verificarPagamento(){
@@ -1056,6 +1069,18 @@ async function gen(){
   const sig=document.getElementById('sig').value.trim()||'🙏 Paz e Bem!';
   const md=modeData[curMode];
 
+  // Busca o santo do dia no Vatican News se necessário
+  let santoHoje = '';
+  if(curType === 'santo'){
+    try{
+      const sr = await fetch('/.netlify/functions/santo');
+      const sd = await sr.json();
+      if(sd?.santo) santoHoje = sd.santo;
+    }catch(e){
+      console.log('Não foi possível buscar o santo:', e.message);
+    }
+  }
+
   setErr('');
   document.getElementById('cfg').style.display='none';
   document.getElementById('load').classList.add('on');
@@ -1073,18 +1098,29 @@ REGRAS OBRIGATÓRIAS para a citação bíblica (padrão CNBB):
 - Separe capítulo e versículo com VÍRGULA: Jo 3,16 (NÃO use dois pontos)
 - Intervalo de versículos com hífen: Jo 3,16-17
 - Vários versículos: Sl 23,1.3.5
-- Exemplo correto: Jo 10,10 — Exemplo ERRADO: João 3:16
 
 Retorne APENAS JSON: {"text":"versículo curto","ref":"Ab Cap,Ver","sig":"${sig}"}`,
 
-    mensagem:`Hoje é ${dFull}. Mensagem inspiradora católica de "${md.title}". ${tTxt}
-Máx 3 linhas simples. NÃO inicie com "${md.title}".
-Retorne APENAS JSON: {"text":"mensagem","ref":"","sig":"${sig}"}`,
+    mensagem:`Hoje é ${dFull}. Crie uma mensagem inspiradora católica de "${md.title}". ${tTxt}
+REGRAS OBRIGATÓRIAS:
+- Máx 3 linhas simples, diretas e acolhedoras
+- NÃO inicie com "${md.title}"
+- NÃO inclua versículo bíblico nem referência bíblica
+- Deve ser uma mensagem de encorajamento, esperança ou amor cristão
+- Linguagem simples, acessível para todos
 
-    santo:`Hoje é ${dFull}. Santo católico celebrado hoje. Mensagem de "${md.title}".
-Máx 3 linhas. NÃO inicie com "${md.title}".
-Se incluir citação bíblica use padrão CNBB com vírgula: Jo 10,10
-Retorne APENAS JSON: {"text":"mensagem sobre o santo","ref":"Santo do Dia: [Nome]","sig":"${sig}"}`,
+Retorne APENAS JSON: {"text":"mensagem inspiradora sem versículo","ref":"","sig":"${sig}"}`,
+
+    santo:`Hoje é ${dFull}. O santo católico celebrado hoje segundo o Vatican News e calendário da CNBB é: ${santoHoje||'[buscar no calendário litúrgico do dia '+dShort+']'}.
+Crie uma mensagem de "${md.title}" sobre este santo.
+REGRAS:
+- Máx 3 linhas
+- NÃO inicie com "${md.title}"
+- Mencione o nome do santo corretamente
+- Diga algo sobre sua vida ou virtude principal
+- Se não souber o santo exato, use o calendário litúrgico católico para ${dShort}
+
+Retorne APENAS JSON: {"text":"mensagem sobre o santo de hoje","ref":"Santo do Dia: [Nome Completo]","sig":"${sig}"}`,
 
     mariana:`Hoje é ${dFull}. Mensagem mariana de "${md.title}". ${tTxt}
 Máx 3 linhas. Tom devocional. NÃO inicie com "${md.title}".
