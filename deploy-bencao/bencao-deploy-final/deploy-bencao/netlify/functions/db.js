@@ -1,21 +1,35 @@
 // netlify/functions/db.js
-// Banco de dados centralizado usando Netlify Blobs
-// Todas as operações de usuários passam por aqui
+// Banco centralizado usando KV Store simples via fetch
+// Usa JSONBin.io (gratuito, sem instalação)
 
-const { getStore } = require('@netlify/blobs');
-
+const JSONBIN_KEY = process.env.JSONBIN_KEY;
+const JSONBIN_BIN_ID = process.env.JSONBIN_BIN_ID;
 const ADMIN_PASS = process.env.ADMIN_PASS || 'BencaoDia@2025!';
 
-function getUsuariosStore() {
-  return getStore({ name: 'usuarios', consistency: 'strong' });
+const BASE_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+async function lerDB() {
+  try {
+    const res = await fetch(`${BASE_URL}/latest`, {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    const data = await res.json();
+    return data.record || { usuarios: {}, codigos: {}, sessoes: {} };
+  } catch(e) {
+    return { usuarios: {}, codigos: {}, sessoes: {} };
+  }
 }
 
-function getCodigosStore() {
-  return getStore({ name: 'codigos', consistency: 'strong' });
+async function salvarDB(db) {
+  await fetch(BASE_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
+    body: JSON.stringify(db)
+  });
 }
 
-function getSessoesStore() {
-  return getStore({ name: 'sessoes', consistency: 'strong' });
+function btoa_node(str) {
+  return Buffer.from(str || '').toString('base64');
 }
 
 exports.handler = async (event) => {
@@ -31,135 +45,120 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body || '{}');
     const { acao, email, senha, plano, obs, sessaoId, codigo } = body;
 
-    const usuarios = getUsuariosStore();
-    const codigos = getCodigosStore();
-    const sessoes = getSessoesStore();
+    const db = await lerDB();
+    if (!db.usuarios) db.usuarios = {};
+    if (!db.codigos) db.codigos = {};
+    if (!db.sessoes) db.sessoes = {};
 
     // ── LOGIN ──
     if (acao === 'login') {
-      const raw = await usuarios.get(email, { type: 'json' }).catch(() => null);
-      if (!raw) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Usuário não encontrado' }) };
-      if (raw.plano === 'Bloqueado') return { statusCode: 403, headers, body: JSON.stringify({ error: 'Bloqueado', bloqueado: true }) };
-      if (raw.pendente) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Pendente', pendente: true }) };
-      if (raw.senha !== btoa_node(senha)) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Senha incorreta' }) };
+      const u = db.usuarios[email];
+      if (!u) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Usuário não encontrado' }) };
+      if (u.plano === 'Bloqueado') return { statusCode: 403, headers, body: JSON.stringify({ error: 'Bloqueado', bloqueado: true }) };
+      if (u.pendente) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Pendente', pendente: true }) };
+      if (u.senha !== btoa_node(senha)) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Senha incorreta' }) };
 
       // Verifica sessão ativa
-      const sessaoAtual = await sessoes.get(email, { type: 'json' }).catch(() => null);
-      if (sessaoAtual && sessaoAtual.sessaoId !== sessaoId) {
-        const diff = (Date.now() - (sessaoAtual.ts || 0)) / 1000;
-        if (diff < 86400) { // 24h
-          return { statusCode: 409, headers, body: JSON.stringify({ error: 'Sessão ativa', sessaoAtiva: true, device: sessaoAtual.device || 'outro dispositivo' }) };
+      const s = db.sessoes[email];
+      if (s && s.sessaoId !== sessaoId) {
+        const diff = (Date.now() - (s.ts || 0)) / 1000 / 60 / 60;
+        if (diff < 24) {
+          return { statusCode: 409, headers, body: JSON.stringify({ error: 'Sessão ativa', sessaoAtiva: true, device: s.device || 'outro dispositivo' }) };
         }
       }
 
-      // Salva nova sessão
       const sid = Math.random().toString(36).substr(2) + Date.now().toString(36);
-      await sessoes.set(email, JSON.stringify({ sessaoId: sid, ts: Date.now(), device: body.device || 'desconhecido' }));
+      db.sessoes[email] = { sessaoId: sid, ts: Date.now(), device: body.device || 'desconhecido' };
+      await salvarDB(db);
 
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, usuario: { ...raw, senha: undefined }, sessaoId: sid }) };
+      const { senha: _, ...usuarioSemSenha } = u;
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, usuario: usuarioSemSenha, sessaoId: sid }) };
     }
 
-    // ── CADASTRO — envia código ──
+    // ── CADASTRAR — gera código ──
     if (acao === 'cadastrar') {
-      const existente = await usuarios.get(email, { type: 'json' }).catch(() => null);
-      if (existente && !existente.pendente) return { statusCode: 409, headers, body: JSON.stringify({ error: 'E-mail já cadastrado' }) };
-
+      if (db.usuarios[email] && !db.usuarios[email].pendente) {
+        return { statusCode: 409, headers, body: JSON.stringify({ error: 'E-mail já cadastrado' }) };
+      }
       const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const ts = new Date().toISOString();
-      await codigos.set(`cadastro_${email}`, JSON.stringify({ code, expires: Date.now() + 15 * 60 * 1000, senha, ts }));
-
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, code_debug: process.env.NODE_ENV !== 'production' ? code : undefined }) };
+      db.codigos[`cad_${email}`] = { code, expires: Date.now() + 15 * 60 * 1000, senha };
+      await salvarDB(db);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
     // ── CONFIRMAR CÓDIGO ──
     if (acao === 'confirmar') {
-      const raw = await codigos.get(`cadastro_${email}`, { type: 'json' }).catch(() => null);
-      if (!raw) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código não encontrado. Solicite um novo.' }) };
-      if (Date.now() > raw.expires) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código expirado. Solicite um novo.' }) };
-      if (raw.code !== codigo) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código incorreto.' }) };
+      const c = db.codigos[`cad_${email}`];
+      if (!c) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código não encontrado. Solicite um novo.' }) };
+      if (Date.now() > c.expires) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código expirado. Solicite um novo.' }) };
+      if (c.code !== codigo) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código incorreto.' }) };
 
-      // Cria conta
       const ts = new Date().toISOString();
-      const usuario = { nome: email.split('@')[0], senha: raw.senha, plano: 'Trial', trialStart: ts, pendente: false, criadoEm: ts };
-      await usuarios.set(email, JSON.stringify(usuario));
-      await codigos.delete(`cadastro_${email}`).catch(() => {});
-
-      // Cria sessão
+      db.usuarios[email] = { nome: email.split('@')[0], senha: c.senha, plano: 'Trial', trialStart: ts, pendente: false, criadoEm: ts };
+      delete db.codigos[`cad_${email}`];
       const sid = Math.random().toString(36).substr(2) + Date.now().toString(36);
-      await sessoes.set(email, JSON.stringify({ sessaoId: sid, ts: Date.now(), device: body.device || 'desconhecido' }));
+      db.sessoes[email] = { sessaoId: sid, ts: Date.now(), device: body.device || 'desconhecido' };
+      await salvarDB(db);
 
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, usuario, sessaoId: sid }) };
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, usuario: db.usuarios[email], sessaoId: sid }) };
     }
 
     // ── VERIFICAR SESSÃO ──
     if (acao === 'verificar_sessao') {
-      const usuario = await usuarios.get(email, { type: 'json' }).catch(() => null);
-      if (!usuario) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Não encontrado' }) };
-      if (usuario.plano === 'Bloqueado') return { statusCode: 403, headers, body: JSON.stringify({ error: 'Bloqueado', bloqueado: true }) };
-
-      const sessaoAtual = await sessoes.get(email, { type: 'json' }).catch(() => null);
-      if (sessaoAtual && sessaoAtual.sessaoId !== sessaoId) {
+      const u = db.usuarios[email];
+      if (!u) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Não encontrado' }) };
+      if (u.plano === 'Bloqueado') return { statusCode: 403, headers, body: JSON.stringify({ error: 'Bloqueado', bloqueado: true }) };
+      const s = db.sessoes[email];
+      if (s && s.sessaoId !== sessaoId) {
         return { statusCode: 409, headers, body: JSON.stringify({ error: 'Sessão inválida', sessaoInvalida: true }) };
       }
-
-      // Atualiza timestamp
-      if (sessaoAtual) {
-        sessaoAtual.ts = Date.now();
-        await sessoes.set(email, JSON.stringify(sessaoAtual));
-      }
-
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, plano: usuario.plano }) };
+      if (s) { s.ts = Date.now(); await salvarDB(db); }
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, plano: u.plano }) };
     }
 
     // ── LOGOUT ──
     if (acao === 'logout') {
-      await sessoes.delete(email).catch(() => {});
+      delete db.sessoes[email];
+      await salvarDB(db);
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
-    // ── ADMIN: listar usuários ──
+    // ── ADMIN: listar ──
     if (acao === 'admin_listar') {
       if (body.adminPass !== ADMIN_PASS) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Não autorizado' }) };
-      const { blobs } = await usuarios.list();
-      const lista = [];
-      for (const blob of blobs) {
-        const u = await usuarios.get(blob.key, { type: 'json' }).catch(() => null);
-        if (u) lista.push({ email: blob.key, ...u, senha: undefined });
-      }
+      const lista = Object.entries(db.usuarios).map(([em, u]) => ({ email: em, ...u, senha: undefined }));
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, usuarios: lista }) };
     }
 
-    // ── ADMIN: atualizar usuário ──
+    // ── ADMIN: atualizar ──
     if (acao === 'admin_atualizar') {
       if (body.adminPass !== ADMIN_PASS) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Não autorizado' }) };
-      const u = await usuarios.get(email, { type: 'json' }).catch(() => null);
-      if (!u) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Usuário não encontrado' }) };
-      u.plano = plano || u.plano;
-      if (obs !== undefined) u.obs = obs;
-      await usuarios.set(email, JSON.stringify(u));
-      // Se bloqueou, encerra sessão
-      if (plano === 'Bloqueado') await sessoes.delete(email).catch(() => {});
+      if (!db.usuarios[email]) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Não encontrado' }) };
+      if (plano) db.usuarios[email].plano = plano;
+      if (obs !== undefined) db.usuarios[email].obs = obs;
+      if (plano === 'Bloqueado') delete db.sessoes[email];
+      await salvarDB(db);
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
-    // ── RECUPERAR SENHA — enviar código ──
+    // ── RECUPERAR SENHA — enviar ──
     if (acao === 'recuperar_enviar') {
-      const u = await usuarios.get(email, { type: 'json' }).catch(() => null);
-      if (!u) return { statusCode: 404, headers, body: JSON.stringify({ error: 'E-mail não cadastrado.' }) };
+      if (!db.usuarios[email]) return { statusCode: 404, headers, body: JSON.stringify({ error: 'E-mail não cadastrado.' }) };
       const code = Math.floor(100000 + Math.random() * 900000).toString();
-      await codigos.set(`recuperar_${email}`, JSON.stringify({ code, expires: Date.now() + 15 * 60 * 1000 }));
+      db.codigos[`rec_${email}`] = { code, expires: Date.now() + 15 * 60 * 1000 };
+      await salvarDB(db);
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, code }) };
     }
 
     // ── RECUPERAR SENHA — redefinir ──
     if (acao === 'recuperar_redefinir') {
-      const raw = await codigos.get(`recuperar_${email}`, { type: 'json' }).catch(() => null);
-      if (!raw) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código não encontrado.' }) };
-      if (Date.now() > raw.expires) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código expirado.' }) };
-      if (raw.code !== codigo) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código incorreto.' }) };
-      const u = await usuarios.get(email, { type: 'json' }).catch(() => null);
-      if (u) { u.senha = btoa_node(body.novaSenha); await usuarios.set(email, JSON.stringify(u)); }
-      await codigos.delete(`recuperar_${email}`).catch(() => {});
+      const c = db.codigos[`rec_${email}`];
+      if (!c) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código não encontrado.' }) };
+      if (Date.now() > c.expires) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código expirado.' }) };
+      if (c.code !== codigo) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código incorreto.' }) };
+      db.usuarios[email].senha = btoa_node(body.novaSenha);
+      delete db.codigos[`rec_${email}`];
+      await salvarDB(db);
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
@@ -170,7 +169,3 @@ exports.handler = async (event) => {
     return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
   }
 };
-
-function btoa_node(str) {
-  return Buffer.from(str || '').toString('base64');
-}
