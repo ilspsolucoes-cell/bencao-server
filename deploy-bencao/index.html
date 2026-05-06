@@ -290,6 +290,41 @@ select:focus,.iapp:focus{border-color:var(--primary)}
         </div>
         <button class="btn-p" id="btnE" onclick="loginEmail()">Entrar / Cadastrar</button>
         <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:10px;line-height:1.6">Primeira vez? Só digitar e-mail e criar uma senha.</p>
+        <div style="text-align:center;margin-top:10px">
+          <button onclick="showRecuperar()" style="background:none;border:none;color:var(--primary);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:underline">
+            Esqueci minha senha
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal recuperar senha -->
+      <div id="modalRecuperar" style="display:none;margin-top:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:20px">
+        <div style="font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--primary);margin-bottom:14px;text-align:center">🔑 Recuperar Senha</div>
+
+        <!-- Passo 1: informar contato -->
+        <div id="recStep1">
+          <p style="font-size:14px;color:var(--text3);margin-bottom:12px;text-align:center;line-height:1.5">Digite seu e-mail para receber o código de recuperação</p>
+          <input type="text" class="ifield" id="recContato" placeholder="Seu e-mail" style="margin-bottom:10px">
+          <button class="btn-p" onclick="enviarCodigo()" style="font-size:15px;padding:13px">Enviar código</button>
+        </div>
+
+        <!-- Passo 2: inserir código e nova senha -->
+        <div id="recStep2" style="display:none">
+          <p style="font-size:14px;color:var(--green);margin-bottom:12px;text-align:center;font-weight:700">✅ Código enviado!</p>
+          <input type="text" class="ifield" id="recCodigo" placeholder="Digite o código de 6 dígitos" style="margin-bottom:10px;letter-spacing:4px;text-align:center;font-size:18px;font-weight:800">
+          <div style="position:relative;margin-bottom:10px">
+            <input type="password" class="ifield" id="recNovaSenha" placeholder="Nova senha (mín. 4 caracteres)" style="padding-right:50px">
+            <button onclick="togglePassRec()" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);padding:0" id="eyeBtnRec">👁️</button>
+          </div>
+          <button class="btn-p" onclick="redefinirSenha()" style="font-size:15px;padding:13px">Redefinir senha</button>
+          <div style="text-align:center;margin-top:10px">
+            <button onclick="enviarCodigo()" style="background:none;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline">Reenviar código</button>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-top:12px">
+          <button onclick="hideRecuperar()" style="background:none;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:13px;cursor:pointer">← Voltar ao login</button>
+        </div>
       </div>
       <!-- Código de cortesia -->
       <div class="code-box">
@@ -613,6 +648,89 @@ document.addEventListener('click',e=>{
     });
   }
 })();
+
+// ════════════════════════════════════════
+// RECUPERAR SENHA
+// ════════════════════════════════════════
+function showRecuperar(){
+  document.getElementById('modalRecuperar').style.display='block';
+  document.getElementById('eform').style.display='none';
+}
+function hideRecuperar(){
+  document.getElementById('modalRecuperar').style.display='none';
+  document.getElementById('eform').style.display='block';
+  document.getElementById('recStep1').style.display='block';
+  document.getElementById('recStep2').style.display='none';
+  document.getElementById('recContato').value='';
+  document.getElementById('recCodigo').value='';
+  document.getElementById('recNovaSenha').value='';
+}
+function togglePassRec(){
+  const p=document.getElementById('recNovaSenha');
+  const btn=document.getElementById('eyeBtnRec');
+  p.type=p.type==='password'?'text':'password';
+  btn.textContent=p.type==='password'?'👁️':'🙈';
+}
+
+async function enviarCodigo(){
+  const contato=document.getElementById('recContato').value.trim();
+  if(!contato){toast('⚠️ Informe seu e-mail.');return;}
+
+  toast('⏳ Enviando código...');
+  try{
+    const res=await fetch('/.netlify/functions/recuperar',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'enviar',contato})
+    });
+    const data=await res.json();
+    if(data.success){
+      document.getElementById('recStep1').style.display='none';
+      document.getElementById('recStep2').style.display='block';
+      toast('✅ Código enviado!');
+      // Debug — remove em produção
+      if(data.code_debug) toast(`Código: ${data.code_debug}`);
+    } else {
+      toast('⚠️ '+(data.error||'Erro ao enviar.'));
+    }
+  }catch(e){
+    toast('⚠️ Erro ao enviar código.');
+  }
+}
+
+async function redefinirSenha(){
+  const contato=document.getElementById('recContato').value.trim();
+  const codigo=document.getElementById('recCodigo').value.trim();
+  const novaSenha=document.getElementById('recNovaSenha').value.trim();
+
+  if(!codigo){toast('⚠️ Digite o código.');return;}
+  if(!novaSenha||novaSenha.length<4){toast('⚠️ Senha deve ter mín. 4 caracteres.');return;}
+
+  try{
+    const res=await fetch('/.netlify/functions/recuperar',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'verificar',contato,codigo})
+    });
+    const data=await res.json();
+    if(data.success){
+      // Atualiza senha no localStorage
+      const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+      if(contas[contato]){
+        contas[contato].senha=btoa(novaSenha);
+        localStorage.setItem('bd_contas',JSON.stringify(contas));
+        toast('✅ Senha redefinida com sucesso!');
+        setTimeout(()=>hideRecuperar(),1500);
+      } else {
+        toast('⚠️ Conta não encontrada.');
+      }
+    } else {
+      toast('⚠️ '+(data.error||'Código incorreto.'));
+    }
+  }catch(e){
+    toast('⚠️ Erro ao redefinir senha.');
+  }
+}
 
 // ════════════════════════════════════════
 // TOGGLE SENHA

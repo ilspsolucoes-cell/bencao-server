@@ -1,13 +1,11 @@
 // netlify/functions/assinar.js
-// Cria o link de assinatura no Mercado Pago e redireciona o usuário
-
 const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN;
 const APP_URL = process.env.APP_URL || 'https://bencaododia.app.br';
 
 const PLANOS = {
-  basico:   { nome: 'Bênção do Dia — Básico',  valor: 29.00 },
-  pro:      { nome: 'Bênção do Dia — Pro',      valor: 49.00 },
-  paroquia: { nome: 'Bênção do Dia — Paróquia', valor: 99.00 },
+  fiel_mensal: { nome: 'Bênção do Dia — Fiel Mensal',    valor: 10.00, frequency: 1, frequency_type: 'months' },
+  fiel_anual:  { nome: 'Bênção do Dia — Fiel Anual',     valor: 99.00, frequency: 1, frequency_type: 'months' },
+  paroquia:    { nome: 'Bênção do Dia — Paróquia',        valor: 57.00, frequency: 1, frequency_type: 'months' },
 };
 
 exports.handler = async (event) => {
@@ -16,19 +14,16 @@ exports.handler = async (event) => {
     'Content-Type': 'application/json',
   };
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
 
   const plano = event.queryStringParameters?.plano;
   const email = event.queryStringParameters?.email;
 
+  console.log('Plano recebido:', plano);
+
   if (!plano || !PLANOS[plano]) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: 'Plano inválido' }),
-    };
+    console.log('Planos disponíveis:', Object.keys(PLANOS));
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Plano inválido', plano_recebido: plano, planos_validos: Object.keys(PLANOS) }) };
   }
 
   const p = PLANOS[plano];
@@ -37,16 +32,15 @@ exports.handler = async (event) => {
     const body = {
       reason: p.nome,
       auto_recurring: {
-        frequency: 1,
-        frequency_type: 'months',
+        frequency:          p.frequency,
+        frequency_type:     p.frequency_type,
         transaction_amount: p.valor,
-        currency_id: 'BRL',
+        currency_id:        'BRL',
       },
       back_url: `${APP_URL}?plano=${plano}&status=aprovado`,
       status: 'pending',
     };
 
-    // Adiciona email do pagador se disponível
     if (email) body.payer_email = decodeURIComponent(email);
 
     const res = await fetch('https://api.mercadopago.com/preapproval', {
@@ -69,7 +63,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // Retorna erro detalhado para debug
     return {
       statusCode: 400,
       headers,
@@ -78,10 +71,6 @@ exports.handler = async (event) => {
 
   } catch (e) {
     console.error('Erro:', e.message);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: e.message }),
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
   }
 };

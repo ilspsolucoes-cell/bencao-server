@@ -28,12 +28,34 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 400,
-        messages: body.messages,
+        max_tokens: 500,
+        messages: body.messages || [],
       }),
     });
 
-    const data = await res.json();
+    const text = await res.text();
+
+    // Tenta fazer parse do JSON
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch(e) {
+      console.error('Erro ao fazer parse da resposta:', text.substring(0, 200));
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'Resposta inválida da API', detail: text.substring(0, 200) }),
+      };
+    }
+
+    if (!res.ok) {
+      return {
+        statusCode: res.status,
+        headers,
+        body: JSON.stringify({ error: data?.error?.message || `HTTP ${res.status}` }),
+      };
+    }
+
     return {
       statusCode: 200,
       headers,
@@ -49,3 +71,4 @@ exports.handler = async (event) => {
     };
   }
 };
+
