@@ -254,6 +254,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
   <div class="tright">
     <div class="pbadge" id="pbadge">Grátis</div>
     <div class="ibtn" onclick="toggleTP()" title="Temas">🎨</div>
+    <div class="ibtn" onclick="sairApp()" title="Sair" style="font-size:15px">🚪</div>
     <div class="avbtn" id="avbtn" onclick="goAdmin()">?</div>
   </div>
 </div>
@@ -294,6 +295,22 @@ select:focus,.iapp:focus{border-color:var(--primary)}
           <button onclick="showRecuperar()" style="background:none;border:none;color:var(--primary);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:underline">
             Esqueci minha senha
           </button>
+        </div>
+      </div>
+
+      <!-- Verificação de novo cadastro -->
+      <div id="verifyBox" style="display:none;margin-top:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:20px">
+        <div style="text-align:center;margin-bottom:14px">
+          <div style="font-size:32px">📧</div>
+          <div style="font-size:15px;font-weight:800;color:var(--primary);margin-top:6px">Verifique seu e-mail</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:6px;line-height:1.5">Enviamos um código de 6 dígitos para<br><strong style="color:var(--text2)" id="verifyEmailShow"></strong></div>
+        </div>
+        <input type="text" class="ifield" id="verifyCode" placeholder="Digite o código" style="text-align:center;letter-spacing:6px;font-size:22px;font-weight:800;margin-bottom:12px">
+        <button class="btn-p" onclick="confirmarCodigo()">✅ Confirmar cadastro</button>
+        <div style="text-align:center;margin-top:12px">
+          <button onclick="reenviarCodigo()" style="background:none;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline">Reenviar código</button>
+          &nbsp;·&nbsp;
+          <button onclick="cancelarVerificacao()" style="background:none;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline">Cancelar</button>
         </div>
       </div>
 
@@ -653,7 +670,11 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       <h2>⚙️ Dashboard Admin</h2>
       <p id="dashDate"></p>
     </div>
-    <button class="btn-back" onclick="goScreen('sApp')" style="width:auto;padding:10px 20px">← Voltar ao App</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="loadAdmin()" style="padding:10px 16px;border-radius:10px;background:var(--border);border:1px solid var(--border2);color:var(--primary);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer">🔄 Atualizar</button>
+      <button class="btn-back" onclick="goScreen('sApp')" style="width:auto;padding:10px 16px">← App</button>
+      <button onclick="sairApp()" style="padding:10px 16px;border-radius:10px;background:rgba(180,40,40,.15);border:1px solid rgba(180,40,40,.3);color:#e8a0a0;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer">🚪 Sair</button>
+    </div>
   </div>
 
   <!-- KPIs -->
@@ -959,56 +980,207 @@ function toggleEF(){
   document.getElementById('btnE').textContent='Entrar / Cadastrar';
 }
 
-function loginEmail(){
+// ════════════════════════════════════════
+// SESSÃO ÚNICA — verifica a cada 30s
+// ════════════════════════════════════════
+let sessaoId='';
+let sessaoInterval=null;
+
+function gerarSessaoId(){
+  return Date.now().toString(36)+Math.random().toString(36).substr(2,8);
+}
+
+function iniciarSessao(email){
+  sessaoId=gerarSessaoId();
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  if(contas[email]){
+    contas[email].sessaoAtiva=sessaoId;
+    contas[email].sessaoTs=Date.now();
+    localStorage.setItem('bd_contas',JSON.stringify(contas));
+  }
+  // Verifica sessão a cada 30 segundos
+  if(sessaoInterval) clearInterval(sessaoInterval);
+  sessaoInterval=setInterval(()=>verificarSessao(email),30000);
+}
+
+function verificarSessao(email){
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  const c=contas[email];
+  if(!c) return;
+  // Verifica se foi bloqueado
+  if(c.plano==='Bloqueado'){
+    clearInterval(sessaoInterval);
+    sairForcado('🚫 Seu acesso foi bloqueado pelo administrador.');
+    return;
+  }
+  // Verifica sessão duplicada
+  if(c.sessaoAtiva && c.sessaoAtiva!==sessaoId){
+    clearInterval(sessaoInterval);
+    sairForcado('⚠️ Sua conta foi acessada em outro dispositivo. Por segurança, você foi desconectado.');
+    return;
+  }
+  // Atualiza timestamp da sessão
+  contas[email].sessaoTs=Date.now();
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+}
+
+function sairForcado(msg){
+  encerrarSessao();
+  alert(msg);
+  location.reload();
+}
+
+function encerrarSessao(){
+  if(sessaoInterval) clearInterval(sessaoInterval);
+  sessaoInterval=null;
+  if(curUser.email && curUser.plan!=='Admin'){
+    const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+    if(contas[curUser.email]&&contas[curUser.email].sessaoAtiva===sessaoId){
+      delete contas[curUser.email].sessaoAtiva;
+      localStorage.setItem('bd_contas',JSON.stringify(contas));
+    }
+  }
+}
+
+function sairApp(){
+  if(!confirm('Deseja sair do aplicativo?')) return;
+  encerrarSessao();
+  curUser={name:'',email:'',plan:'',trialStart:null,cardsToday:0};
+  sessaoId='';
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('ei').value='';
+  document.getElementById('pi').value='';
+  goScreen('sLogin');
+  toast('✦ Você saiu com segurança.');
+}
+
+// ════════════════════════════════════════
+// VERIFICAÇÃO DE EMAIL — novo cadastro
+// ════════════════════════════════════════
+let pendingEmail='', pendingPass='', pendingCode='';
+
+async function enviarCodigoVerificacao(email){
+  const code=Math.floor(100000+Math.random()*900000).toString();
+  pendingCode=code;
+  try{
+    const res=await fetch('/.netlify/functions/recuperar',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'enviar',contato:email,assunto:'Verificação de cadastro',mensagem:`Seu código de verificação para o Bênção do Dia é: ${code}`})
+    });
+    const data=await res.json();
+    console.log('Código enviado:', code);
+    return data.success;
+  }catch(e){
+    console.error('Erro ao enviar código:', e);
+    return false;
+  }
+}
+
+async function confirmarCodigo(){
+  const digitado=document.getElementById('verifyCode').value.trim();
+  if(!digitado){toast('⚠️ Digite o código.');return;}
+  if(digitado!==pendingCode){toast('❌ Código incorreto. Tente novamente.');return;}
+
+  // Código correto — finaliza cadastro
+  const ts=new Date().toISOString();
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  contas[pendingEmail]={
+    nome:pendingEmail.split('@')[0],
+    senha:btoa(pendingPass),
+    plano:'Trial',
+    trialStart:ts,
+    verificado:true,
+    cadastroEm:ts
+  };
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+
+  curUser.name=contas[pendingEmail].nome;
+  curUser.email=pendingEmail;
+  curUser.plan='Trial';
+  curUser.trialStart=ts;
+
+  document.getElementById('verifyBox').style.display='none';
+  document.getElementById('eform').style.display='block';
+
+  toast('✅ E-mail verificado! Bem-vindo!');
+  iniciarSessao(pendingEmail);
+  afterLogin(false);
+}
+
+async function reenviarCodigo(){
+  toast('⏳ Reenviando código...');
+  const ok=await enviarCodigoVerificacao(pendingEmail);
+  toast(ok?'✅ Novo código enviado!':'⚠️ Erro ao reenviar. Tente novamente.');
+}
+
+function cancelarVerificacao(){
+  pendingEmail='';pendingPass='';pendingCode='';
+  document.getElementById('verifyBox').style.display='none';
+  document.getElementById('eform').style.display='block';
+  document.getElementById('verifyCode').value='';
+}
+
+// ════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════
+async function loginEmail(){
   const eEl=document.getElementById('ei');
   const pEl=document.getElementById('pi');
   const e=eEl.value.trim(), p=pEl.value.trim();
-  const isRO=eEl.hasAttribute('readonly');
 
-  // Verifica senha admin
-  if(!isRO && p === ADMIN_PASS){
-    curUser={name:'Admin',email:e,plan:'Admin',trialStart:null,cardsToday:0};
+  // Admin
+  if(p===ADMIN_PASS){
+    curUser={name:'Admin',email:e||'admin',plan:'Admin',trialStart:null,cardsToday:0};
     afterLogin(true);
     return;
   }
 
   if(!e){toast('⚠️ Informe seu e-mail.');eEl.focus();return;}
-  if(!isRO&&!p){toast('⚠️ Informe sua senha.');pEl.focus();return;}
+  if(!p){toast('⚠️ Informe sua senha.');pEl.focus();return;}
 
   const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
 
-  if(!isRO){
-    if(contas[e]){
-      if(contas[e].senha!==btoa(p)){toast('⚠️ Senha incorreta.');pEl.value='';pEl.focus();return;}
-      curUser.name=contas[e].nome;
-      curUser.plan=contas[e].plano||'';
-      curUser.trialStart=contas[e].trialStart||null;
-    } else {
-      // Novo usuário — inicia trial
-      const ts=new Date().toISOString();
-      contas[e]={nome:e.split('@')[0],senha:btoa(p),plano:'Trial',trialStart:ts};
-      localStorage.setItem('bd_contas',JSON.stringify(contas));
-      curUser.name=contas[e].nome;
-      curUser.plan='Trial';
-      curUser.trialStart=ts;
-      toast('✦ Bem-vindo! Seus 3 dias grátis começaram!');
+  if(contas[e]){
+    // Usuário existe — verifica bloqueio
+    if(contas[e].plano==='Bloqueado'){
+      toast('🚫 Seu acesso está bloqueado. Entre em contato com o suporte.');
+      return;
     }
+    // Verifica senha
+    if(contas[e].senha!==btoa(p)){
+      toast('⚠️ Senha incorreta.');pEl.value='';pEl.focus();return;
+    }
+    // Verifica sessão ativa em outro dispositivo
+    if(contas[e].sessaoAtiva&&contas[e].sessaoTs){
+      const diff=(Date.now()-contas[e].sessaoTs)/1000;
+      if(diff<60){ // Sessão ativa há menos de 60 segundos
+        toast('⚠️ Esta conta já está conectada em outro dispositivo.');
+        return;
+      }
+    }
+    curUser.name=contas[e].nome;
+    curUser.email=e;
+    curUser.plan=contas[e].plano||'Trial';
+    curUser.trialStart=contas[e].trialStart||null;
+    iniciarSessao(e);
+    afterLogin(false);
   } else {
-    if(!contas[e]){
-      const ts=new Date().toISOString();
-      contas[e]={nome:curUser.name,senha:'',plano:'Trial',trialStart:ts};
-      localStorage.setItem('bd_contas',JSON.stringify(contas));
-      curUser.plan='Trial';
-      curUser.trialStart=ts;
+    // Novo usuário — envia código de verificação
+    pendingEmail=e;
+    pendingPass=p;
+    toast('⏳ Enviando código de verificação...');
+    const ok=await enviarCodigoVerificacao(e);
+    document.getElementById('eform').style.display='none';
+    document.getElementById('verifyBox').style.display='block';
+    document.getElementById('verifyEmailShow').textContent=e;
+    document.getElementById('verifyCode').value='';
+    if(ok){
+      toast('📧 Código enviado para seu e-mail!');
     } else {
-      curUser.name=contas[e].nome;
-      curUser.plan=contas[e].plano||'Trial';
-      curUser.trialStart=contas[e].trialStart||null;
+      toast('⚠️ Não foi possível enviar o e-mail. Verifique o endereço.');
     }
   }
-
-  curUser.email=e;
-  afterLogin(false);
 }
 
 function afterLogin(isAdmin){
@@ -1023,14 +1195,19 @@ function afterLogin(isAdmin){
     return;
   }
 
-  const trialStatus=checkTrial();
+  // Verifica bloqueio
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  if(contas[curUser.email]?.plano==='Bloqueado'){
+    toast('🚫 Acesso bloqueado.');
+    document.getElementById('topbar').style.display='none';
+    return;
+  }
 
-  if(curUser.plan==='Paróquia'||curUser.plan==='Fiel'){
-    updateBadge(curUser.plan);
-    goScreen('sApp');
-    updateAppUI();
-  } else if(curUser.plan==='Cortesia'){
-    updateBadge('Cortesia 🎁');
+  const trialStatus=checkTrial();
+  const plano=curUser.plan;
+
+  if(['Paróquia','Fiel Mensal','Fiel Anual','Fiel','Cortesia'].includes(plano)){
+    updateBadge(plano);
     goScreen('sApp');
     updateAppUI();
   } else if(trialStatus==='active'){
@@ -1038,9 +1215,8 @@ function afterLogin(isAdmin){
     goScreen('sApp');
     updateAppUI();
   } else if(trialStatus==='expired'){
-    // Trial expirado — redireciona automaticamente para planos
     updateBadge('Trial Expirado');
-    toast('⏰ Seu período de teste expirou. Escolha um plano para continuar!');
+    toast('⏰ Seu período de teste expirou. Escolha um plano!');
     setTimeout(()=>goScreen('sPlanos'),1500);
   } else {
     goScreen('sPlanos');
