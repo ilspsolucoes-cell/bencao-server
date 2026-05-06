@@ -554,45 +554,227 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 
 <!-- ══ ADMIN ══ -->
 <div id="sAdmin" class="screen">
-  <div class="admin-head">
-    <h2>⚙️ Painel Admin</h2>
-    <p>Gerenciamento do Bênção do Dia</p>
+<style>
+/* Dashboard styles */
+.dash-wrap{max-width:900px;margin:0 auto;padding:16px 16px 60px}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.dash-header h2{font-family:'Dancing Script',cursive;font-size:clamp(22px,6vw,30px);color:var(--primary);font-weight:700}
+.dash-header p{font-size:13px;color:var(--text3);margin-top:2px}
+
+/* KPI cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--primary)}
+.kpi.green::before{background:var(--green)}
+.kpi.blue::before{background:#4a9eed}
+.kpi.purple::before{background:#9c6fd6}
+.kpi-val{font-size:clamp(24px,6vw,36px);font-weight:800;color:var(--primary);line-height:1}
+.kpi.green .kpi-val{color:var(--green)}
+.kpi.blue .kpi-val{color:#4a9eed}
+.kpi.purple .kpi-val{color:#9c6fd6}
+.kpi-lbl{font-size:12px;color:var(--text3);margin-top:6px;font-weight:600;letter-spacing:.5px}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:3px;opacity:.7}
+
+/* Receita */
+.receita-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+.receita-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px}
+.receita-icon{font-size:24px;flex-shrink:0}
+.receita-info .val{font-size:18px;font-weight:800;color:var(--primary)}
+.receita-info .lbl{font-size:12px;color:var(--text3);font-weight:600;margin-top:2px}
+
+/* Tabs */
+.dash-tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
+.dash-tab{padding:9px 18px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:all .2s}
+.dash-tab.on{background:var(--primary);color:var(--bg);border-color:var(--primary)}
+
+/* Filtros */
+.filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .2s}
+.filter-btn.on{border-color:var(--primary);color:var(--primary);background:var(--border)}
+
+/* Tabela usuários */
+.user-table{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.user-table-head{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:10px 14px;background:var(--border);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.user-row{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:12px 14px;border-top:1px solid var(--border);align-items:center;transition:background .2s}
+.user-row:hover{background:var(--border)}
+.user-email-cell{font-size:14px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.user-email-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.plan-tag{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;white-space:nowrap}
+.plan-tag.trial{background:rgba(37,211,102,.12);color:var(--green)}
+.plan-tag.fiel{background:rgba(201,168,76,.15);color:var(--primary)}
+.plan-tag.paroquia{background:rgba(156,111,214,.15);color:#9c6fd6}
+.plan-tag.gratis{background:var(--border);color:var(--text3)}
+.plan-tag.bloqueado{background:rgba(180,40,40,.15);color:#e8a0a0}
+.plan-tag.cortesia{background:rgba(74,158,237,.12);color:#4a9eed}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.active{background:var(--green)}
+.status-dot.inactive{background:#e8a0a0}
+.status-dot.trial{background:var(--primary)}
+
+/* Ações usuário */
+.user-actions{display:flex;gap:6px;flex-shrink:0}
+.ua-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;border:none;-webkit-tap-highlight-color:transparent;transition:all .2s}
+.ua-btn.enable{background:rgba(37,211,102,.15);color:var(--green)}
+.ua-btn.block{background:rgba(180,40,40,.12);color:#e8a0a0}
+.ua-btn.plan{background:var(--border);color:var(--primary)}
+
+/* Modal editar usuário */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.on{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:400px;animation:fadeUp .3s ease both}
+.modal-box h3{font-size:16px;font-weight:800;color:var(--primary);margin-bottom:16px}
+.modal-field{margin-bottom:14px}
+.modal-field label{display:block;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.modal-row{display:flex;gap:10px;margin-top:16px}
+.modal-btn{flex:1;padding:12px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;border:none;-webkit-tap-highlight-color:transparent}
+.modal-btn.save{background:linear-gradient(135deg,var(--accent),var(--primary));color:var(--bg)}
+.modal-btn.cancel{background:var(--bg3);border:1px solid var(--border);color:var(--text3)}
+.modal-btn.danger{background:rgba(180,40,40,.2);color:#e8a0a0;border:1px solid rgba(180,40,40,.3)}
+
+/* Códigos dashboard */
+.code-dash-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+
+/* Busca */
+.search-box{position:relative;margin-bottom:14px}
+.search-box input{width:100%;padding:11px 14px 11px 38px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-family:'Nunito',sans-serif;font-size:15px;outline:none;-webkit-appearance:none}
+.search-box input:focus{border-color:var(--primary)}
+.search-box::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px}
+
+@media(min-width:480px){
+  .kpi-grid{grid-template-columns:repeat(4,1fr)}
+  .receita-grid{grid-template-columns:repeat(4,1fr)}
+  .dash-wrap{padding:24px 24px 72px}
+}
+</style>
+
+<div class="dash-wrap">
+  <div class="dash-header">
+    <div>
+      <h2>⚙️ Dashboard Admin</h2>
+      <p id="dashDate"></p>
+    </div>
+    <button class="btn-back" onclick="goScreen('sApp')" style="width:auto;padding:10px 20px">← Voltar ao App</button>
   </div>
 
-  <!-- Gerar códigos -->
-  <div class="admin-sect">
-    <h3>🎟️ Gerar Códigos de Cortesia</h3>
-    <div class="code-gen-row">
-      <select id="codeDays">
-        <option value="30">30 dias</option>
-        <option value="60">60 dias</option>
-        <option value="90">90 dias</option>
-        <option value="180">6 meses</option>
-        <option value="365">1 ano</option>
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi"><div class="kpi-val" id="kpiTotal">0</div><div class="kpi-lbl">Total de usuários</div></div>
+    <div class="kpi green"><div class="kpi-val" id="kpiAtivos">0</div><div class="kpi-lbl">Assinantes ativos</div></div>
+    <div class="kpi blue"><div class="kpi-val" id="kpiTrial">0</div><div class="kpi-lbl">Em trial</div></div>
+    <div class="kpi purple"><div class="kpi-val" id="kpiBloqueados">0</div><div class="kpi-lbl">Bloqueados</div></div>
+  </div>
+
+  <!-- Receita estimada -->
+  <div class="receita-grid" id="receitaGrid">
+    <div class="receita-item"><span class="receita-icon">💚</span><div class="receita-info"><div class="val" id="recFielM">R$0</div><div class="lbl">Fiel Mensal</div></div></div>
+    <div class="receita-item"><span class="receita-icon">⭐</span><div class="receita-info"><div class="val" id="recFielA">R$0</div><div class="lbl">Fiel Anual</div></div></div>
+    <div class="receita-item"><span class="receita-icon">⛪</span><div class="receita-info"><div class="val" id="recParoquia">R$0</div><div class="lbl">Paróquia</div></div></div>
+    <div class="receita-item"><span class="receita-icon">💰</span><div class="receita-info"><div class="val" id="recTotal">R$0</div><div class="lbl">Total/mês</div></div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="dash-tabs">
+    <button class="dash-tab on" onclick="showTab('tabUsuarios',this)">👥 Usuários</button>
+    <button class="dash-tab" onclick="showTab('tabCodigos',this)">🎟️ Códigos</button>
+    <button class="dash-tab" onclick="showTab('tabGraficos',this)">📊 Distribuição</button>
+  </div>
+
+  <!-- Tab Usuários -->
+  <div id="tabUsuarios">
+    <div class="search-box">
+      <input type="text" id="searchUser" placeholder="Buscar por e-mail..." oninput="filtrarUsuarios()">
+    </div>
+    <div class="filter-row" id="filterRow">
+      <button class="filter-btn on" onclick="setFiltro('todos',this)">Todos</button>
+      <button class="filter-btn" onclick="setFiltro('Trial',this)">Trial</button>
+      <button class="filter-btn" onclick="setFiltro('Fiel Mensal',this)">Fiel Mensal</button>
+      <button class="filter-btn" onclick="setFiltro('Fiel Anual',this)">Fiel Anual</button>
+      <button class="filter-btn" onclick="setFiltro('Paróquia',this)">Paróquia</button>
+      <button class="filter-btn" onclick="setFiltro('Bloqueado',this)">Bloqueados</button>
+    </div>
+    <div class="user-table">
+      <div class="user-table-head">
+        <div>Usuário</div>
+        <div>Plano</div>
+        <div>Status</div>
+        <div>Ações</div>
+      </div>
+      <div id="userTableBody"></div>
+    </div>
+  </div>
+
+  <!-- Tab Códigos -->
+  <div id="tabCodigos" style="display:none">
+    <div class="admin-sect">
+      <h3>🎟️ Gerar Novo Código</h3>
+      <div class="code-dash-row">
+        <select id="codeDays" style="flex:1">
+          <option value="30">30 dias</option>
+          <option value="60">60 dias</option>
+          <option value="90">90 dias</option>
+          <option value="180">6 meses</option>
+          <option value="365">1 ano</option>
+        </select>
+        <select id="codeUsos" style="flex:1">
+          <option value="1">Uso único</option>
+          <option value="5">5 usos</option>
+          <option value="10">10 usos</option>
+          <option value="999">Ilimitado</option>
+        </select>
+        <button class="btn-gen-code" onclick="genCode()">✦ Gerar</button>
+      </div>
+      <div class="code-list" id="codeList">
+        <p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum código gerado ainda.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Gráficos -->
+  <div id="tabGraficos" style="display:none">
+    <div class="admin-sect">
+      <h3>📊 Distribuição por Plano</h3>
+      <div id="chartPlanos" style="padding:8px 0"></div>
+    </div>
+    <div class="admin-sect">
+      <h3>📅 Cadastros por período</h3>
+      <div id="chartCadastros" style="padding:8px 0"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal editar usuário -->
+<div class="modal-overlay" id="modalUser">
+  <div class="modal-box">
+    <h3>✏️ Editar Usuário</h3>
+    <div class="modal-field">
+      <label>E-mail</label>
+      <div style="font-size:14px;color:var(--text2);padding:10px;background:var(--bg3);border-radius:8px;word-break:break-all" id="modalEmail"></div>
+    </div>
+    <div class="modal-field">
+      <label>Plano</label>
+      <select id="modalPlano" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-family:'Nunito',sans-serif;font-size:15px;padding:11px 14px;outline:none;-webkit-appearance:none">
+        <option value="Trial">Trial (3 dias grátis)</option>
+        <option value="Fiel Mensal">Fiel Mensal — R$10/mês</option>
+        <option value="Fiel Anual">Fiel Anual — R$99/ano</option>
+        <option value="Paróquia">Paróquia — R$57/mês</option>
+        <option value="Cortesia">Cortesia</option>
+        <option value="Bloqueado">Bloqueado</option>
       </select>
-      <button class="btn-gen-code" onclick="genCode()">✦ Gerar Código</button>
     </div>
-    <div class="code-list" id="codeList">
-      <p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum código gerado ainda.</p>
+    <div class="modal-field">
+      <label>Observação</label>
+      <input type="text" id="modalObs" placeholder="Ex: pagamento confirmado, inadimplente..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-family:'Nunito',sans-serif;font-size:15px;padding:11px 14px;outline:none;-webkit-appearance:none">
     </div>
-  </div>
-
-  <!-- Usuários -->
-  <div class="admin-sect">
-    <h3>👥 Usuários Cadastrados</h3>
-    <div id="userList">
-      <p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Carregando...</p>
+    <div class="modal-row">
+      <button class="modal-btn cancel" onclick="closeModalUser()">Cancelar</button>
+      <button class="modal-btn save" onclick="salvarUsuario()">✅ Salvar</button>
     </div>
-  </div>
-
-  <!-- Stats -->
-  <div class="admin-sect">
-    <h3>📊 Estatísticas</h3>
-    <div id="stats" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="modal-row" style="margin-top:8px">
+      <button class="modal-btn danger" onclick="bloquearUsuario()" style="width:100%">🚫 Bloquear acesso</button>
     </div>
   </div>
-
-  <button class="btn-back" onclick="goScreen('sApp')">← Voltar ao App</button>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1017,117 +1199,172 @@ function goAdmin(){
 }
 
 // ════════════════════════════════════════
-// ADMIN — Gerar códigos
+// DASHBOARD ADMIN
 // ════════════════════════════════════════
+let filtroAtual='todos', editandoEmail='';
+
+function showTab(id,btn){
+  ['tabUsuarios','tabCodigos','tabGraficos'].forEach(t=>{document.getElementById(t).style.display=t===id?'block':'none';});
+  document.querySelectorAll('.dash-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function setFiltro(f,btn){
+  filtroAtual=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderUserTable();
+}
+function filtrarUsuarios(){renderUserTable();}
+function getContas(){return JSON.parse(localStorage.getItem('bd_contas')||'{}');}
+function getPlanClass(p){if(!p||p==='Trial')return 'trial';if(p==='Bloqueado')return 'bloqueado';if(p==='Cortesia')return 'cortesia';if(p==='Paróquia')return 'paroquia';return 'fiel';}
+function getTrialInfo(c){if(!c.trialStart)return{status:'none',dias:0};const diff=TRIAL_DAYS-((new Date()-new Date(c.trialStart))/(1000*60*60*24));return diff>0?{status:'active',dias:Math.ceil(diff)}:{status:'expired',dias:0};}
+
+function loadAdmin(){
+  document.getElementById('dashDate').textContent=`Atualizado em ${new Date().toLocaleString('pt-BR')}`;
+  renderKPIs();
+  renderUserTable();
+  renderCodes();
+  renderCharts();
+}
+
+function renderKPIs(){
+  const entries=Object.values(getContas());
+  const total=entries.length;
+  const ativos=entries.filter(c=>['Fiel Mensal','Fiel Anual','Paróquia','Cortesia'].includes(c.plano)).length;
+  const trial=entries.filter(c=>(!c.plano||c.plano==='Trial')&&getTrialInfo(c).status==='active').length;
+  const bloqueados=entries.filter(c=>c.plano==='Bloqueado').length;
+  document.getElementById('kpiTotal').textContent=total;
+  document.getElementById('kpiAtivos').textContent=ativos;
+  document.getElementById('kpiTrial').textContent=trial;
+  document.getElementById('kpiBloqueados').textContent=bloqueados;
+  const fielM=entries.filter(c=>c.plano==='Fiel Mensal').length;
+  const fielA=entries.filter(c=>c.plano==='Fiel Anual').length;
+  const par=entries.filter(c=>c.plano==='Paróquia').length;
+  const rFM=fielM*10, rFA=fielA*(99/12), rP=par*57, rT=rFM+rFA+rP;
+  document.getElementById('recFielM').textContent=`R$${rFM.toFixed(0)}`;
+  document.getElementById('recFielA').textContent=`R$${rFA.toFixed(0)}`;
+  document.getElementById('recParoquia').textContent=`R$${rP.toFixed(0)}`;
+  document.getElementById('recTotal').textContent=`R$${rT.toFixed(0)}`;
+}
+
+function renderUserTable(){
+  const contas=getContas();
+  const busca=document.getElementById('searchUser')?.value?.toLowerCase()||'';
+  let entries=Object.entries(contas);
+  if(filtroAtual!=='todos') entries=entries.filter(([,c])=>(c.plano||'Trial')===filtroAtual);
+  if(busca) entries=entries.filter(([email])=>email.toLowerCase().includes(busca));
+  const body=document.getElementById('userTableBody');
+  if(!entries.length){body.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:14px">Nenhum usuário encontrado.</div>';return;}
+  body.innerHTML=entries.map(([email,c])=>{
+    const plano=c.plano||'Trial';
+    const ti=getTrialInfo(c);
+    let prazoTxt='', isActive=false;
+    if(plano==='Trial'){if(ti.status==='active'){prazoTxt=`⏳ ${ti.dias}d restantes`;isActive=true;}else{prazoTxt='❌ Expirado';}}
+    else if(plano==='Bloqueado'){prazoTxt='🚫 Bloqueado';}
+    else if(plano==='Cortesia'){prazoTxt='🎁 Cortesia';isActive=true;}
+    else{prazoTxt='✅ Ativo';isActive=true;}
+    return `<div class="user-row">
+      <div style="min-width:0"><div class="user-email-cell">${email}</div><div class="user-email-sub">${prazoTxt}${c.obs?` · ${c.obs}`:''}</div></div>
+      <span class="plan-tag ${getPlanClass(plano)}">${plano}</span>
+      <div class="status-dot ${isActive?'active':'inactive'}"></div>
+      <div class="user-actions">
+        <button class="ua-btn plan" onclick="editarUsuario('${email}')">✏️</button>
+        ${isActive&&plano!=='Bloqueado'?`<button class="ua-btn block" onclick="bloquearRapido('${email}')">🚫</button>`:`<button class="ua-btn enable" onclick="habilitarRapido('${email}')">✅</button>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function editarUsuario(email){
+  editandoEmail=email;
+  const c=getContas()[email]||{};
+  document.getElementById('modalEmail').textContent=email;
+  document.getElementById('modalPlano').value=c.plano||'Trial';
+  document.getElementById('modalObs').value=c.obs||'';
+  document.getElementById('modalUser').classList.add('on');
+}
+function closeModalUser(){document.getElementById('modalUser').classList.remove('on');editandoEmail='';}
+function salvarUsuario(){
+  const contas=getContas();
+  if(!contas[editandoEmail])contas[editandoEmail]={};
+  contas[editandoEmail].plano=document.getElementById('modalPlano').value;
+  contas[editandoEmail].obs=document.getElementById('modalObs').value;
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+  closeModalUser();loadAdmin();toast('✅ Usuário atualizado!');
+}
+function bloquearUsuario(){
+  const contas=getContas();
+  if(contas[editandoEmail])contas[editandoEmail].plano='Bloqueado';
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+  closeModalUser();loadAdmin();toast('🚫 Usuário bloqueado.');
+}
+function bloquearRapido(email){
+  const contas=getContas();
+  if(contas[email])contas[email].plano='Bloqueado';
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+  loadAdmin();toast('🚫 Acesso bloqueado.');
+}
+function habilitarRapido(email){
+  const contas=getContas();
+  if(contas[email]){contas[email].plano='Trial';contas[email].trialStart=new Date().toISOString();}
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+  loadAdmin();toast('✅ Acesso habilitado.');
+}
+
+function renderCharts(){
+  const entries=Object.values(getContas());
+  const total=entries.length||1;
+  const counts={'Trial':0,'Fiel Mensal':0,'Fiel Anual':0,'Paróquia':0,'Cortesia':0,'Bloqueado':0};
+  entries.forEach(c=>{const p=c.plano||'Trial';if(counts[p]!==undefined)counts[p]++;});
+  const colors={'Trial':'#c9a84c','Fiel Mensal':'#25d366','Fiel Anual':'#4a9eed','Paróquia':'#9c6fd6','Cortesia':'#64b5f6','Bloqueado':'#e8a0a0'};
+  document.getElementById('chartPlanos').innerHTML=Object.entries(counts).map(([nome,qtd])=>{
+    const pct=Math.round((qtd/total)*100);
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:5px">
+        <span style="color:var(--text2)">${nome}</span>
+        <span style="color:${colors[nome]}">${qtd} (${pct}%)</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;height:10px;overflow:hidden">
+        <div style="background:${colors[nome]};width:${pct}%;height:100%;border-radius:6px"></div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('chartCadastros').innerHTML=`<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Total de cadastros: <strong style="color:var(--primary)">${entries.length}</strong></p>`;
+}
+
 function genCode(){
   const days=parseInt(document.getElementById('codeDays').value);
+  const usos=parseInt(document.getElementById('codeUsos').value);
   const code='BENCAO-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-'+Math.random().toString(36).substr(2,4).toUpperCase();
   const expires=new Date(Date.now()+days*24*60*60*1000).toISOString();
-
   const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
-  codes[code]={expires,days,used:false,singleUse:true,createdAt:new Date().toISOString()};
+  codes[code]={expires,days,usosMax:usos,usosUsados:0,singleUse:usos===1,createdAt:new Date().toISOString()};
   localStorage.setItem('bd_codes',JSON.stringify(codes));
-
   renderCodes();
-  toast(`✦ Código gerado: ${code}`);
+  toast(`✦ Código: ${code}`);
 }
 
 function renderCodes(){
   const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
   const el=document.getElementById('codeList');
   const entries=Object.entries(codes).reverse();
-
-  if(!entries.length){
-    el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum código gerado ainda.</p>';
-    return;
-  }
-
+  if(!entries.length){el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum código gerado ainda.</p>';return;}
   el.innerHTML=entries.map(([code,c])=>{
     const expired=new Date()>new Date(c.expires);
     const exp=new Date(c.expires).toLocaleDateString('pt-BR');
+    const usos=c.usosUsados||0;
+    const max=c.usosMax||1;
     return `<div class="code-item">
-      <div>
-        <div class="code-val">${code}</div>
-        <div class="code-meta">${c.days} dias • Expira: ${exp}</div>
-      </div>
+      <div><div class="code-val">${code}</div><div class="code-meta">${c.days}d • Expira: ${exp} • Usos: ${usos}/${max==='999'?'∞':max}</div></div>
       <div style="display:flex;align-items:center;gap:8px">
-        <span class="code-used ${c.used?'yes':'no'}">${c.used?'Usado':'Livre'}</span>
-        ${expired?'<span style="font-size:11px;color:#e8a0a0">Expirado</span>':''}
+        <span class="code-used ${usos>=max||expired?'yes':'no'}">${usos>=max||expired?'Esgotado':'Livre'}</span>
         <button class="btn-copy-code" onclick="copyCode('${code}')">📋</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function copyCode(code){
-  navigator.clipboard?.writeText(code).then(()=>toast('✦ Código copiado!'));
-}
-
-function loadAdmin(){
-  renderCodes();
-
-  // Usuários
-  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
-  const ul=document.getElementById('userList');
-  const entries=Object.entries(contas);
-  if(!entries.length){
-    ul.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum usuário ainda.</p>';
-  } else {
-    ul.innerHTML=entries.map(([email,c])=>{
-      let prazo='';
-      let prazoColor='var(--text3)';
-      if(c.plano==='Trial'&&c.trialStart){
-        const start=new Date(c.trialStart);
-        const diff=TRIAL_DAYS-((new Date()-start)/(1000*60*60*24));
-        if(diff>0){
-          prazo=`⏳ ${Math.ceil(diff)} dia(s) restante(s)`;
-          prazoColor='var(--green)';
-        } else {
-          prazo='❌ Trial expirado';
-          prazoColor='#e8a0a0';
-        }
-      } else if(c.plano==='Fiel'){
-        prazo='✅ Anual ativo';
-        prazoColor='var(--green)';
-      } else if(c.plano==='Paróquia'){
-        prazo='✅ Mensal ativo';
-        prazoColor='var(--green)';
-      } else if(c.plano==='Cortesia'){
-        prazo='🎁 Cortesia';
-        prazoColor='var(--primary)';
-      }
-      return `<div class="user-item">
-        <div style="flex:1;min-width:0">
-          <div class="user-email" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${email}</div>
-          <div style="font-size:12px;color:${prazoColor};margin-top:3px;font-weight:700">${prazo}</div>
-        </div>
-        <span class="user-plan">${c.plano||'Trial'}</span>
-      </div>`;
-    }).join('');
-  }
-
-  // Stats
-  const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
-  const totalCodes=Object.keys(codes).length;
-  const usedCodes=Object.values(codes).filter(c=>c.used).length;
-  document.getElementById('stats').innerHTML=`
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
-      <div style="font-size:28px;font-weight:800;color:var(--primary)">${entries.length}</div>
-      <div style="font-size:13px;color:var(--text3);margin-top:4px">Usuários</div>
-    </div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
-      <div style="font-size:28px;font-weight:800;color:var(--green)">${totalCodes}</div>
-      <div style="font-size:13px;color:var(--text3);margin-top:4px">Códigos gerados</div>
-    </div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
-      <div style="font-size:28px;font-weight:800;color:var(--accent)">${usedCodes}</div>
-      <div style="font-size:13px;color:var(--text3);margin-top:4px">Códigos usados</div>
-    </div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
-      <div style="font-size:28px;font-weight:800;color:var(--primary2)">${totalCodes-usedCodes}</div>
-      <div style="font-size:13px;color:var(--text3);margin-top:4px">Códigos livres</div>
-    </div>`;
-}
+function copyCode(code){navigator.clipboard?.writeText(code).then(()=>toast('✦ Código copiado!'));}
 
 // ════════════════════════════════════════
 // APP — Modo / Tipo
