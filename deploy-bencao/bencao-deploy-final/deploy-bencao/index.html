@@ -981,7 +981,7 @@ function toggleEF(){
 }
 
 // ════════════════════════════════════════
-// SESSÃO ÚNICA — verifica a cada 30s
+// SESSÃO ÚNICA — verifica a cada 30s via servidor
 // ════════════════════════════════════════
 let sessaoId='';
 let sessaoInterval=null;
@@ -992,36 +992,37 @@ function gerarSessaoId(){
 
 function iniciarSessao(email){
   sessaoId=gerarSessaoId();
-  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
-  if(contas[email]){
-    contas[email].sessaoAtiva=sessaoId;
-    contas[email].sessaoTs=Date.now();
-    localStorage.setItem('bd_contas',JSON.stringify(contas));
-  }
-  // Verifica sessão a cada 30 segundos
+  // Salva sessão localmente
+  localStorage.setItem('bd_sessao',JSON.stringify({email,sessaoId,ts:Date.now()}));
+  // Verifica sessão a cada 30 segundos via servidor
   if(sessaoInterval) clearInterval(sessaoInterval);
-  sessaoInterval=setInterval(()=>verificarSessao(email),30000);
+  sessaoInterval=setInterval(()=>verificarSessaoServidor(email),30000);
 }
 
-function verificarSessao(email){
-  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
-  const c=contas[email];
-  if(!c) return;
-  // Verifica se foi bloqueado
-  if(c.plano==='Bloqueado'){
-    clearInterval(sessaoInterval);
-    sairForcado('🚫 Seu acesso foi bloqueado pelo administrador.');
-    return;
+async function verificarSessaoServidor(email){
+  if(!email||!sessaoId) return;
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'verificar_sessao',email,sessaoId})
+    });
+    const data=await res.json();
+    if(data.bloqueado){
+      clearInterval(sessaoInterval);
+      sairForcado('🚫 Seu acesso foi bloqueado pelo administrador.');
+    } else if(data.sessaoInvalida){
+      clearInterval(sessaoInterval);
+      sairForcado('⚠️ Sua conta foi acessada em outro dispositivo. Por segurança, você foi desconectado.');
+    } else if(data.success && data.plano && data.plano!==curUser.plan){
+      // Atualiza plano se mudou
+      curUser.plan=data.plano;
+      updateBadge(data.plano);
+      updateAppUI();
+    }
+  }catch(e){
+    console.log('Erro ao verificar sessão:', e.message);
   }
-  // Verifica sessão duplicada
-  if(c.sessaoAtiva && c.sessaoAtiva!==sessaoId){
-    clearInterval(sessaoInterval);
-    sairForcado('⚠️ Sua conta foi acessada em outro dispositivo. Por segurança, você foi desconectado.');
-    return;
-  }
-  // Atualiza timestamp da sessão
-  contas[email].sessaoTs=Date.now();
-  localStorage.setItem('bd_contas',JSON.stringify(contas));
 }
 
 function sairForcado(msg){
@@ -1030,16 +1031,19 @@ function sairForcado(msg){
   location.reload();
 }
 
-function encerrarSessao(){
+async function encerrarSessao(){
   if(sessaoInterval) clearInterval(sessaoInterval);
   sessaoInterval=null;
   if(curUser.email && curUser.plan!=='Admin'){
-    const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
-    if(contas[curUser.email]&&contas[curUser.email].sessaoAtiva===sessaoId){
-      delete contas[curUser.email].sessaoAtiva;
-      localStorage.setItem('bd_contas',JSON.stringify(contas));
-    }
+    try{
+      await fetch('/.netlify/functions/db',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({acao:'logout',email:curUser.email,sessaoId})
+      });
+    }catch(e){}
   }
+  localStorage.removeItem('bd_sessao');
 }
 
 function sairApp(){
@@ -1057,20 +1061,30 @@ function sairApp(){
 // ════════════════════════════════════════
 // VERIFICAÇÃO DE EMAIL — novo cadastro
 // ════════════════════════════════════════
-let pendingEmail='', pendingPass='', pendingCode='';
+let pendingEmail='', pendingPass='';
 
 async function enviarCodigoVerificacao(email){
-  const code=Math.floor(100000+Math.random()*900000).toString();
-  pendingCode=code;
   try{
-    const res=await fetch('/.netlify/functions/recuperar',{
+    // Solicita ao servidor gerar e enviar o código
+    const res=await fetch('/.netlify/functions/db',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({acao:'enviar',contato:email,assunto:'Verificação de cadastro',mensagem:`Seu código de verificação para o Bênção do Dia é: ${code}`})
+      body:JSON.stringify({acao:'cadastrar', email, senha:btoa(pendingPass)})
     });
     const data=await res.json();
-    console.log('Código enviado:', code);
-    return data.success;
+    if(data.success){
+      // Servidor gerou o código — agora envia por e-mail via recuperar.js
+      const resEmail=await fetch('/.netlify/functions/recuperar',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({acao:'enviar_cadastro', contato:email})
+      });
+      return true;
+    } else if(data.error==='E-mail já cadastrado'){
+      toast('⚠️ E-mail já cadastrado. Faça login.');
+      return false;
+    }
+    return false;
   }catch(e){
     console.error('Erro ao enviar código:', e);
     return false;
@@ -1080,107 +1094,140 @@ async function enviarCodigoVerificacao(email){
 async function confirmarCodigo(){
   const digitado=document.getElementById('verifyCode').value.trim();
   if(!digitado){toast('⚠️ Digite o código.');return;}
-  if(digitado!==pendingCode){toast('❌ Código incorreto. Tente novamente.');return;}
 
-  // Código correto — finaliza cadastro
-  const ts=new Date().toISOString();
-  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
-  contas[pendingEmail]={
-    nome:pendingEmail.split('@')[0],
-    senha:btoa(pendingPass),
-    plano:'Trial',
-    trialStart:ts,
-    verificado:true,
-    cadastroEm:ts
-  };
-  localStorage.setItem('bd_contas',JSON.stringify(contas));
+  try{
+    // Verifica código no servidor
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        acao:'confirmar',
+        email:pendingEmail,
+        codigo:digitado,
+        device:navigator.userAgent.substr(0,80)
+      })
+    });
+    const data=await res.json();
 
-  curUser.name=contas[pendingEmail].nome;
-  curUser.email=pendingEmail;
-  curUser.plan='Trial';
-  curUser.trialStart=ts;
+    if(data.success){
+      curUser.name=data.usuario?.nome||pendingEmail.split('@')[0];
+      curUser.email=pendingEmail;
+      curUser.plan=data.usuario?.plano||'Trial';
+      curUser.trialStart=data.usuario?.trialStart||null;
+      sessaoId=data.sessaoId||gerarSessaoId();
+      localStorage.setItem('bd_sessao',JSON.stringify({email:pendingEmail,sessaoId,ts:Date.now()}));
 
-  document.getElementById('verifyBox').style.display='none';
-  document.getElementById('eform').style.display='block';
+      document.getElementById('verifyBox').style.display='none';
+      document.getElementById('eform').style.display='block';
 
-  toast('✅ E-mail verificado! Bem-vindo!');
-  iniciarSessao(pendingEmail);
-  afterLogin(false);
+      toast('✅ E-mail verificado! Bem-vindo!');
+      if(sessaoInterval) clearInterval(sessaoInterval);
+      sessaoInterval=setInterval(()=>verificarSessaoServidor(pendingEmail),30000);
+      afterLogin(false);
+    } else {
+      toast('❌ '+(data.error||'Código incorreto.'));
+    }
+  }catch(e){
+    toast('⚠️ Erro ao verificar. Tente novamente.');
+    console.error(e);
+  }
 }
 
 async function reenviarCodigo(){
   toast('⏳ Reenviando código...');
   const ok=await enviarCodigoVerificacao(pendingEmail);
-  toast(ok?'✅ Novo código enviado!':'⚠️ Erro ao reenviar. Tente novamente.');
+  toast(ok?'✅ Novo código enviado!':'⚠️ Erro ao reenviar.');
 }
 
 function cancelarVerificacao(){
-  pendingEmail='';pendingPass='';pendingCode='';
+  pendingEmail='';pendingPass='';
   document.getElementById('verifyBox').style.display='none';
   document.getElementById('eform').style.display='block';
   document.getElementById('verifyCode').value='';
 }
 
 // ════════════════════════════════════════
-// LOGIN
+// LOGIN — usa banco centralizado
 // ════════════════════════════════════════
 async function loginEmail(){
   const eEl=document.getElementById('ei');
   const pEl=document.getElementById('pi');
-  const e=eEl.value.trim(), p=pEl.value.trim();
+  const e=eEl.value.trim().toLowerCase(), p=pEl.value.trim();
 
-  // Admin
+  // Admin — sem banco de dados
   if(p===ADMIN_PASS){
-    curUser={name:'Admin',email:e||'admin',plan:'Admin',trialStart:null,cardsToday:0};
+    curUser={name:'Admin',email:e||'admin@bencaododia.app.br',plan:'Admin',trialStart:null,cardsToday:0};
     afterLogin(true);
     return;
   }
 
   if(!e){toast('⚠️ Informe seu e-mail.');eEl.focus();return;}
   if(!p){toast('⚠️ Informe sua senha.');pEl.focus();return;}
+  if(p.length<4){toast('⚠️ Senha deve ter mínimo 4 caracteres.');pEl.focus();return;}
 
-  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  document.getElementById('btnE').disabled=true;
+  document.getElementById('btnE').textContent='⏳ Verificando...';
 
-  if(contas[e]){
-    // Usuário existe — verifica bloqueio
-    if(contas[e].plano==='Bloqueado'){
-      toast('🚫 Seu acesso está bloqueado. Entre em contato com o suporte.');
-      return;
-    }
-    // Verifica senha
-    if(contas[e].senha!==btoa(p)){
-      toast('⚠️ Senha incorreta.');pEl.value='';pEl.focus();return;
-    }
-    // Verifica sessão ativa em outro dispositivo
-    if(contas[e].sessaoAtiva&&contas[e].sessaoTs){
-      const diff=(Date.now()-contas[e].sessaoTs)/1000;
-      if(diff<60){ // Sessão ativa há menos de 60 segundos
-        toast('⚠️ Esta conta já está conectada em outro dispositivo.');
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'login', email:e, senha:p, device:navigator.userAgent.substr(0,80)})
+    });
+    const data=await res.json();
+
+    if(data.bloqueado){
+      toast('🚫 Seu acesso foi bloqueado. Entre em contato com o suporte.');
+    } else if(data.pendente){
+      toast('⚠️ Confirme seu e-mail antes de entrar.');
+      pendingEmail=e; pendingPass=p;
+      document.getElementById('eform').style.display='none';
+      document.getElementById('verifyBox').style.display='block';
+      document.getElementById('verifyEmailShow').textContent=e;
+    } else if(data.sessaoAtiva){
+      // Sessão em outro dispositivo
+      if(confirm(`⚠️ Já existe uma sessão ativa em outro dispositivo.\n\nDeseja encerrar a outra sessão e entrar aqui?`)){
+        // Força novo login ignorando sessão ativa
+        const res2=await fetch('/.netlify/functions/db',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({acao:'logout', email:e})
+        });
+        document.getElementById('btnE').disabled=false;
+        document.getElementById('btnE').textContent='Entrar / Cadastrar';
+        loginEmail(); // Tenta novamente
         return;
       }
+    } else if(data.error==='Usuário não encontrado'){
+      // Novo usuário
+      pendingEmail=e; pendingPass=p;
+      toast('⏳ Enviando código de verificação...');
+      const ok=await enviarCodigoVerificacao(e);
+      document.getElementById('eform').style.display='none';
+      document.getElementById('verifyBox').style.display='block';
+      document.getElementById('verifyEmailShow').textContent=e;
+      document.getElementById('verifyCode').value='';
+      toast(ok?'📧 Código enviado para seu e-mail!':'⚠️ Verifique o endereço de e-mail.');
+    } else if(data.error){
+      toast('⚠️ '+data.error);
+    } else if(data.success){
+      curUser.name=data.usuario?.nome||e.split('@')[0];
+      curUser.email=e;
+      curUser.plan=data.usuario?.plano||'Trial';
+      curUser.trialStart=data.usuario?.trialStart||null;
+      sessaoId=data.sessaoId||gerarSessaoId();
+      localStorage.setItem('bd_sessao',JSON.stringify({email:e,sessaoId,ts:Date.now()}));
+      if(sessaoInterval) clearInterval(sessaoInterval);
+      sessaoInterval=setInterval(()=>verificarSessaoServidor(e),30000);
+      afterLogin(false);
     }
-    curUser.name=contas[e].nome;
-    curUser.email=e;
-    curUser.plan=contas[e].plano||'Trial';
-    curUser.trialStart=contas[e].trialStart||null;
-    iniciarSessao(e);
-    afterLogin(false);
-  } else {
-    // Novo usuário — envia código de verificação
-    pendingEmail=e;
-    pendingPass=p;
-    toast('⏳ Enviando código de verificação...');
-    const ok=await enviarCodigoVerificacao(e);
-    document.getElementById('eform').style.display='none';
-    document.getElementById('verifyBox').style.display='block';
-    document.getElementById('verifyEmailShow').textContent=e;
-    document.getElementById('verifyCode').value='';
-    if(ok){
-      toast('📧 Código enviado para seu e-mail!');
-    } else {
-      toast('⚠️ Não foi possível enviar o e-mail. Verifique o endereço.');
-    }
+  }catch(err){
+    toast('⚠️ Erro de conexão. Tente novamente.');
+    console.error(err);
   }
+
+  document.getElementById('btnE').disabled=false;
+  document.getElementById('btnE').textContent='Entrar / Cadastrar';
 }
 
 function afterLogin(isAdmin){
@@ -1395,7 +1442,24 @@ function getContas(){return JSON.parse(localStorage.getItem('bd_contas')||'{}');
 function getPlanClass(p){if(!p||p==='Trial')return 'trial';if(p==='Bloqueado')return 'bloqueado';if(p==='Cortesia')return 'cortesia';if(p==='Paróquia')return 'paroquia';return 'fiel';}
 function getTrialInfo(c){if(!c.trialStart)return{status:'none',dias:0};const diff=TRIAL_DAYS-((new Date()-new Date(c.trialStart))/(1000*60*60*24));return diff>0?{status:'active',dias:Math.ceil(diff)}:{status:'expired',dias:0};}
 
-function loadAdmin(){
+async function loadAdmin(){
+  document.getElementById('dashDate').textContent=`Atualizando...`;
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'admin_listar', adminPass:ADMIN_PASS})
+    });
+    const data=await res.json();
+    if(data.success){
+      // Atualiza lista de usuários no localStorage para renderização
+      const contas={};
+      (data.usuarios||[]).forEach(u=>{contas[u.email]={...u};});
+      localStorage.setItem('bd_contas',JSON.stringify(contas));
+    }
+  }catch(e){
+    console.log('Usando dados locais:', e.message);
+  }
   document.getElementById('dashDate').textContent=`Atualizado em ${new Date().toLocaleString('pt-BR')}`;
   renderKPIs();
   renderUserTable();
@@ -1460,27 +1524,47 @@ function editarUsuario(email){
   document.getElementById('modalUser').classList.add('on');
 }
 function closeModalUser(){document.getElementById('modalUser').classList.remove('on');editandoEmail='';}
-function salvarUsuario(){
+async function salvarUsuario(){
+  const novoPlano=document.getElementById('modalPlano').value;
+  const novaObs=document.getElementById('modalObs').value;
+  try{
+    await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'admin_atualizar',adminPass:ADMIN_PASS,email:editandoEmail,plano:novoPlano,obs:novaObs})
+    });
+  }catch(e){console.log('Erro ao salvar no servidor, salvando local:', e.message);}
+  // Atualiza local também
   const contas=getContas();
   if(!contas[editandoEmail])contas[editandoEmail]={};
-  contas[editandoEmail].plano=document.getElementById('modalPlano').value;
-  contas[editandoEmail].obs=document.getElementById('modalObs').value;
+  contas[editandoEmail].plano=novoPlano;
+  contas[editandoEmail].obs=novaObs;
   localStorage.setItem('bd_contas',JSON.stringify(contas));
   closeModalUser();loadAdmin();toast('✅ Usuário atualizado!');
 }
-function bloquearUsuario(){
-  const contas=getContas();
-  if(contas[editandoEmail])contas[editandoEmail].plano='Bloqueado';
-  localStorage.setItem('bd_contas',JSON.stringify(contas));
-  closeModalUser();loadAdmin();toast('🚫 Usuário bloqueado.');
-}
-function bloquearRapido(email){
+
+async function bloquearRapido(email){
+  try{
+    await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'admin_atualizar',adminPass:ADMIN_PASS,email,plano:'Bloqueado'})
+    });
+  }catch(e){}
   const contas=getContas();
   if(contas[email])contas[email].plano='Bloqueado';
   localStorage.setItem('bd_contas',JSON.stringify(contas));
   loadAdmin();toast('🚫 Acesso bloqueado.');
 }
-function habilitarRapido(email){
+
+async function habilitarRapido(email){
+  try{
+    await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'admin_atualizar',adminPass:ADMIN_PASS,email,plano:'Trial'})
+    });
+  }catch(e){}
   const contas=getContas();
   if(contas[email]){contas[email].plano='Trial';contas[email].trialStart=new Date().toISOString();}
   localStorage.setItem('bd_contas',JSON.stringify(contas));
