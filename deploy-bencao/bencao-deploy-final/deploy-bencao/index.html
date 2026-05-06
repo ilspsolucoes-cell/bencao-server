@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bênção do Dia — Cards Católicos</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lora:ital,wght@0,400;1,400&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --bg:#0f0d0a;--bg2:#1a1710;--bg3:#252218;
+  --primary:#c9a84c;--primary2:#e8d49a;--accent:#e8a44a;
+  --text:#d4c9a8;--text2:#f5f0e8;--text3:#8a8070;
+  --border:rgba(201,168,76,.2);--border2:rgba(201,168,76,.45);
+  --green:#25d366;--shadow:rgba(201,168,76,.15);
+  --card-ov:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.62) 40%,rgba(0,0,0,.62) 72%,rgba(0,0,0,.2) 100%);
+}
+body.tm{--bg:#08101e;--bg2:#0e1c38;--bg3:#152448;--primary:#7ba7e8;--primary2:#b8d4ff;--accent:#5c8fd4;--text:#a8c0e0;--text2:#e8f0ff;--text3:#4a6080;--border:rgba(123,167,232,.2);--border2:rgba(123,167,232,.5);--shadow:rgba(123,167,232,.15)}
+body.tr{--bg:#1a0f14;--bg2:#2a1820;--bg3:#35202a;--primary:#e88aac;--primary2:#f5c0d5;--accent:#f06292;--text:#d4a8bc;--text2:#fce8f0;--text3:#806070;--border:rgba(232,138,172,.2);--border2:rgba(232,138,172,.5);--shadow:rgba(232,138,172,.15)}
+body.tg{--bg:#081410;--bg2:#0f2018;--bg3:#162c20;--primary:#4caf80;--primary2:#a0dfc0;--accent:#66bb6a;--text:#a0c8b0;--text2:#e8f5ee;--text3:#406050;--border:rgba(76,175,128,.2);--border2:rgba(76,175,128,.5);--shadow:rgba(76,175,128,.15)}
+body.tp{--bg:#100a1a;--bg2:#1a1028;--bg3:#221535;--primary:#9c6fd6;--primary2:#cca8f0;--accent:#ab47bc;--text:#c0a8d8;--text2:#f0e8ff;--text3:#604880;--border:rgba(156,111,214,.2);--border2:rgba(156,111,214,.5);--shadow:rgba(156,111,214,.15)}
+body.tl{--bg:#f0ede8;--bg2:#fff;--bg3:#f8f5f0;--primary:#8b5e2a;--primary2:#c9903c;--accent:#e07020;--text:#5a4030;--text2:#2a1a10;--text3:#a08060;--border:rgba(139,94,42,.18);--border2:rgba(139,94,42,.45);--shadow:rgba(139,94,42,.12)}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:17px;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden;transition:background .4s,color .4s}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ── SCREENS ── */
+.screen{display:none!important}
+.screen.on{display:block!important}
+#sLogin.on{display:flex!important;flex-direction:column}
+
+/* ── LOGIN ── */
+#sLogin{min-height:100vh;background:var(--bg);position:relative;overflow:hidden}
+#sLogin::before{content:'';position:absolute;top:-120px;left:-120px;width:400px;height:400px;background:radial-gradient(circle,rgba(201,168,76,.12) 0%,transparent 70%);pointer-events:none}
+#sLogin::after{content:'';position:absolute;bottom:-100px;right:-100px;width:350px;height:350px;background:radial-gradient(circle,rgba(201,168,76,.08) 0%,transparent 70%);pointer-events:none}
+.lhero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px 20px;position:relative;z-index:1}
+.licon{font-size:56px;margin-bottom:16px;animation:floatUp .8s ease both}
+.lbrand{font-family:'Dancing Script',cursive;font-size:clamp(38px,10vw,52px);font-weight:700;color:var(--primary);line-height:1;text-align:center;animation:floatUp .8s ease .1s both}
+.ltag{font-size:clamp(13px,4vw,15px);color:var(--text3);margin-top:8px;text-align:center;line-height:1.5;max-width:280px;animation:floatUp .8s ease .2s both}
+.gline{width:60px;height:2px;background:linear-gradient(to right,transparent,var(--primary),transparent);margin:18px auto;animation:floatUp .8s ease .3s both}
+.lbox{width:100%;max-width:420px;margin:0 auto;padding:0 20px 48px;position:relative;z-index:1;animation:floatUp .8s ease .4s both}
+.lcard{background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:32px 24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.ltitle{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:18px;text-align:center}
+.sbtns{display:flex;flex-direction:column;gap:11px;margin-bottom:18px}
+.sbtn{width:100%;padding:14px;border-radius:12px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;cursor:pointer;border:2px solid var(--border);background:var(--bg3);color:var(--text2);display:flex;align-items:center;justify-content:center;gap:12px;transition:all .2s;-webkit-tap-highlight-color:transparent;min-height:52px}
+.sbtn:active{transform:scale(.98);opacity:.85}
+.sbtn.sg{border-color:rgba(234,67,53,.35)}
+.sbtn.sa{border-color:rgba(255,255,255,.2)}
+.sbtn.se{border-color:var(--border2);color:var(--primary)}
+.div-or{text-align:center;font-size:13px;color:var(--text3);margin:16px 0;position:relative}
+.div-or::before,.div-or::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--border)}
+.div-or::before{left:0}.div-or::after{right:0}
+.eform{display:none;margin-top:4px}
+.eform.on{display:block;animation:fadeUp .3s ease both}
+.ifield{width:100%;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;color:var(--text2);font-family:'Nunito',sans-serif;font-size:16px;outline:none;transition:border-color .2s;margin-bottom:12px;-webkit-appearance:none}
+.ifield:focus{border-color:var(--primary)}
+.ifield::placeholder{color:var(--text3)}
+.ifield[readonly]{opacity:.7}
+.btn-p{width:100%;padding:16px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--primary));border:none;color:var(--bg);font-family:'Nunito',sans-serif;font-size:17px;font-weight:800;cursor:pointer;min-height:54px;transition:opacity .2s,transform .1s;-webkit-tap-highlight-color:transparent}
+.btn-p:active{opacity:.85;transform:scale(.99)}
+.lnote{text-align:center;margin-top:16px;font-size:12px;color:var(--text3);line-height:1.6}
+.llink{color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline}
+
+/* Código de cortesia */
+.code-box{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.code-row{display:flex;gap:8px;align-items:stretch}
+.code-input{flex:1;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;outline:none;-webkit-appearance:none;min-width:0}
+.code-input:focus{border-color:var(--primary)}
+.code-input::placeholder{letter-spacing:0;font-weight:400;text-transform:none;font-size:13px}
+.btn-code{flex-shrink:0;padding:12px 14px;background:var(--border);border:1px solid var(--border2);border-radius:10px;color:var(--primary);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;min-height:48px}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--border);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;backdrop-filter:blur(12px)}
+.tlogo{font-family:'Dancing Script',cursive;font-size:clamp(17px,5vw,22px);font-weight:700;color:var(--primary);line-height:1;white-space:nowrap}
+.tlogo span{font-size:.58em;color:var(--text3);display:block;font-family:'Nunito',sans-serif;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.tright{display:flex;align-items:center;gap:8px}
+.pbadge{padding:4px 11px;border-radius:20px;font-size:12px;font-weight:800;background:var(--border);color:var(--primary);border:1px solid var(--border2);white-space:nowrap}
+.pbadge.trial{background:rgba(37,211,102,.1);color:var(--green);border-color:rgba(37,211,102,.3)}
+.pbadge.admin{background:rgba(201,168,76,.2);color:#fff;border-color:var(--primary)}
+.ibtn{width:38px;height:38px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:all .2s}
+.ibtn:active{transform:scale(.9)}
+.avbtn{width:38px;height:38px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--bg);cursor:pointer;flex-shrink:0;border:2px solid var(--border2)}
+
+/* ── THEME PANEL ── */
+.tpanel{display:none;position:fixed;top:64px;right:10px;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:18px;z-index:200;box-shadow:0 8px 40px rgba(0,0,0,.4);min-width:250px;animation:slideDown .25s ease}
+.tpanel.on{display:block}
+.tpanel h3{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--primary);margin-bottom:14px}
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.topt{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:10px 6px;border-radius:10px;border:2px solid transparent;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.topt:hover,.topt.on{border-color:var(--primary);background:var(--border)}
+.tswatch{width:36px;height:36px;border-radius:50%;border:3px solid rgba(255,255,255,.15)}
+.tname{font-size:11px;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
+
+/* ── PLANOS ── */
+#sPlanos{padding:24px 16px 60px;max-width:700px;margin:0 auto;background:var(--bg);min-height:100vh}
+.ph{text-align:center;margin-bottom:28px;padding-top:8px}
+.ph h2{font-family:'Dancing Script',cursive;font-size:clamp(26px,7vw,36px);color:var(--primary);font-weight:700}
+.ph p{font-size:15px;color:var(--text3);margin-top:6px;line-height:1.5}
+
+/* Trial banner */
+.trial-banner{background:linear-gradient(135deg,rgba(37,211,102,.12),rgba(37,211,102,.05));border:1px solid rgba(37,211,102,.3);border-radius:14px;padding:16px 20px;margin-bottom:20px;text-align:center}
+.trial-banner h3{font-size:18px;font-weight:800;color:var(--green);margin-bottom:6px}
+.trial-banner p{font-size:14px;color:var(--text);line-height:1.5}
+
+.pgrid{display:flex;flex-direction:column;gap:14px;margin-bottom:20px}
+.pcard{background:var(--bg2);border:2px solid var(--border);border-radius:16px;padding:22px 20px;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden;transition:all .2s}
+.pcard.pop{border-color:var(--primary);box-shadow:0 0 30px var(--shadow)}
+.pcard.pop::before{content:'MAIS POPULAR';position:absolute;top:14px;right:-28px;background:var(--primary);color:var(--bg);font-size:10px;font-weight:800;letter-spacing:1.5px;padding:4px 36px;transform:rotate(45deg)}
+.ptop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.pname{font-size:20px;font-weight:800;color:var(--text2)}
+.pemoji{font-size:28px}
+.pval{font-size:28px;font-weight:800;color:var(--primary);line-height:1}
+.pper{font-size:12px;color:var(--text3);font-weight:600}
+.pfeats{display:flex;flex-direction:column;gap:8px;margin:14px 0 18px}
+.feat{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text);font-weight:600}
+.btn-plan{width:100%;padding:14px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;cursor:pointer;border:2px solid var(--border2);background:transparent;color:var(--primary);transition:all .2s;min-height:50px}
+.pcard.pop .btn-plan{background:linear-gradient(135deg,var(--accent),var(--primary));color:var(--bg);border-color:transparent}
+.btn-skip{width:100%;padding:14px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text3);font-family:'Nunito',sans-serif;font-size:15px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+
+/* Trial countdown */
+.trial-info{background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.25);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.trial-info .icon{font-size:26px;flex-shrink:0}
+.trial-info p{font-size:14px;font-weight:600;color:var(--text);line-height:1.5}
+.trial-info strong{color:var(--green)}
+
+/* ── APP ── */
+#sApp{background:var(--bg);min-height:100vh}
+.abody{padding:16px 16px 70px;max-width:700px;margin:0 auto}
+.sect{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px 16px;margin-bottom:16px}
+.stit{font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--primary);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.stit::after{content:'';flex:1;height:1px;background:var(--border)}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.selbtn{padding:13px 6px;border-radius:14px;border:2px solid var(--border);background:var(--bg3);color:var(--text);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s;-webkit-tap-highlight-color:transparent;line-height:1.4}
+.selbtn .ic{font-size:24px;display:block;margin-bottom:4px}
+.selbtn.on{border-color:var(--primary);background:var(--border);color:var(--primary2)}
+.selbtn:active{transform:scale(.96)}
+.flbl{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--primary);opacity:.8;margin-bottom:8px;display:block}
+.fst{display:flex;flex-direction:column;gap:14px;margin-top:14px}
+select,.iapp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-family:'Nunito',sans-serif;font-size:16px;font-weight:600;padding:13px 15px;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+select:focus,.iapp:focus{border-color:var(--primary)}
+.iapp::placeholder{color:var(--text3);font-weight:400}
+.upz{width:100%;border:2px dashed var(--border2);border-radius:12px;background:var(--bg3);padding:22px 14px;text-align:center;cursor:pointer;transition:all .3s;position:relative;-webkit-tap-highlight-color:transparent}
+.upz.has{border-color:var(--primary);border-style:solid;background:var(--border)}
+.upz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;background:none}
+.upic{font-size:32px;display:block;margin-bottom:8px}
+.uptx{font-size:15px;font-weight:700;color:var(--text3);line-height:1.5}
+.uptx span{display:block;font-size:13px;margin-top:3px;opacity:.6;font-weight:400}
+.pvw{display:none;position:relative;margin-top:12px;border-radius:10px;overflow:hidden}
+.pvw.on{display:block}
+.pvwi{width:100%;max-height:150px;object-fit:cover;display:block;border-radius:10px}
+.rmbtn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.82);border:1px solid var(--border2);color:var(--primary);font-size:13px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer}
+.genbtn{width:100%;padding:18px;background:linear-gradient(135deg,var(--accent) 0%,var(--primary) 50%,var(--accent) 100%);background-size:200% 100%;border:none;border-radius:14px;color:var(--bg);font-family:'Nunito',sans-serif;font-size:18px;font-weight:800;cursor:pointer;margin-top:20px;-webkit-tap-highlight-color:transparent;transition:opacity .2s,transform .1s;min-height:58px}
+.genbtn:active{opacity:.85;transform:scale(.99)}
+.genbtn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+
+/* Loading */
+.load{display:none;text-align:center;padding:50px 20px}
+.load.on{display:block;animation:fadeUp .4s ease both}
+.lic{font-size:42px;animation:pulse 1.5s ease infinite;display:block;margin-bottom:14px}
+.load p{font-size:18px;color:var(--primary);font-style:italic;font-weight:600}
+
+/* Card visual */
+.rcard{display:none;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.rcard.on{display:block;animation:fadeUp .5s ease both}
+.rhead{background:linear-gradient(135deg,var(--border),transparent);padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.rhead h2{font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--primary)}
+.dbadge{font-size:13px;color:var(--text3);font-style:italic;font-weight:600}
+.rbody{padding:16px}
+.plbl{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--primary);text-transform:uppercase;opacity:.6;margin-bottom:10px;display:block}
+#cardV{position:relative;width:100%;aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+#cardBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+#cardBg.on{display:block}
+#cardOv{position:absolute;inset:0;background:var(--card-ov);z-index:1}
+#cardCt{position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:24px 20px 20px;text-align:center}
+.ctit{font-family:'Dancing Script',cursive;font-size:clamp(32px,9vw,48px);font-weight:700;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7);line-height:1.1}
+.cbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:8px 0}
+.ctxt{font-family:'Lora',serif;font-size:clamp(15px,4.5vw,21px);color:#fff;line-height:1.7;text-shadow:0 2px 12px rgba(0,0,0,.8);font-weight:400}
+.cref{font-size:clamp(10px,2.8vw,13px);font-weight:700;color:rgba(255,220,120,.95);letter-spacing:2px;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,.7);font-family:'Nunito',sans-serif}
+.cfoot{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+.csig{font-family:'Dancing Script',cursive;font-size:clamp(18px,5.5vw,28px);font-weight:600;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.7);opacity:.92}
+.clogo{max-width:70px;max-height:44px;object-fit:contain;border-radius:6px;opacity:.9}
+
+.snote{background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:12px;padding:14px 16px;margin-bottom:18px;font-size:14px;font-weight:600;color:var(--text);line-height:1.6}
+.snote strong{color:var(--green);display:block;margin-bottom:4px;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+.arow{display:flex;flex-direction:column;gap:12px}
+.abtn{width:100%;padding:16px;border-radius:12px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;cursor:pointer;min-height:54px;transition:opacity .2s;border:none;-webkit-tap-highlight-color:transparent}
+.abtn-s{background:linear-gradient(135deg,var(--border),var(--bg3));border:2px solid var(--border2)!important;color:var(--primary)}
+.abtn-n{background:transparent;border:2px solid var(--border)!important;color:var(--text3)}
+.abtn:active{opacity:.65}
+
+/* Limite */
+.lbanner{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border:1px solid var(--border2);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.lbanner .ic{font-size:26px;flex-shrink:0}
+.lbanner p{font-size:14px;font-weight:600;color:var(--text);line-height:1.5}
+.lbanner strong{color:var(--primary)}
+.btn-up{margin-top:8px;padding:8px 16px;background:linear-gradient(135deg,var(--accent),var(--primary));border:none;border-radius:8px;color:var(--bg);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer}
+
+.errbox{display:none;background:rgba(180,40,40,.12);border:1px solid rgba(180,40,40,.35);border-radius:10px;padding:14px;margin-top:14px;color:#e8a0a0;font-size:14px;line-height:1.5;font-weight:600}
+.errbox.on{display:block}
+
+/* ── ADMIN ── */
+#sAdmin{background:var(--bg);min-height:100vh;padding:16px 16px 60px;max-width:700px;margin:0 auto}
+.admin-head{text-align:center;margin-bottom:24px;padding-top:8px}
+.admin-head h2{font-family:'Dancing Script',cursive;font-size:clamp(24px,6vw,32px);color:var(--primary);font-weight:700}
+.admin-head p{font-size:14px;color:var(--text3);margin-top:4px}
+.admin-sect{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+.admin-sect h3{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--primary);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.admin-sect h3::after{content:'';flex:1;height:1px;background:var(--border)}
+.code-gen-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.code-gen-row select{flex:1;min-width:120px}
+.btn-gen-code{padding:13px 20px;background:linear-gradient(135deg,var(--accent),var(--primary));border:none;border-radius:10px;color:var(--bg);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap}
+.code-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto}
+.code-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;flex-wrap:wrap}
+.code-val{font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--primary);letter-spacing:2px}
+.code-meta{font-size:12px;color:var(--text3);font-weight:500}
+.code-used{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:800}
+.code-used.yes{background:rgba(37,211,102,.15);color:var(--green)}
+.code-used.no{background:var(--border);color:var(--primary)}
+.btn-copy-code{padding:6px 12px;background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--primary);font-size:12px;font-weight:700;cursor:pointer}
+.user-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;flex-wrap:wrap}
+.user-email{font-size:14px;color:var(--text2);font-weight:600}
+.user-plan{font-size:12px;padding:3px 10px;border-radius:20px;font-weight:800;background:var(--border);color:var(--primary)}
+.btn-back{width:100%;padding:14px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text3);font-family:'Nunito',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}
+
+/* Toast */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--bg2);border:2px solid var(--border2);color:var(--primary);padding:12px 24px;border-radius:12px;font-size:14px;font-weight:800;opacity:0;transition:all .35s ease;z-index:999;pointer-events:none;white-space:nowrap;max-width:92vw;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes floatUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.85)}}
+
+@media(min-width:480px){
+  .abody{padding:20px 24px 72px}.sect{padding:24px}.rbody{padding:22px 24px}
+  .fst{flex-direction:row}.fst>div{flex:1}
+  .arow{flex-direction:row}.abtn{width:auto;flex:1}
+  .pgrid{display:grid;grid-template-columns:1fr 1fr}
+}
+@media(min-width:700px){
+  .abody{padding:32px 32px 80px}.sect{padding:28px 32px}.rbody{padding:28px 32px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar" style="display:none">
+  <div class="tlogo">✝️ Bênção do Dia<span>Cards Católicos</span></div>
+  <div class="tright">
+    <div class="pbadge" id="pbadge">Grátis</div>
+    <div class="ibtn" onclick="toggleTP()" title="Temas">🎨</div>
+    <div class="ibtn" onclick="sairApp()" title="Sair" style="font-size:15px">🚪</div>
+    <div class="avbtn" id="avbtn" onclick="goAdmin()">?</div>
+  </div>
+</div>
+
+<!-- THEME PANEL -->
+<div class="tpanel" id="tpanel">
+  <h3>🎨 Escolha o tema</h3>
+  <div class="tgrid">
+    <div class="topt on" onclick="setTheme('',this)"><div class="tswatch" style="background:linear-gradient(135deg,#c9a84c,#8b6914)"></div><span class="tname">Dourado</span></div>
+    <div class="topt" onclick="setTheme('tm',this)"><div class="tswatch" style="background:linear-gradient(135deg,#7ba7e8,#1a3a8a)"></div><span class="tname">Azul Mariano</span></div>
+    <div class="topt" onclick="setTheme('tr',this)"><div class="tswatch" style="background:linear-gradient(135deg,#e88aac,#c05070)"></div><span class="tname">Rosa Suave</span></div>
+    <div class="topt" onclick="setTheme('tg',this)"><div class="tswatch" style="background:linear-gradient(135deg,#4caf80,#1a6040)"></div><span class="tname">Verde</span></div>
+    <div class="topt" onclick="setTheme('tp',this)"><div class="tswatch" style="background:linear-gradient(135deg,#9c6fd6,#5020a0)"></div><span class="tname">Roxo</span></div>
+    <div class="topt" onclick="setTheme('tl',this)"><div class="tswatch" style="background:linear-gradient(135deg,#f5f0e8,#c9903c)"></div><span class="tname">Branco</span></div>
+  </div>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div id="sLogin" class="screen on">
+  <div class="lhero">
+    <div class="licon">✝️</div>
+    <div class="lbrand">Bênção do Dia</div>
+    <div class="ltag">Cards católicos inspiradores para WhatsApp</div>
+    <div class="gline"></div>
+  </div>
+  <div class="lbox">
+    <div class="lcard">
+      <div class="ltitle">Entre ou crie sua conta</div>
+      <div class="eform on" id="eform">
+        <input type="email" class="ifield" id="ei" placeholder="Seu e-mail">
+        <div style="position:relative">
+          <input type="password" class="ifield" id="pi" placeholder="Senha (mín. 4 caracteres)" style="padding-right:50px">
+          <button onclick="togglePass()" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:20px;color:var(--text3);padding:0;line-height:1" id="eyeBtn">👁️</button>
+        </div>
+        <button class="btn-p" id="btnE" onclick="loginEmail()">Entrar / Cadastrar</button>
+        <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:10px;line-height:1.6">Primeira vez? Só digitar e-mail e criar uma senha.</p>
+        <div style="text-align:center;margin-top:10px">
+          <button onclick="showRecuperar()" style="background:none;border:none;color:var(--primary);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:underline">
+            Esqueci minha senha
+          </button>
+        </div>
+      </div>
+
+      <!-- Verificação de novo cadastro -->
+      <div id="verifyBox" style="display:none;margin-top:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:20px">
+        <div style="text-align:center;margin-bottom:14px">
+          <div style="font-size:32px">📧</div>
+          <div style="font-size:15px;font-weight:800;color:var(--primary);margin-top:6px">Verifique seu e-mail</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:6px;line-height:1.5">Enviamos um código de 6 dígitos para<br><strong style="color:var(--text2)" id="verifyEmailShow"></strong></div>
+        </div>
+        <input type="text" class="ifield" id="verifyCode" placeholder="Digite o código" style="text-align:center;letter-spacing:6px;font-size:22px;font-weight:800;margin-bottom:12px">
+        <button class="btn-p" onclick="confirmarCodigo()">✅ Confirmar cadastro</button>
+        <div style="text-align:center;margin-top:12px">
+          <button onclick="reenviarCodigo()" style="background:none;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline">Reenviar código</button>
+          &nbsp;·&nbsp;
+          <button onclick="cancelarVerificacao()" style="background:none;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Modal recuperar senha -->
+      <div id="modalRecuperar" style="display:none;margin-top:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:20px">
+        <div style="font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--primary);margin-bottom:14px;text-align:center">🔑 Recuperar Senha</div>
+
+        <!-- Passo 1: informar contato -->
+        <div id="recStep1">
+          <p style="font-size:14px;color:var(--text3);margin-bottom:12px;text-align:center;line-height:1.5">Digite seu e-mail para receber o código de recuperação</p>
+          <input type="text" class="ifield" id="recContato" placeholder="Seu e-mail" style="margin-bottom:10px">
+          <button class="btn-p" onclick="enviarCodigo()" style="font-size:15px;padding:13px">Enviar código</button>
+        </div>
+
+        <!-- Passo 2: inserir código e nova senha -->
+        <div id="recStep2" style="display:none">
+          <p style="font-size:14px;color:var(--green);margin-bottom:12px;text-align:center;font-weight:700">✅ Código enviado!</p>
+          <input type="text" class="ifield" id="recCodigo" placeholder="Digite o código de 6 dígitos" style="margin-bottom:10px;letter-spacing:4px;text-align:center;font-size:18px;font-weight:800">
+          <div style="position:relative;margin-bottom:10px">
+            <input type="password" class="ifield" id="recNovaSenha" placeholder="Nova senha (mín. 4 caracteres)" style="padding-right:50px">
+            <button onclick="togglePassRec()" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);padding:0" id="eyeBtnRec">👁️</button>
+          </div>
+          <button class="btn-p" onclick="redefinirSenha()" style="font-size:15px;padding:13px">Redefinir senha</button>
+          <div style="text-align:center;margin-top:10px">
+            <button onclick="enviarCodigo()" style="background:none;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline">Reenviar código</button>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-top:12px">
+          <button onclick="hideRecuperar()" style="background:none;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:13px;cursor:pointer">← Voltar ao login</button>
+        </div>
+      </div>
+      <!-- Código de cortesia -->
+      <div class="code-box">
+        <div class="div-or">ou use um código de cortesia</div>
+        <div class="code-row">
+          <input type="text" class="code-input" id="codeInput" placeholder="BENCAO-XXXX-XXXX" maxlength="20">
+          <button class="btn-code" onclick="useCode()">Usar código</button>
+        </div>
+      </div>
+      <div class="lnote">Ao entrar você concorda com os<br><span class="llink">Termos de Uso</span> e <span class="llink">Política de Privacidade</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PLANOS ══ -->
+<div id="sPlanos" class="screen">
+  <div class="ph">
+    <h2>✝️ Experimente Grátis</h2>
+    <p>3 dias grátis com acesso completo — sem cartão</p>
+  </div>
+
+  <div class="trial-banner">
+    <h3>🎁 3 dias grátis para você!</h3>
+    <p>Experimente todas as funcionalidades sem pagar nada.<br>Depois escolha o plano que cabe no seu bolso.</p>
+  </div>
+
+  <div class="pgrid">
+    <div class="pcard pop" onclick="startTrial()">
+      <div class="ptop"><div><div class="pname">Trial Grátis</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Experimente tudo</div></div><div class="pemoji">🎁</div></div>
+      <div class="ptop"><div class="pval" style="color:var(--green)">R$ 0</div><div class="pper">por 3 dias</div></div>
+      <div class="pfeats">
+        <div class="feat">✅ Acesso completo</div>
+        <div class="feat">✅ Todos os tipos de card</div>
+        <div class="feat">✅ Imagem de fundo</div>
+        <div class="feat">✅ 6 temas de cores</div>
+        <div class="feat" style="opacity:.4">❌ Logo personalizada</div>
+      </div>
+      <button class="btn-plan">Começar grátis agora</button>
+    </div>
+
+    <div class="pcard" onclick="goMP('fiel_mensal')">
+      <div class="ptop"><div><div class="pname">Fiel Mensal</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Uso pessoal</div></div><div class="pemoji">⭐</div></div>
+      <div class="ptop"><div><div class="pval">R$10</div><div class="pper">/mês</div></div></div>
+      <div class="pfeats">
+        <div class="feat">✅ Tudo do Trial</div>
+        <div class="feat">✅ Acesso completo</div>
+        <div class="feat">✅ PIX, cartão ou boleto</div>
+        <div class="feat">✅ Cancele quando quiser</div>
+        <div class="feat" style="opacity:.4">❌ Logo personalizada</div>
+      </div>
+      <button class="btn-plan">Assinar por R$10/mês</button>
+    </div>
+
+    <div class="pcard pop" onclick="goMP('fiel_anual')">
+      <div class="ptop"><div><div class="pname">Fiel Anual</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Melhor custo-benefício</div></div><div class="pemoji">🌟</div></div>
+      <div class="ptop"><div><div class="pval">R$99</div><div class="pper">/ano — R$8,25/mês</div></div></div>
+      <div class="pfeats">
+        <div class="feat">✅ Tudo do Fiel Mensal</div>
+        <div class="feat">✅ Economia de R$21/ano</div>
+        <div class="feat">✅ PIX, cartão ou boleto</div>
+        <div class="feat">✅ Suporte prioritário</div>
+        <div class="feat" style="opacity:.4">❌ Logo personalizada</div>
+      </div>
+      <button class="btn-plan">Assinar por R$99/ano</button>
+    </div>
+
+    <div class="pcard" onclick="goMP('paroquia')">
+      <div class="ptop"><div><div class="pname">Paróquia</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Igrejas e empresas</div></div><div class="pemoji">⛪</div></div>
+      <div class="ptop"><div><div class="pval">R$57</div><div class="pper">/mês</div></div></div>
+      <div class="pfeats">
+        <div class="feat">✅ Tudo do Fiel</div>
+        <div class="feat">✅ Logo da paróquia no card</div>
+        <div class="feat">✅ Até 5 usuários</div>
+        <div class="feat">✅ Suporte WhatsApp</div>
+        <div class="feat">✅ Relatórios de uso</div>
+      </div>
+      <button class="btn-plan">Assinar Paróquia</button>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:8px">
+    <button onclick="verificarPagamento()" style="background:transparent;border:none;color:var(--primary);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;text-decoration:underline;padding:10px">
+      ✅ Já paguei — Verificar minha assinatura
+    </button>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="sApp" class="screen">
+  <div class="abody">
+
+    <div class="trial-info" id="trialInfo" style="display:none">
+      <span class="ic">⏳</span>
+      <div><p>Você está no período de teste gratuito.<br><strong id="trialDays">3 dias restantes</strong> — <span style="color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="goScreen('sPlanos')">Assinar agora →</span></p></div>
+    </div>
+
+    <div class="lbanner" id="lbanner" style="display:none">
+      <span class="ic">⚡</span>
+      <div><p>Seu período de teste <strong>expirou</strong>.<br>Assine para continuar usando.</p><button class="btn-up" onclick="goScreen('sPlanos')">Ver planos →</button></div>
+    </div>
+
+    <div class="sect" id="cfg">
+      <div class="stit">Momento do dia</div>
+      <div class="g3">
+        <button class="selbtn on" onclick="setMode('dia',this)"><span class="ic">☀️</span>Bom Dia</button>
+        <button class="selbtn" onclick="setMode('tarde',this)"><span class="ic">🌤️</span>Boa Tarde</button>
+        <button class="selbtn" onclick="setMode('noite',this)"><span class="ic">🌙</span>Boa Noite</button>
+      </div>
+
+      <div class="stit" style="margin-top:22px">Tipo de mensagem</div>
+      <div class="g2" style="margin-bottom:10px">
+        <button class="selbtn on" onclick="setType('versiculo',this)"><span class="ic">📖</span>Versículo Bíblico</button>
+        <button class="selbtn" onclick="setType('inspiradora',this)"><span class="ic">💬</span>Mensagem Inspiradora</button>
+      </div>
+      <div class="g2" style="margin-bottom:10px">
+        <button class="selbtn" onclick="setType('motivacional',this)"><span class="ic">🔥</span>Mensagem Motivacional</button>
+        <button class="selbtn" onclick="setType('mariana',this)"><span class="ic">💙</span>Mensagem Mariana</button>
+      </div>
+      <div class="g2" style="margin-bottom:10px">
+        <button class="selbtn" onclick="setType('autocuidado',this)"><span class="ic">🌿</span>Autocuidado</button>
+        <button class="selbtn" onclick="setType('divertida',this)"><span class="ic">😄</span>Mensagem Divertida</button>
+      </div>
+      <div class="g2">
+        <button class="selbtn" onclick="setType('propria',this)" style="grid-column:1/-1"><span class="ic">✏️</span>Escrever minha própria mensagem</button>
+      </div>
+
+      <!-- Campo mensagem própria -->
+      <div id="msgPropriaBox" style="display:none;margin-top:12px">
+        <span class="flbl">Sua mensagem</span>
+        <textarea class="iapp" id="msgPropria" placeholder="Digite aqui sua mensagem para o card..." style="resize:none;height:90px;line-height:1.6;font-weight:500"></textarea>
+      </div>
+
+      <div class="fst">
+        <div>
+          <span class="flbl">Tema</span>
+          <select id="theme">
+            <option value="automatico">✨ Automático</option>
+            <option value="fé">Fé</option>
+            <option value="esperança">Esperança</option>
+            <option value="amor">Amor ao próximo</option>
+            <option value="gratidão">Gratidão a Deus</option>
+            <option value="paz">Paz interior</option>
+            <option value="família">Família</option>
+            <option value="sabedoria">Sabedoria</option>
+            <option value="cura">Cura e saúde</option>
+            <option value="nossa-senhora">Nossa Senhora</option>
+            <option value="quaresma">Quaresma</option>
+            <option value="advento">Advento</option>
+            <option value="pascoa">Páscoa</option>
+          </select>
+        </div>
+        <div>
+          <span class="flbl">Assinatura</span>
+          <input type="text" class="iapp" id="sig" value="🙏 Paz e Bem!" placeholder="Ex: Grupo de Oração">
+        </div>
+      </div>
+
+      <div class="stit" style="margin-top:22px">Imagem de fundo</div>
+      <div class="upz" id="upz">
+        <input type="file" id="imgInput" accept="image/*" onchange="handleImg(event)">
+        <span class="upic">🖼️</span>
+        <div class="uptx">Toque para escolher a foto de fundo<span>A imagem fica atrás do texto</span></div>
+      </div>
+      <div class="pvw" id="pvw">
+        <img id="pvwi" class="pvwi" src="" alt="">
+        <button class="rmbtn" onclick="removeImg()">✕ Remover</button>
+      </div>
+
+      <!-- Logo (só plano Paróquia) -->
+      <div id="logoSection" style="display:none;margin-top:16px">
+        <div class="stit">Logo da paróquia/empresa</div>
+        <div class="upz" id="upzLogo">
+          <input type="file" id="logoInput" accept="image/*" onchange="handleLogo(event)">
+          <span class="upic">🏛️</span>
+          <div class="uptx">Toque para adicionar a logo<span>Aparecerá no card</span></div>
+        </div>
+        <div class="pvw" id="pvwLogo">
+          <img id="pvwLogoI" class="pvwi" src="" alt="">
+          <button class="rmbtn" onclick="removeLogo()">✕ Remover</button>
+        </div>
+      </div>
+
+      <div class="errbox" id="err"></div>
+      <button class="genbtn" id="genbtn" onclick="gen()">✝️ &nbsp;Criar Card Agora</button>
+    </div>
+
+    <div class="load" id="load">
+      <span class="lic">🙏</span>
+      <p>Criando sua mensagem...</p>
+    </div>
+
+    <div class="rcard" id="rcard">
+      <div class="rhead">
+        <h2>✝️ Card Pronto!</h2>
+        <span class="dbadge" id="ddisp"></span>
+      </div>
+      <div class="rbody">
+        <span class="plbl">PRÉVIA — SALVE E ENVIE PELO WHATSAPP</span>
+        <div id="cardV">
+          <img id="cardBg" src="" alt="">
+          <div id="cardOv"></div>
+          <div id="cardCt">
+            <div class="ctit" id="cTit">Bom Dia</div>
+            <div class="cbody">
+              <div class="ctxt" id="cTxt"></div>
+              <div class="cref" id="cRef"></div>
+            </div>
+            <div class="cfoot">
+              <img id="cLogo" class="clogo" src="" alt="" style="display:none">
+              <div class="csig" id="cSig"></div>
+            </div>
+          </div>
+        </div>
+        <div class="snote">
+          <strong>📲 Como enviar</strong>
+          Salve o card → abra o WhatsApp → envie a imagem para seus contatos.
+        </div>
+        <div class="arow">
+          <button class="abtn abtn-s" onclick="saveCard()">💾 &nbsp;Salvar Card</button>
+          <button class="abtn abtn-n" onclick="rst()">↺ &nbsp;Criar Novo</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ ADMIN ══ -->
+<div id="sAdmin" class="screen">
+<style>
+/* Dashboard styles */
+.dash-wrap{max-width:900px;margin:0 auto;padding:16px 16px 60px}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.dash-header h2{font-family:'Dancing Script',cursive;font-size:clamp(22px,6vw,30px);color:var(--primary);font-weight:700}
+.dash-header p{font-size:13px;color:var(--text3);margin-top:2px}
+
+/* KPI cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--primary)}
+.kpi.green::before{background:var(--green)}
+.kpi.blue::before{background:#4a9eed}
+.kpi.purple::before{background:#9c6fd6}
+.kpi-val{font-size:clamp(24px,6vw,36px);font-weight:800;color:var(--primary);line-height:1}
+.kpi.green .kpi-val{color:var(--green)}
+.kpi.blue .kpi-val{color:#4a9eed}
+.kpi.purple .kpi-val{color:#9c6fd6}
+.kpi-lbl{font-size:12px;color:var(--text3);margin-top:6px;font-weight:600;letter-spacing:.5px}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:3px;opacity:.7}
+
+/* Receita */
+.receita-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+.receita-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px}
+.receita-icon{font-size:24px;flex-shrink:0}
+.receita-info .val{font-size:18px;font-weight:800;color:var(--primary)}
+.receita-info .lbl{font-size:12px;color:var(--text3);font-weight:600;margin-top:2px}
+
+/* Tabs */
+.dash-tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
+.dash-tab{padding:9px 18px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:all .2s}
+.dash-tab.on{background:var(--primary);color:var(--bg);border-color:var(--primary)}
+
+/* Filtros */
+.filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .2s}
+.filter-btn.on{border-color:var(--primary);color:var(--primary);background:var(--border)}
+
+/* Tabela usuários */
+.user-table{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.user-table-head{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:10px 14px;background:var(--border);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.user-row{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:12px 14px;border-top:1px solid var(--border);align-items:center;transition:background .2s}
+.user-row:hover{background:var(--border)}
+.user-email-cell{font-size:14px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.user-email-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.plan-tag{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;white-space:nowrap}
+.plan-tag.trial{background:rgba(37,211,102,.12);color:var(--green)}
+.plan-tag.fiel{background:rgba(201,168,76,.15);color:var(--primary)}
+.plan-tag.paroquia{background:rgba(156,111,214,.15);color:#9c6fd6}
+.plan-tag.gratis{background:var(--border);color:var(--text3)}
+.plan-tag.bloqueado{background:rgba(180,40,40,.15);color:#e8a0a0}
+.plan-tag.cortesia{background:rgba(74,158,237,.12);color:#4a9eed}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.active{background:var(--green)}
+.status-dot.inactive{background:#e8a0a0}
+.status-dot.trial{background:var(--primary)}
+
+/* Ações usuário */
+.user-actions{display:flex;gap:6px;flex-shrink:0}
+.ua-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;border:none;-webkit-tap-highlight-color:transparent;transition:all .2s}
+.ua-btn.enable{background:rgba(37,211,102,.15);color:var(--green)}
+.ua-btn.block{background:rgba(180,40,40,.12);color:#e8a0a0}
+.ua-btn.plan{background:var(--border);color:var(--primary)}
+
+/* Modal editar usuário */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.on{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:400px;animation:fadeUp .3s ease both}
+.modal-box h3{font-size:16px;font-weight:800;color:var(--primary);margin-bottom:16px}
+.modal-field{margin-bottom:14px}
+.modal-field label{display:block;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.modal-row{display:flex;gap:10px;margin-top:16px}
+.modal-btn{flex:1;padding:12px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;border:none;-webkit-tap-highlight-color:transparent}
+.modal-btn.save{background:linear-gradient(135deg,var(--accent),var(--primary));color:var(--bg)}
+.modal-btn.cancel{background:var(--bg3);border:1px solid var(--border);color:var(--text3)}
+.modal-btn.danger{background:rgba(180,40,40,.2);color:#e8a0a0;border:1px solid rgba(180,40,40,.3)}
+
+/* Códigos dashboard */
+.code-dash-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+
+/* Busca */
+.search-box{position:relative;margin-bottom:14px}
+.search-box input{width:100%;padding:11px 14px 11px 38px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-family:'Nunito',sans-serif;font-size:15px;outline:none;-webkit-appearance:none}
+.search-box input:focus{border-color:var(--primary)}
+.search-box::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px}
+
+@media(min-width:480px){
+  .kpi-grid{grid-template-columns:repeat(4,1fr)}
+  .receita-grid{grid-template-columns:repeat(4,1fr)}
+  .dash-wrap{padding:24px 24px 72px}
+}
+</style>
+
+<div class="dash-wrap">
+  <div class="dash-header">
+    <div>
+      <h2>⚙️ Dashboard Admin</h2>
+      <p id="dashDate"></p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="loadAdmin()" style="padding:10px 16px;border-radius:10px;background:var(--border);border:1px solid var(--border2);color:var(--primary);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer">🔄 Atualizar</button>
+      <button class="btn-back" onclick="goScreen('sApp')" style="width:auto;padding:10px 16px">← App</button>
+      <button onclick="sairApp()" style="padding:10px 16px;border-radius:10px;background:rgba(180,40,40,.15);border:1px solid rgba(180,40,40,.3);color:#e8a0a0;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer">🚪 Sair</button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi"><div class="kpi-val" id="kpiTotal">0</div><div class="kpi-lbl">Total de usuários</div></div>
+    <div class="kpi green"><div class="kpi-val" id="kpiAtivos">0</div><div class="kpi-lbl">Assinantes ativos</div></div>
+    <div class="kpi blue"><div class="kpi-val" id="kpiTrial">0</div><div class="kpi-lbl">Em trial</div></div>
+    <div class="kpi purple"><div class="kpi-val" id="kpiBloqueados">0</div><div class="kpi-lbl">Bloqueados</div></div>
+  </div>
+
+  <!-- Receita estimada -->
+  <div class="receita-grid" id="receitaGrid">
+    <div class="receita-item"><span class="receita-icon">💚</span><div class="receita-info"><div class="val" id="recFielM">R$0</div><div class="lbl">Fiel Mensal</div></div></div>
+    <div class="receita-item"><span class="receita-icon">⭐</span><div class="receita-info"><div class="val" id="recFielA">R$0</div><div class="lbl">Fiel Anual</div></div></div>
+    <div class="receita-item"><span class="receita-icon">⛪</span><div class="receita-info"><div class="val" id="recParoquia">R$0</div><div class="lbl">Paróquia</div></div></div>
+    <div class="receita-item"><span class="receita-icon">💰</span><div class="receita-info"><div class="val" id="recTotal">R$0</div><div class="lbl">Total/mês</div></div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="dash-tabs">
+    <button class="dash-tab on" onclick="showTab('tabUsuarios',this)">👥 Usuários</button>
+    <button class="dash-tab" onclick="showTab('tabCodigos',this)">🎟️ Códigos</button>
+    <button class="dash-tab" onclick="showTab('tabGraficos',this)">📊 Distribuição</button>
+  </div>
+
+  <!-- Tab Usuários -->
+  <div id="tabUsuarios">
+    <div class="search-box">
+      <input type="text" id="searchUser" placeholder="Buscar por e-mail..." oninput="filtrarUsuarios()">
+    </div>
+    <div class="filter-row" id="filterRow">
+      <button class="filter-btn on" onclick="setFiltro('todos',this)">Todos</button>
+      <button class="filter-btn" onclick="setFiltro('Trial',this)">Trial</button>
+      <button class="filter-btn" onclick="setFiltro('Fiel Mensal',this)">Fiel Mensal</button>
+      <button class="filter-btn" onclick="setFiltro('Fiel Anual',this)">Fiel Anual</button>
+      <button class="filter-btn" onclick="setFiltro('Paróquia',this)">Paróquia</button>
+      <button class="filter-btn" onclick="setFiltro('Bloqueado',this)">Bloqueados</button>
+    </div>
+    <div class="user-table">
+      <div class="user-table-head">
+        <div>Usuário</div>
+        <div>Plano</div>
+        <div>Status</div>
+        <div>Ações</div>
+      </div>
+      <div id="userTableBody"></div>
+    </div>
+  </div>
+
+  <!-- Tab Códigos -->
+  <div id="tabCodigos" style="display:none">
+    <div class="admin-sect">
+      <h3>🎟️ Gerar Novo Código</h3>
+      <div class="code-dash-row">
+        <select id="codeDays" style="flex:1">
+          <option value="30">30 dias</option>
+          <option value="60">60 dias</option>
+          <option value="90">90 dias</option>
+          <option value="180">6 meses</option>
+          <option value="365">1 ano</option>
+        </select>
+        <select id="codeUsos" style="flex:1">
+          <option value="1">Uso único</option>
+          <option value="5">5 usos</option>
+          <option value="10">10 usos</option>
+          <option value="999">Ilimitado</option>
+        </select>
+        <button class="btn-gen-code" onclick="genCode()">✦ Gerar</button>
+      </div>
+      <div class="code-list" id="codeList">
+        <p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum código gerado ainda.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Gráficos -->
+  <div id="tabGraficos" style="display:none">
+    <div class="admin-sect">
+      <h3>📊 Distribuição por Plano</h3>
+      <div id="chartPlanos" style="padding:8px 0"></div>
+    </div>
+    <div class="admin-sect">
+      <h3>📅 Cadastros por período</h3>
+      <div id="chartCadastros" style="padding:8px 0"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal editar usuário -->
+<div class="modal-overlay" id="modalUser">
+  <div class="modal-box">
+    <h3>✏️ Editar Usuário</h3>
+    <div class="modal-field">
+      <label>E-mail</label>
+      <div style="font-size:14px;color:var(--text2);padding:10px;background:var(--bg3);border-radius:8px;word-break:break-all" id="modalEmail"></div>
+    </div>
+    <div class="modal-field">
+      <label>Plano</label>
+      <select id="modalPlano" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-family:'Nunito',sans-serif;font-size:15px;padding:11px 14px;outline:none;-webkit-appearance:none">
+        <option value="Trial">Trial (3 dias grátis)</option>
+        <option value="Fiel Mensal">Fiel Mensal — R$10/mês</option>
+        <option value="Fiel Anual">Fiel Anual — R$99/ano</option>
+        <option value="Paróquia">Paróquia — R$57/mês</option>
+        <option value="Cortesia">Cortesia</option>
+        <option value="Bloqueado">Bloqueado</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Observação</label>
+      <input type="text" id="modalObs" placeholder="Ex: pagamento confirmado, inadimplente..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-family:'Nunito',sans-serif;font-size:15px;padding:11px 14px;outline:none;-webkit-appearance:none">
+    </div>
+    <div class="modal-row">
+      <button class="modal-btn cancel" onclick="closeModalUser()">Cancelar</button>
+      <button class="modal-btn save" onclick="salvarUsuario()">✅ Salvar</button>
+    </div>
+    <div class="modal-row" style="margin-top:8px">
+      <button class="modal-btn danger" onclick="bloquearUsuario()" style="width:100%">🚫 Bloquear acesso</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════
+// CONFIGURAÇÕES
+// ════════════════════════════════════════
+const ADMIN_PASS = 'BencaoDia@2025!'; // Senha do administrador
+const MP_LINKS = {
+  fiel:     'https://pay.hotmart.com/O105656518E?off=2dk2prev',
+  paroquia: 'https://pay.hotmart.com/O105656518E?off=j94c3ez1',
+};
+const TRIAL_DAYS = 3;
+
+const today    = new Date();
+const dShort   = today.toLocaleDateString('pt-BR');
+const dFull    = today.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+// Estado
+let curUser = {name:'',email:'',plan:'',trialStart:null,cardsToday:0};
+let curMode = 'dia', curType = 'versiculo';
+let imgDataUrl = null, logoDataUrl = null;
+
+const modeData = {
+  dia:  {title:'Bom Dia',   emoji:'☀️', cor:'#f5d78a'},
+  tarde:{title:'Boa Tarde', emoji:'🌤️', cor:'#f5c46a'},
+  noite:{title:'Boa Noite', emoji:'🌙', cor:'#c5b8f5'},
+};
+
+// ════════════════════════════════════════
+// TELAS
+// ════════════════════════════════════════
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ════════════════════════════════════════
+// TEMA
+// ════════════════════════════════════════
+function setTheme(cls,el){
+  document.body.className=cls;
+  document.querySelectorAll('.topt').forEach(o=>o.classList.remove('on'));
+  el.classList.add('on');
+  localStorage.setItem('bd_tema',cls);
+  closeTP(); toast('✦ Tema aplicado!');
+}
+function toggleTP(){document.getElementById('tpanel').classList.toggle('on')}
+function closeTP(){document.getElementById('tpanel').classList.remove('on')}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#tpanel')&&!e.target.closest('.ibtn')) closeTP();
+});
+(function(){
+  const t=localStorage.getItem('bd_tema');
+  if(t){
+    document.body.className=t;
+    document.querySelectorAll('.topt').forEach(o=>{
+      if(o.getAttribute('onclick')?.includes("'"+t+"'")) o.classList.add('on');
+      else o.classList.remove('on');
+    });
+  }
+})();
+
+// ════════════════════════════════════════
+// RECUPERAR SENHA
+// ════════════════════════════════════════
+function showRecuperar(){
+  document.getElementById('modalRecuperar').style.display='block';
+  document.getElementById('eform').style.display='none';
+}
+function hideRecuperar(){
+  document.getElementById('modalRecuperar').style.display='none';
+  document.getElementById('eform').style.display='block';
+  document.getElementById('recStep1').style.display='block';
+  document.getElementById('recStep2').style.display='none';
+  document.getElementById('recContato').value='';
+  document.getElementById('recCodigo').value='';
+  document.getElementById('recNovaSenha').value='';
+}
+function togglePassRec(){
+  const p=document.getElementById('recNovaSenha');
+  const btn=document.getElementById('eyeBtnRec');
+  p.type=p.type==='password'?'text':'password';
+  btn.textContent=p.type==='password'?'👁️':'🙈';
+}
+
+async function enviarCodigo(){
+  const contato=document.getElementById('recContato').value.trim();
+  if(!contato){toast('⚠️ Informe seu e-mail.');return;}
+
+  toast('⏳ Enviando código...');
+  try{
+    const res=await fetch('/.netlify/functions/recuperar',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'enviar',contato})
+    });
+    const data=await res.json();
+    if(data.success){
+      document.getElementById('recStep1').style.display='none';
+      document.getElementById('recStep2').style.display='block';
+      toast('✅ Código enviado!');
+      // Debug — remove em produção
+      if(data.code_debug) toast(`Código: ${data.code_debug}`);
+    } else {
+      toast('⚠️ '+(data.error||'Erro ao enviar.'));
+    }
+  }catch(e){
+    toast('⚠️ Erro ao enviar código.');
+  }
+}
+
+async function redefinirSenha(){
+  const contato=document.getElementById('recContato').value.trim();
+  const codigo=document.getElementById('recCodigo').value.trim();
+  const novaSenha=document.getElementById('recNovaSenha').value.trim();
+
+  if(!codigo){toast('⚠️ Digite o código.');return;}
+  if(!novaSenha||novaSenha.length<4){toast('⚠️ Senha deve ter mín. 4 caracteres.');return;}
+
+  try{
+    const res=await fetch('/.netlify/functions/recuperar',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'verificar',contato,codigo})
+    });
+    const data=await res.json();
+    if(data.success){
+      // Atualiza senha no localStorage
+      const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+      if(contas[contato]){
+        contas[contato].senha=btoa(novaSenha);
+        localStorage.setItem('bd_contas',JSON.stringify(contas));
+        toast('✅ Senha redefinida com sucesso!');
+        setTimeout(()=>hideRecuperar(),1500);
+      } else {
+        toast('⚠️ Conta não encontrada.');
+      }
+    } else {
+      toast('⚠️ '+(data.error||'Código incorreto.'));
+    }
+  }catch(e){
+    toast('⚠️ Erro ao redefinir senha.');
+  }
+}
+
+// ════════════════════════════════════════
+// TOGGLE SENHA
+// ════════════════════════════════════════
+function togglePass(){
+  const p=document.getElementById('pi');
+  const btn=document.getElementById('eyeBtn');
+  if(p.type==='password'){
+    p.type='text';
+    btn.textContent='🙈';
+  } else {
+    p.type='password';
+    btn.textContent='👁️';
+  }
+}
+
+// ════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════
+function loginWith(provider){
+  curUser.name  = provider==='Google'?'Usuário Google':'Usuário Apple';
+  curUser.email = provider.toLowerCase()+'@demo.com';
+  document.getElementById('eform').classList.add('on');
+  document.getElementById('ei').value = curUser.email;
+  document.getElementById('ei').setAttribute('readonly','true');
+  document.getElementById('pi').style.display='none';
+  document.getElementById('btnE').textContent=`Entrar com ${provider}`;
+  toast(`Toque em "Entrar com ${provider}"`);
+}
+
+function toggleEF(){
+  document.getElementById('eform').classList.toggle('on');
+  document.getElementById('ei').removeAttribute('readonly');
+  document.getElementById('pi').style.display='block';
+  document.getElementById('btnE').textContent='Entrar / Cadastrar';
+}
+
+// ════════════════════════════════════════
+// SESSÃO ÚNICA — verifica a cada 30s
+// ════════════════════════════════════════
+let sessaoId='';
+let sessaoInterval=null;
+
+function gerarSessaoId(){
+  return Date.now().toString(36)+Math.random().toString(36).substr(2,8);
+}
+
+function iniciarSessao(email){
+  sessaoId=gerarSessaoId();
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  if(contas[email]){
+    contas[email].sessaoAtiva=sessaoId;
+    contas[email].sessaoTs=Date.now();
+    localStorage.setItem('bd_contas',JSON.stringify(contas));
+  }
+  // Verifica sessão a cada 30 segundos
+  if(sessaoInterval) clearInterval(sessaoInterval);
+  sessaoInterval=setInterval(()=>verificarSessao(email),30000);
+}
+
+function verificarSessao(email){
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  const c=contas[email];
+  if(!c) return;
+  // Verifica se foi bloqueado
+  if(c.plano==='Bloqueado'){
+    clearInterval(sessaoInterval);
+    sairForcado('🚫 Seu acesso foi bloqueado pelo administrador.');
+    return;
+  }
+  // Verifica sessão duplicada
+  if(c.sessaoAtiva && c.sessaoAtiva!==sessaoId){
+    clearInterval(sessaoInterval);
+    sairForcado('⚠️ Sua conta foi acessada em outro dispositivo. Por segurança, você foi desconectado.');
+    return;
+  }
+  // Atualiza timestamp da sessão
+  contas[email].sessaoTs=Date.now();
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+}
+
+function sairForcado(msg){
+  encerrarSessao();
+  alert(msg);
+  location.reload();
+}
+
+function encerrarSessao(){
+  if(sessaoInterval) clearInterval(sessaoInterval);
+  sessaoInterval=null;
+  if(curUser.email && curUser.plan!=='Admin'){
+    const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+    if(contas[curUser.email]&&contas[curUser.email].sessaoAtiva===sessaoId){
+      delete contas[curUser.email].sessaoAtiva;
+      localStorage.setItem('bd_contas',JSON.stringify(contas));
+    }
+  }
+}
+
+function sairApp(){
+  if(!confirm('Deseja sair do aplicativo?')) return;
+  encerrarSessao();
+  curUser={name:'',email:'',plan:'',trialStart:null,cardsToday:0};
+  sessaoId='';
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('ei').value='';
+  document.getElementById('pi').value='';
+  goScreen('sLogin');
+  toast('✦ Você saiu com segurança.');
+}
+
+// ════════════════════════════════════════
+// VERIFICAÇÃO DE EMAIL — novo cadastro
+// ════════════════════════════════════════
+let pendingEmail='', pendingPass='', pendingCode='';
+
+async function enviarCodigoVerificacao(email){
+  const code=Math.floor(100000+Math.random()*900000).toString();
+  pendingCode=code;
+  try{
+    const res=await fetch('/.netlify/functions/recuperar',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'enviar',contato:email,assunto:'Verificação de cadastro',mensagem:`Seu código de verificação para o Bênção do Dia é: ${code}`})
+    });
+    const data=await res.json();
+    console.log('Código enviado:', code);
+    return data.success;
+  }catch(e){
+    console.error('Erro ao enviar código:', e);
+    return false;
+  }
+}
+
+async function confirmarCodigo(){
+  const digitado=document.getElementById('verifyCode').value.trim();
+  if(!digitado){toast('⚠️ Digite o código.');return;}
+  if(digitado!==pendingCode){toast('❌ Código incorreto. Tente novamente.');return;}
+
+  // Código correto — finaliza cadastro
+  const ts=new Date().toISOString();
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  contas[pendingEmail]={
+    nome:pendingEmail.split('@')[0],
+    senha:btoa(pendingPass),
+    plano:'Trial',
+    trialStart:ts,
+    verificado:true,
+    cadastroEm:ts
+  };
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+
+  curUser.name=contas[pendingEmail].nome;
+  curUser.email=pendingEmail;
+  curUser.plan='Trial';
+  curUser.trialStart=ts;
+
+  document.getElementById('verifyBox').style.display='none';
+  document.getElementById('eform').style.display='block';
+
+  toast('✅ E-mail verificado! Bem-vindo!');
+  iniciarSessao(pendingEmail);
+  afterLogin(false);
+}
+
+async function reenviarCodigo(){
+  toast('⏳ Reenviando código...');
+  const ok=await enviarCodigoVerificacao(pendingEmail);
+  toast(ok?'✅ Novo código enviado!':'⚠️ Erro ao reenviar. Tente novamente.');
+}
+
+function cancelarVerificacao(){
+  pendingEmail='';pendingPass='';pendingCode='';
+  document.getElementById('verifyBox').style.display='none';
+  document.getElementById('eform').style.display='block';
+  document.getElementById('verifyCode').value='';
+}
+
+// ════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════
+async function loginEmail(){
+  const eEl=document.getElementById('ei');
+  const pEl=document.getElementById('pi');
+  const e=eEl.value.trim(), p=pEl.value.trim();
+
+  // Admin
+  if(p===ADMIN_PASS){
+    curUser={name:'Admin',email:e||'admin',plan:'Admin',trialStart:null,cardsToday:0};
+    afterLogin(true);
+    return;
+  }
+
+  if(!e){toast('⚠️ Informe seu e-mail.');eEl.focus();return;}
+  if(!p){toast('⚠️ Informe sua senha.');pEl.focus();return;}
+
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+
+  if(contas[e]){
+    // Usuário existe — verifica bloqueio
+    if(contas[e].plano==='Bloqueado'){
+      toast('🚫 Seu acesso está bloqueado. Entre em contato com o suporte.');
+      return;
+    }
+    // Verifica senha
+    if(contas[e].senha!==btoa(p)){
+      toast('⚠️ Senha incorreta.');pEl.value='';pEl.focus();return;
+    }
+    // Verifica sessão ativa em outro dispositivo
+    if(contas[e].sessaoAtiva&&contas[e].sessaoTs){
+      const diff=(Date.now()-contas[e].sessaoTs)/1000;
+      if(diff<60){ // Sessão ativa há menos de 60 segundos
+        toast('⚠️ Esta conta já está conectada em outro dispositivo.');
+        return;
+      }
+    }
+    curUser.name=contas[e].nome;
+    curUser.email=e;
+    curUser.plan=contas[e].plano||'Trial';
+    curUser.trialStart=contas[e].trialStart||null;
+    iniciarSessao(e);
+    afterLogin(false);
+  } else {
+    // Novo usuário — envia código de verificação
+    pendingEmail=e;
+    pendingPass=p;
+    toast('⏳ Enviando código de verificação...');
+    const ok=await enviarCodigoVerificacao(e);
+    document.getElementById('eform').style.display='none';
+    document.getElementById('verifyBox').style.display='block';
+    document.getElementById('verifyEmailShow').textContent=e;
+    document.getElementById('verifyCode').value='';
+    if(ok){
+      toast('📧 Código enviado para seu e-mail!');
+    } else {
+      toast('⚠️ Não foi possível enviar o e-mail. Verifique o endereço.');
+    }
+  }
+}
+
+function afterLogin(isAdmin){
+  document.getElementById('avbtn').textContent=curUser.name.charAt(0).toUpperCase();
+  document.getElementById('topbar').style.display='flex';
+
+  if(isAdmin){
+    updateBadge('Admin');
+    goScreen('sApp');
+    updateAppUI();
+    document.getElementById('avbtn').onclick=()=>{goScreen('sAdmin');loadAdmin();};
+    return;
+  }
+
+  // Verifica bloqueio
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  if(contas[curUser.email]?.plano==='Bloqueado'){
+    toast('🚫 Acesso bloqueado.');
+    document.getElementById('topbar').style.display='none';
+    return;
+  }
+
+  const trialStatus=checkTrial();
+  const plano=curUser.plan;
+
+  if(['Paróquia','Fiel Mensal','Fiel Anual','Fiel','Cortesia'].includes(plano)){
+    updateBadge(plano);
+    goScreen('sApp');
+    updateAppUI();
+  } else if(trialStatus==='active'){
+    updateBadge('Trial 🎁');
+    goScreen('sApp');
+    updateAppUI();
+  } else if(trialStatus==='expired'){
+    updateBadge('Trial Expirado');
+    toast('⏰ Seu período de teste expirou. Escolha um plano!');
+    setTimeout(()=>goScreen('sPlanos'),1500);
+  } else {
+    goScreen('sPlanos');
+  }
+}
+
+function checkTrial(){
+  if(!curUser.trialStart) return 'none';
+  const start=new Date(curUser.trialStart);
+  const diff=(new Date()-start)/(1000*60*60*24);
+  return diff<=TRIAL_DAYS?'active':'expired';
+}
+
+function trialDaysLeft(){
+  if(!curUser.trialStart) return 0;
+  const start=new Date(curUser.trialStart);
+  const diff=(new Date()-start)/(1000*60*60*24);
+  return Math.max(0,Math.ceil(TRIAL_DAYS-diff));
+}
+
+function updateBadge(txt){
+  const b=document.getElementById('pbadge');
+  b.textContent=txt;
+  b.className='pbadge';
+  if(txt.includes('Trial')) b.classList.add('trial');
+  if(txt==='Admin') b.classList.add('admin');
+}
+
+function updateAppUI(){
+  const ti=document.getElementById('trialInfo');
+  const lb=document.getElementById('lbanner');
+  const ls=document.getElementById('logoSection');
+  const ts=checkTrial();
+
+  ti.style.display='none';
+  lb.style.display='none';
+
+  if(curUser.plan==='Paróquia'||curUser.plan==='Admin'||curUser.plan==='Fiel'||curUser.plan==='Cortesia'){
+    ls.style.display='block';
+  } else {
+    ls.style.display='none';
+  }
+
+  if(curUser.plan==='Trial'||!curUser.plan){
+    if(ts==='active'){
+      ti.style.display='flex';
+      document.getElementById('trialDays').textContent=`${trialDaysLeft()} dia(s) restante(s)`;
+    } else if(ts==='expired'){
+      lb.style.display='flex';
+    }
+  }
+}
+
+function canUseApp(){
+  if(curUser.plan==='Admin') return true;
+  if(curUser.plan==='Fiel'||curUser.plan==='Paróquia'||curUser.plan==='Cortesia') return true;
+  const ts=checkTrial();
+  return ts==='active';
+}
+
+// ════════════════════════════════════════
+// CÓDIGO DE CORTESIA
+// ════════════════════════════════════════
+function useCode(){
+  const code=document.getElementById('codeInput').value.trim().toUpperCase();
+  if(!code){toast('⚠️ Digite o código.');return;}
+
+  const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
+  const c=codes[code];
+
+  if(!c){toast('❌ Código inválido.');return;}
+  if(c.used&&c.singleUse){toast('❌ Código já utilizado.');return;}
+  if(new Date()>new Date(c.expires)){toast('❌ Código expirado.');return;}
+
+  // Aplica o código
+  const email=document.getElementById('ei').value.trim()||'cortesia@bencaododia.app.br';
+  curUser.email=email;
+  curUser.name='Usuário';
+  curUser.plan='Cortesia';
+  curUser.trialStart=null;
+
+  if(c.singleUse){
+    codes[code].used=true;
+    localStorage.setItem('bd_codes',JSON.stringify(codes));
+  }
+
+  // Salva conta
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  contas[email]={nome:'Usuário',senha:'',plano:'Cortesia',trialStart:null,codeUsed:code};
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+
+  document.getElementById('topbar').style.display='flex';
+  document.getElementById('avbtn').textContent='U';
+  updateBadge('Cortesia 🎁');
+  toast('🎁 Código aplicado! Bem-vindo!');
+  goScreen('sApp');
+  updateAppUI();
+}
+
+// ════════════════════════════════════════
+// PLANOS / PAGAMENTO
+// ════════════════════════════════════════
+function startTrial(){
+  if(!curUser.email){
+    toast('⚠️ Faça login primeiro.');
+    goScreen('sLogin');
+    return;
+  }
+  const ts=new Date().toISOString();
+  curUser.plan='Trial';
+  curUser.trialStart=ts;
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  if(contas[curUser.email]){
+    contas[curUser.email].plano='Trial';
+    contas[curUser.email].trialStart=ts;
+    localStorage.setItem('bd_contas',JSON.stringify(contas));
+  }
+  updateBadge('Trial 🎁');
+  toast('🎁 Trial iniciado! Aproveite 3 dias grátis!');
+  goScreen('sApp');
+  updateAppUI();
+}
+
+function goMP(plano){
+  const email=encodeURIComponent(curUser.email||'');
+  const url=`/.netlify/functions/assinar?plano=${plano}&email=${email}`;
+  window.open(url,'_blank');
+  toast('✦ Abrindo pagamento seguro do Mercado Pago...');
+}
+
+async function verificarPagamento(){
+  toast('🔍 Verificando assinatura...');
+  try{
+    const res=await fetch(`/api/plano?email=${encodeURIComponent(curUser.email)}`);
+    const data=await res.json();
+    if(data?.plan&&data.plan!=='Grátis'){
+      curUser.plan=data.plan;
+      const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+      if(contas[curUser.email]){contas[curUser.email].plano=data.plan;localStorage.setItem('bd_contas',JSON.stringify(contas));}
+      updateBadge(data.plan);
+      toast(`✦ Plano ${data.plan} ativado!`);
+      setTimeout(()=>{goScreen('sApp');updateAppUI();},1000);
+    } else {
+      toast('⚠️ Assinatura não encontrada. Aguarde alguns minutos.');
+    }
+  }catch(e){toast('⚠️ Erro ao verificar. Tente novamente.');}
+}
+
+function goAdmin(){
+  if(curUser.plan==='Admin'){
+    goScreen('sAdmin');
+    loadAdmin();
+  } else {
+    goScreen('sPlanos');
+  }
+}
+
+// ════════════════════════════════════════
+// DASHBOARD ADMIN
+// ════════════════════════════════════════
+let filtroAtual='todos', editandoEmail='';
+
+function showTab(id,btn){
+  ['tabUsuarios','tabCodigos','tabGraficos'].forEach(t=>{document.getElementById(t).style.display=t===id?'block':'none';});
+  document.querySelectorAll('.dash-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function setFiltro(f,btn){
+  filtroAtual=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderUserTable();
+}
+function filtrarUsuarios(){renderUserTable();}
+function getContas(){return JSON.parse(localStorage.getItem('bd_contas')||'{}');}
+function getPlanClass(p){if(!p||p==='Trial')return 'trial';if(p==='Bloqueado')return 'bloqueado';if(p==='Cortesia')return 'cortesia';if(p==='Paróquia')return 'paroquia';return 'fiel';}
+function getTrialInfo(c){if(!c.trialStart)return{status:'none',dias:0};const diff=TRIAL_DAYS-((new Date()-new Date(c.trialStart))/(1000*60*60*24));return diff>0?{status:'active',dias:Math.ceil(diff)}:{status:'expired',dias:0};}
+
+function loadAdmin(){
+  document.getElementById('dashDate').textContent=`Atualizado em ${new Date().toLocaleString('pt-BR')}`;
+  renderKPIs();
+  renderUserTable();
+  renderCodes();
+  renderCharts();
+}
+
+function renderKPIs(){
+  const entries=Object.values(getContas());
+  const total=entries.length;
+  const ativos=entries.filter(c=>['Fiel Mensal','Fiel Anual','Paróquia','Cortesia'].includes(c.plano)).length;
+  const trial=entries.filter(c=>(!c.plano||c.plano==='Trial')&&getTrialInfo(c).status==='active').length;
+  const bloqueados=entries.filter(c=>c.plano==='Bloqueado').length;
+  document.getElementById('kpiTotal').textContent=total;
+  document.getElementById('kpiAtivos').textContent=ativos;
+  document.getElementById('kpiTrial').textContent=trial;
+  document.getElementById('kpiBloqueados').textContent=bloqueados;
+  const fielM=entries.filter(c=>c.plano==='Fiel Mensal').length;
+  const fielA=entries.filter(c=>c.plano==='Fiel Anual').length;
+  const par=entries.filter(c=>c.plano==='Paróquia').length;
+  const rFM=fielM*10, rFA=fielA*(99/12), rP=par*57, rT=rFM+rFA+rP;
+  document.getElementById('recFielM').textContent=`R$${rFM.toFixed(0)}`;
+  document.getElementById('recFielA').textContent=`R$${rFA.toFixed(0)}`;
+  document.getElementById('recParoquia').textContent=`R$${rP.toFixed(0)}`;
+  document.getElementById('recTotal').textContent=`R$${rT.toFixed(0)}`;
+}
+
+function renderUserTable(){
+  const contas=getContas();
+  const busca=document.getElementById('searchUser')?.value?.toLowerCase()||'';
+  let entries=Object.entries(contas);
+  if(filtroAtual!=='todos') entries=entries.filter(([,c])=>(c.plano||'Trial')===filtroAtual);
+  if(busca) entries=entries.filter(([email])=>email.toLowerCase().includes(busca));
+  const body=document.getElementById('userTableBody');
+  if(!entries.length){body.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:14px">Nenhum usuário encontrado.</div>';return;}
+  body.innerHTML=entries.map(([email,c])=>{
+    const plano=c.plano||'Trial';
+    const ti=getTrialInfo(c);
+    let prazoTxt='', isActive=false;
+    if(plano==='Trial'){if(ti.status==='active'){prazoTxt=`⏳ ${ti.dias}d restantes`;isActive=true;}else{prazoTxt='❌ Expirado';}}
+    else if(plano==='Bloqueado'){prazoTxt='🚫 Bloqueado';}
+    else if(plano==='Cortesia'){prazoTxt='🎁 Cortesia';isActive=true;}
+    else{prazoTxt='✅ Ativo';isActive=true;}
+    return `<div class="user-row">
+      <div style="min-width:0"><div class="user-email-cell">${email}</div><div class="user-email-sub">${prazoTxt}${c.obs?` · ${c.obs}`:''}</div></div>
+      <span class="plan-tag ${getPlanClass(plano)}">${plano}</span>
+      <div class="status-dot ${isActive?'active':'inactive'}"></div>
+      <div class="user-actions">
+        <button class="ua-btn plan" onclick="editarUsuario('${email}')">✏️</button>
+        ${isActive&&plano!=='Bloqueado'?`<button class="ua-btn block" onclick="bloquearRapido('${email}')">🚫</button>`:`<button class="ua-btn enable" onclick="habilitarRapido('${email}')">✅</button>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function editarUsuario(email){
+  editandoEmail=email;
+  const c=getContas()[email]||{};
+  document.getElementById('modalEmail').textContent=email;
+  document.getElementById('modalPlano').value=c.plano||'Trial';
+  document.getElementById('modalObs').value=c.obs||'';
+  document.getElementById('modalUser').classList.add('on');
+}
+function closeModalUser(){document.getElementById('modalUser').classList.remove('on');editandoEmail='';}
+function salvarUsuario(){
+  const contas=getContas();
+  if(!contas[editandoEmail])contas[editandoEmail]={};
+  contas[editandoEmail].plano=document.getElementById('modalPlano').value;
+  contas[editandoEmail].obs=document.getElementById('modalObs').value;
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+  closeModalUser();loadAdmin();toast('✅ Usuário atualizado!');
+}
+function bloquearUsuario(){
+  const contas=getContas();
+  if(contas[editandoEmail])contas[editandoEmail].plano='Bloqueado';
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+  closeModalUser();loadAdmin();toast('🚫 Usuário bloqueado.');
+}
+function bloquearRapido(email){
+  const contas=getContas();
+  if(contas[email])contas[email].plano='Bloqueado';
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+  loadAdmin();toast('🚫 Acesso bloqueado.');
+}
+function habilitarRapido(email){
+  const contas=getContas();
+  if(contas[email]){contas[email].plano='Trial';contas[email].trialStart=new Date().toISOString();}
+  localStorage.setItem('bd_contas',JSON.stringify(contas));
+  loadAdmin();toast('✅ Acesso habilitado.');
+}
+
+function renderCharts(){
+  const entries=Object.values(getContas());
+  const total=entries.length||1;
+  const counts={'Trial':0,'Fiel Mensal':0,'Fiel Anual':0,'Paróquia':0,'Cortesia':0,'Bloqueado':0};
+  entries.forEach(c=>{const p=c.plano||'Trial';if(counts[p]!==undefined)counts[p]++;});
+  const colors={'Trial':'#c9a84c','Fiel Mensal':'#25d366','Fiel Anual':'#4a9eed','Paróquia':'#9c6fd6','Cortesia':'#64b5f6','Bloqueado':'#e8a0a0'};
+  document.getElementById('chartPlanos').innerHTML=Object.entries(counts).map(([nome,qtd])=>{
+    const pct=Math.round((qtd/total)*100);
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:5px">
+        <span style="color:var(--text2)">${nome}</span>
+        <span style="color:${colors[nome]}">${qtd} (${pct}%)</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;height:10px;overflow:hidden">
+        <div style="background:${colors[nome]};width:${pct}%;height:100%;border-radius:6px"></div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('chartCadastros').innerHTML=`<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Total de cadastros: <strong style="color:var(--primary)">${entries.length}</strong></p>`;
+}
+
+function genCode(){
+  const days=parseInt(document.getElementById('codeDays').value);
+  const usos=parseInt(document.getElementById('codeUsos').value);
+  const code='BENCAO-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-'+Math.random().toString(36).substr(2,4).toUpperCase();
+  const expires=new Date(Date.now()+days*24*60*60*1000).toISOString();
+  const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
+  codes[code]={expires,days,usosMax:usos,usosUsados:0,singleUse:usos===1,createdAt:new Date().toISOString()};
+  localStorage.setItem('bd_codes',JSON.stringify(codes));
+  renderCodes();
+  toast(`✦ Código: ${code}`);
+}
+
+function renderCodes(){
+  const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
+  const el=document.getElementById('codeList');
+  const entries=Object.entries(codes).reverse();
+  if(!entries.length){el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum código gerado ainda.</p>';return;}
+  el.innerHTML=entries.map(([code,c])=>{
+    const expired=new Date()>new Date(c.expires);
+    const exp=new Date(c.expires).toLocaleDateString('pt-BR');
+    const usos=c.usosUsados||0;
+    const max=c.usosMax||1;
+    return `<div class="code-item">
+      <div><div class="code-val">${code}</div><div class="code-meta">${c.days}d • Expira: ${exp} • Usos: ${usos}/${max==='999'?'∞':max}</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="code-used ${usos>=max||expired?'yes':'no'}">${usos>=max||expired?'Esgotado':'Livre'}</span>
+        <button class="btn-copy-code" onclick="copyCode('${code}')">📋</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyCode(code){navigator.clipboard?.writeText(code).then(()=>toast('✦ Código copiado!'));}
+
+// ════════════════════════════════════════
+// APP — Modo / Tipo
+// ════════════════════════════════════════
+function setMode(m,btn){
+  curMode=m;
+  document.querySelectorAll('.g3 .selbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function setType(t,btn){
+  curType=t;
+  document.querySelectorAll('.g2 .selbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  // Mostra/esconde campo de mensagem própria
+  document.getElementById('msgPropriaBox').style.display=t==='propria'?'block':'none';
+}
+
+// ════════════════════════════════════════
+// IMAGENS
+// ════════════════════════════════════════
+function handleImg(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    imgDataUrl=ev.target.result;
+    document.getElementById('pvwi').src=imgDataUrl;
+    document.getElementById('pvw').classList.add('on');
+    document.getElementById('upz').classList.add('has');
+  };
+  r.readAsDataURL(f);
+}
+function removeImg(){
+  imgDataUrl=null;
+  document.getElementById('imgInput').value='';
+  document.getElementById('pvwi').src='';
+  document.getElementById('pvw').classList.remove('on');
+  document.getElementById('upz').classList.remove('has');
+}
+function handleLogo(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    logoDataUrl=ev.target.result;
+    document.getElementById('pvwLogoI').src=logoDataUrl;
+    document.getElementById('pvwLogo').classList.add('on');
+    document.getElementById('upzLogo').classList.add('has');
+  };
+  r.readAsDataURL(f);
+}
+function removeLogo(){
+  logoDataUrl=null;
+  document.getElementById('logoInput').value='';
+  document.getElementById('pvwLogoI').src='';
+  document.getElementById('pvwLogo').classList.remove('on');
+  document.getElementById('upzLogo').classList.remove('has');
+}
+
+// ════════════════════════════════════════
+// GERAR CARD
+// ════════════════════════════════════════
+async function gen(){
+  if(!canUseApp()){
+    setErr('Seu período de teste expirou. Assine para continuar.');
+    return;
+  }
+
+  const theme=document.getElementById('theme').value;
+  const sig=document.getElementById('sig').value.trim()||'🙏 Paz e Bem!';
+  const md=modeData[curMode];
+
+  setErr('');
+  const tTxt=theme==='automatico'?'Escolha o tema mais adequado.':`Tema: ${theme}.`;
+
+  // Mensagem própria — usa direto sem chamar IA
+  if(curType==='propria'){
+    const msgPropria=document.getElementById('msgPropria').value.trim();
+    if(!msgPropria){setErr('⚠️ Digite sua mensagem antes de criar o card.');return;}
+    document.getElementById('cfg').style.display='none';
+    document.getElementById('load').classList.add('on');
+    document.getElementById('genbtn').disabled=true;
+    setTimeout(()=>{
+      document.getElementById('cTit').textContent=md.title;
+      document.getElementById('cTit').style.color=md.cor;
+      document.getElementById('cTxt').textContent=msgPropria;
+      document.getElementById('cRef').textContent='';
+      document.getElementById('cRef').style.display='none';
+      document.getElementById('cSig').textContent=sig;
+      aplicarFundo(md);
+      curUser.cardsToday++;
+      localStorage.setItem('bd_cards_'+dShort,curUser.cardsToday);
+      updateAppUI();
+      document.getElementById('load').classList.remove('on');
+      document.getElementById('ddisp').textContent=`${md.emoji} ${dShort}`;
+      document.getElementById('rcard').classList.add('on');
+      window.scrollTo({top:0,behavior:'smooth'});
+    },500);
+    return;
+  }
+
+  document.getElementById('cfg').style.display='none';
+  document.getElementById('load').classList.add('on');
+  document.getElementById('genbtn').disabled=true;
+
+  const prompts={
+    versiculo:`Hoje é ${dFull}. Card católico de "${md.title}". ${tTxt}
+Use a Bíblia da CNBB. Máx 3 linhas. NÃO inicie com "${md.title}".
+Citação CNBB: abreviação oficial + vírgula: Jo 3,16 (não dois pontos).
+Retorne APENAS JSON: {"text":"versículo curto","ref":"Ab Cap,Ver","sig":"${sig}"}`,
+
+    inspiradora:`Hoje é ${dFull}. Mensagem inspiradora de "${md.title}". ${tTxt}
+Máx 3 linhas. Tom acolhedor e positivo. NÃO inicie com "${md.title}".
+Pode ser cristã em geral. SEM versículo bíblico. Linguagem simples.
+Retorne APENAS JSON: {"text":"mensagem inspiradora","ref":"","sig":"${sig}"}`,
+
+    motivacional:`Hoje é ${dFull}. Mensagem motivacional de "${md.title}". ${tTxt}
+Máx 3 linhas. Tom energético e encorajador. NÃO inicie com "${md.title}".
+Pode ser completamente secular — sobre superação, força, determinação, coragem.
+Retorne APENAS JSON: {"text":"mensagem motivacional","ref":"","sig":"${sig}"}`,
+
+    mariana:`Hoje é ${dFull}. Mensagem mariana de "${md.title}". ${tTxt}
+Máx 3 linhas. Tom devocional e amoroso. NÃO inicie com "${md.title}".
+Sobre Nossa Senhora ou devoção mariana.
+Retorne APENAS JSON: {"text":"mensagem mariana","ref":"💙 Nossa Senhora","sig":"${sig}"}`,
+
+    autocuidado:`Hoje é ${dFull}. Mensagem de autocuidado de "${md.title}". ${tTxt}
+Máx 3 linhas. Tom gentil e acolhedor. NÃO inicie com "${md.title}".
+Sobre cuidar de si mesmo, saúde mental, descanso, bem-estar. Pode ser secular.
+Retorne APENAS JSON: {"text":"mensagem de autocuidado","ref":"🌿","sig":"${sig}"}`,
+
+    divertida:`Hoje é ${dFull}. Mensagem divertida e bem-humorada de "${md.title}". ${tTxt}
+Máx 3 linhas. Tom leve, alegre, com humor saudável. NÃO inicie com "${md.title}".
+Pode incluir trocadilho ou algo que faça sorrir. Pode ser secular.
+Retorne APENAS JSON: {"text":"mensagem divertida","ref":"😄","sig":"${sig}"}`,
+  };
+
+  try{
+    const res=await fetch('/.netlify/functions/gerar',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:[{type:'text',text:prompts[curType]||prompts.versiculo}]}]})
+    });
+    const data=await res.json();
+    if(!res.ok) throw new Error(data?.error?.message||`HTTP ${res.status}`);
+
+    let txt=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    const m=txt.match(/\{[\s\S]*\}/);
+    if(!m) throw new Error('Formato inválido.');
+    const p=JSON.parse(m[0]);
+
+    document.getElementById('cTit').textContent=md.title;
+    document.getElementById('cTit').style.color=md.cor;
+    document.getElementById('cTxt').textContent=p.text||'';
+    document.getElementById('cRef').textContent=p.ref||'';
+    document.getElementById('cRef').style.display=p.ref?'block':'none';
+    document.getElementById('cSig').textContent=p.sig||sig;
+
+    // Logo
+    const logoEl=document.getElementById('cLogo');
+    if(logoDataUrl&&(curUser.plan==='Paróquia'||curUser.plan==='Admin')){
+      logoEl.src=logoDataUrl;logoEl.style.display='block';
+    } else {
+      logoEl.style.display='none';
+    }
+
+    // Fundo
+    if(imgDataUrl){
+      const bg=document.getElementById('cardBg');
+      bg.src=imgDataUrl;bg.classList.add('on');
+    } else {
+      document.getElementById('cardBg').classList.remove('on');
+      document.getElementById('cardV').style.background={
+        dia:'linear-gradient(160deg,#1a3a1a,#2a5a2a,#1a2a10)',
+        tarde:'linear-gradient(160deg,#3a1a0a,#5a3010,#2a2010)',
+        noite:'linear-gradient(160deg,#0a0a2a,#1a1050,#0a0820)'
+      }[curMode];
+    }
+
+    document.getElementById('load').classList.remove('on');
+    document.getElementById('ddisp').textContent=`${md.emoji} ${dShort}`;
+    document.getElementById('rcard').classList.add('on');
+    window.scrollTo({top:0,behavior:'smooth'});
+
+  }catch(e){
+    document.getElementById('load').classList.remove('on');
+    document.getElementById('cfg').style.display='block';
+    document.getElementById('genbtn').disabled=false;
+    setErr('Erro: '+(e.message||'Tente novamente.'));
+    console.error(e);
+  }
+}
+
+// ════════════════════════════════════════
+// SALVAR CARD
+// ════════════════════════════════════════
+async function saveCard(){
+  toast('⏳ Gerando imagem...');
+  const el=document.getElementById('cardV');
+  try{
+    const c=await html2canvas(el,{scale:3,useCORS:true,allowTaint:true,backgroundColor:null,logging:false});
+    const url=c.toDataURL('image/jpeg',.95);
+    const a=document.createElement('a');
+    a.href=url;a.download=`bencao-${curMode}-${dShort.replace(/\//g,'-')}.jpg`;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    toast('✦ Card salvo! Envie pelo WhatsApp.');
+  }catch(e){
+    try{
+      const c=await html2canvas(el,{scale:2,backgroundColor:'#0f0d0a'});
+      const url=c.toDataURL('image/jpeg',.9);
+      const w=window.open('','_blank');
+      w.document.write(`<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Card</title></head><body style="margin:0;background:#111;display:flex;flex-direction:column;align-items:center;padding:20px;gap:16px"><img src="${url}" style="width:100%;max-width:500px;border-radius:14px"><p style="color:#c9a84c;font-family:sans-serif;font-size:16px;text-align:center;font-weight:700">📲 Pressione e segure para salvar</p></body></html>`);
+      toast('Pressione e segure para salvar.');
+    }catch{setErr('Faça uma captura de tela do card.');}
+  }
+}
+
+function aplicarFundo(md){
+  if(imgDataUrl){
+    const bg=document.getElementById('cardBg');
+    bg.src=imgDataUrl;bg.classList.add('on');
+  } else {
+    document.getElementById('cardBg').classList.remove('on');
+    document.getElementById('cardV').style.background={
+      dia:'linear-gradient(160deg,#1a3a1a,#2a5a2a,#1a2a10)',
+      tarde:'linear-gradient(160deg,#3a1a0a,#5a3010,#2a2010)',
+      noite:'linear-gradient(160deg,#0a0a2a,#1a1050,#0a0820)'
+    }[curMode];
+  }
+  const logoEl=document.getElementById('cLogo');
+  if(logoDataUrl&&(curUser.plan==='Paróquia'||curUser.plan==='Admin')){
+    logoEl.src=logoDataUrl;logoEl.style.display='block';
+  } else {
+    logoEl.style.display='none';
+  }
+}
+
+function rst(){
+  document.getElementById('rcard').classList.remove('on');
+  document.getElementById('cfg').style.display='block';
+  document.getElementById('genbtn').disabled=false;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),3200);
+}
+function setErr(m){
+  const b=document.getElementById('err');
+  if(m){b.textContent=m;b.classList.add('on');}
+  else{b.classList.remove('on');b.textContent='';}
+}
+</script>
+</body>
+</html>
