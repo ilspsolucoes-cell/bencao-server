@@ -437,15 +437,24 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       <div class="stit" style="margin-top:22px">Tipo de mensagem</div>
       <div class="g2" style="margin-bottom:10px">
         <button class="selbtn on" onclick="setType('versiculo',this)"><span class="ic">📖</span>Versículo Bíblico</button>
-        <button class="selbtn" onclick="setType('mensagem',this)"><span class="ic">💬</span>Mensagem Inspiradora</button>
+        <button class="selbtn" onclick="setType('inspiradora',this)"><span class="ic">💬</span>Mensagem Inspiradora</button>
       </div>
       <div class="g2" style="margin-bottom:10px">
-        <button class="selbtn" onclick="setType('santo',this)"><span class="ic">🙏</span>Santo do Dia</button>
+        <button class="selbtn" onclick="setType('motivacional',this)"><span class="ic">🔥</span>Mensagem Motivacional</button>
         <button class="selbtn" onclick="setType('mariana',this)"><span class="ic">💙</span>Mensagem Mariana</button>
       </div>
+      <div class="g2" style="margin-bottom:10px">
+        <button class="selbtn" onclick="setType('autocuidado',this)"><span class="ic">🌿</span>Autocuidado</button>
+        <button class="selbtn" onclick="setType('divertida',this)"><span class="ic">😄</span>Mensagem Divertida</button>
+      </div>
       <div class="g2">
-        <button class="selbtn" onclick="setType('terico',this)"><span class="ic">📿</span>Para o Terço</button>
-        <button class="selbtn" onclick="setType('liturgia',this)"><span class="ic">✝️</span>Liturgia do Dia</button>
+        <button class="selbtn" onclick="setType('propria',this)" style="grid-column:1/-1"><span class="ic">✏️</span>Escrever minha própria mensagem</button>
+      </div>
+
+      <!-- Campo mensagem própria -->
+      <div id="msgPropriaBox" style="display:none;margin-top:12px">
+        <span class="flbl">Sua mensagem</span>
+        <textarea class="iapp" id="msgPropria" placeholder="Digite aqui sua mensagem para o card..." style="resize:none;height:90px;line-height:1.6;font-weight:500"></textarea>
       </div>
 
       <div class="fst">
@@ -1132,6 +1141,8 @@ function setType(t,btn){
   curType=t;
   document.querySelectorAll('.g2 .selbtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
+  // Mostra/esconde campo de mensagem própria
+  document.getElementById('msgPropriaBox').style.display=t==='propria'?'block':'none';
 }
 
 // ════════════════════════════════════════
@@ -1187,72 +1198,69 @@ async function gen(){
   const sig=document.getElementById('sig').value.trim()||'🙏 Paz e Bem!';
   const md=modeData[curMode];
 
-  // Busca o santo do dia no Vatican News se necessário
-  let santoHoje = '';
-  if(curType === 'santo'){
-    try{
-      const sr = await fetch('/.netlify/functions/santo');
-      const sd = await sr.json();
-      if(sd?.santo) santoHoje = sd.santo;
-    }catch(e){
-      console.log('Não foi possível buscar o santo:', e.message);
-    }
+  setErr('');
+  const tTxt=theme==='automatico'?'Escolha o tema mais adequado.':`Tema: ${theme}.`;
+
+  // Mensagem própria — usa direto sem chamar IA
+  if(curType==='propria'){
+    const msgPropria=document.getElementById('msgPropria').value.trim();
+    if(!msgPropria){setErr('⚠️ Digite sua mensagem antes de criar o card.');return;}
+    document.getElementById('cfg').style.display='none';
+    document.getElementById('load').classList.add('on');
+    document.getElementById('genbtn').disabled=true;
+    setTimeout(()=>{
+      document.getElementById('cTit').textContent=md.title;
+      document.getElementById('cTit').style.color=md.cor;
+      document.getElementById('cTxt').textContent=msgPropria;
+      document.getElementById('cRef').textContent='';
+      document.getElementById('cRef').style.display='none';
+      document.getElementById('cSig').textContent=sig;
+      aplicarFundo(md);
+      curUser.cardsToday++;
+      localStorage.setItem('bd_cards_'+dShort,curUser.cardsToday);
+      updateAppUI();
+      document.getElementById('load').classList.remove('on');
+      document.getElementById('ddisp').textContent=`${md.emoji} ${dShort}`;
+      document.getElementById('rcard').classList.add('on');
+      window.scrollTo({top:0,behavior:'smooth'});
+    },500);
+    return;
   }
 
-  setErr('');
   document.getElementById('cfg').style.display='none';
   document.getElementById('load').classList.add('on');
   document.getElementById('genbtn').disabled=true;
 
-  const tTxt=theme==='automatico'?'Escolha o tema mais adequado.':`Tema: ${theme}.`;
-
   const prompts={
     versiculo:`Hoje é ${dFull}. Card católico de "${md.title}". ${tTxt}
-Use a Bíblia da CNBB (Conferência Nacional dos Bispos do Brasil).
-Máx 3 linhas simples e diretas. NÃO inicie com "${md.title}".
-
-REGRAS OBRIGATÓRIAS para a citação bíblica (padrão CNBB):
-- Use abreviações oficiais da CNBB (ex: Jo, Mt, Lc, Sl, Gn, Ex, Rm, etc.)
-- Separe capítulo e versículo com VÍRGULA: Jo 3,16 (NÃO use dois pontos)
-- Intervalo de versículos com hífen: Jo 3,16-17
-- Vários versículos: Sl 23,1.3.5
-
+Use a Bíblia da CNBB. Máx 3 linhas. NÃO inicie com "${md.title}".
+Citação CNBB: abreviação oficial + vírgula: Jo 3,16 (não dois pontos).
 Retorne APENAS JSON: {"text":"versículo curto","ref":"Ab Cap,Ver","sig":"${sig}"}`,
 
-    mensagem:`Hoje é ${dFull}. Crie uma mensagem inspiradora católica de "${md.title}". ${tTxt}
-REGRAS OBRIGATÓRIAS:
-- Máx 3 linhas simples, diretas e acolhedoras
-- NÃO inicie com "${md.title}"
-- NÃO inclua versículo bíblico nem referência bíblica
-- Deve ser uma mensagem de encorajamento, esperança ou amor cristão
-- Linguagem simples, acessível para todos
+    inspiradora:`Hoje é ${dFull}. Mensagem inspiradora de "${md.title}". ${tTxt}
+Máx 3 linhas. Tom acolhedor e positivo. NÃO inicie com "${md.title}".
+Pode ser cristã em geral. SEM versículo bíblico. Linguagem simples.
+Retorne APENAS JSON: {"text":"mensagem inspiradora","ref":"","sig":"${sig}"}`,
 
-Retorne APENAS JSON: {"text":"mensagem inspiradora sem versículo","ref":"","sig":"${sig}"}`,
-
-    santo:`Hoje é ${dFull}. O santo católico celebrado hoje segundo o Vatican News e calendário da CNBB é: ${santoHoje||'[buscar no calendário litúrgico do dia '+dShort+']'}.
-Crie uma mensagem de "${md.title}" sobre este santo.
-REGRAS:
-- Máx 3 linhas
-- NÃO inicie com "${md.title}"
-- Mencione o nome do santo corretamente
-- Diga algo sobre sua vida ou virtude principal
-- Se não souber o santo exato, use o calendário litúrgico católico para ${dShort}
-
-Retorne APENAS JSON: {"text":"mensagem sobre o santo de hoje","ref":"Santo do Dia: [Nome Completo]","sig":"${sig}"}`,
+    motivacional:`Hoje é ${dFull}. Mensagem motivacional de "${md.title}". ${tTxt}
+Máx 3 linhas. Tom energético e encorajador. NÃO inicie com "${md.title}".
+Pode ser completamente secular — sobre superação, força, determinação, coragem.
+Retorne APENAS JSON: {"text":"mensagem motivacional","ref":"","sig":"${sig}"}`,
 
     mariana:`Hoje é ${dFull}. Mensagem mariana de "${md.title}". ${tTxt}
-Máx 3 linhas. Tom devocional. NÃO inicie com "${md.title}".
-Se incluir citação bíblica use padrão CNBB com vírgula: Lc 1,28
+Máx 3 linhas. Tom devocional e amoroso. NÃO inicie com "${md.title}".
+Sobre Nossa Senhora ou devoção mariana.
 Retorne APENAS JSON: {"text":"mensagem mariana","ref":"💙 Nossa Senhora","sig":"${sig}"}`,
 
-    terico:`Hoje é ${dFull}. Incentivo para o Terço de "${md.title}". Inclua o mistério do dia.
-Máx 3 linhas. NÃO inicie com "${md.title}".
-Retorne APENAS JSON: {"text":"mensagem do terço","ref":"📿 [Mistério do Rosário]","sig":"${sig}"}`,
+    autocuidado:`Hoje é ${dFull}. Mensagem de autocuidado de "${md.title}". ${tTxt}
+Máx 3 linhas. Tom gentil e acolhedor. NÃO inicie com "${md.title}".
+Sobre cuidar de si mesmo, saúde mental, descanso, bem-estar. Pode ser secular.
+Retorne APENAS JSON: {"text":"mensagem de autocuidado","ref":"🌿","sig":"${sig}"}`,
 
-    liturgia:`Hoje é ${dFull}. Liturgia Católica do dia para "${md.title}".
-Máx 3 linhas. NÃO inicie com "${md.title}".
-Se incluir citação bíblica use padrão CNBB com vírgula: Mt 5,1-12
-Retorne APENAS JSON: {"text":"mensagem litúrgica","ref":"✝️ Liturgia de ${dShort}","sig":"${sig}"}`,
+    divertida:`Hoje é ${dFull}. Mensagem divertida e bem-humorada de "${md.title}". ${tTxt}
+Máx 3 linhas. Tom leve, alegre, com humor saudável. NÃO inicie com "${md.title}".
+Pode incluir trocadilho ou algo que faça sorrir. Pode ser secular.
+Retorne APENAS JSON: {"text":"mensagem divertida","ref":"😄","sig":"${sig}"}`,
   };
 
   try{
@@ -1332,6 +1340,26 @@ async function saveCard(){
       w.document.write(`<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Card</title></head><body style="margin:0;background:#111;display:flex;flex-direction:column;align-items:center;padding:20px;gap:16px"><img src="${url}" style="width:100%;max-width:500px;border-radius:14px"><p style="color:#c9a84c;font-family:sans-serif;font-size:16px;text-align:center;font-weight:700">📲 Pressione e segure para salvar</p></body></html>`);
       toast('Pressione e segure para salvar.');
     }catch{setErr('Faça uma captura de tela do card.');}
+  }
+}
+
+function aplicarFundo(md){
+  if(imgDataUrl){
+    const bg=document.getElementById('cardBg');
+    bg.src=imgDataUrl;bg.classList.add('on');
+  } else {
+    document.getElementById('cardBg').classList.remove('on');
+    document.getElementById('cardV').style.background={
+      dia:'linear-gradient(160deg,#1a3a1a,#2a5a2a,#1a2a10)',
+      tarde:'linear-gradient(160deg,#3a1a0a,#5a3010,#2a2010)',
+      noite:'linear-gradient(160deg,#0a0a2a,#1a1050,#0a0820)'
+    }[curMode];
+  }
+  const logoEl=document.getElementById('cLogo');
+  if(logoDataUrl&&(curUser.plan==='Paróquia'||curUser.plan==='Admin')){
+    logoEl.src=logoDataUrl;logoEl.style.display='block';
+  } else {
+    logoEl.style.display='none';
   }
 }
 
