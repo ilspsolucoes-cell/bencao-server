@@ -75,7 +75,46 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, usuario: usuarioSemSenha, sessaoId: sid }) };
     }
 
-    // ── CADASTRAR — gera código ──
+    // ── CADASTRAR com envio de e-mail ──
+    if (acao === 'cadastrar_com_email') {
+      if (db.usuarios[email] && !db.usuarios[email].pendente) {
+        return { statusCode: 409, headers, body: JSON.stringify({ error: 'E-mail já cadastrado' }) };
+      }
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      db.codigos[`cad_${email}`] = { code, expires: Date.now() + 15 * 60 * 1000, senha };
+      await salvarDB(db);
+
+      // Envia e-mail via Resend
+      try {
+        const RESEND_KEY = process.env.RESEND_API_KEY;
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: 'Bênção do Dia <noreply@bencaododia.app.br>',
+            to: [email],
+            subject: '✅ Confirme seu cadastro — Bênção do Dia',
+            html: `<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:30px;background:#f9f5ef;border-radius:12px">
+              <h1 style="font-family:Georgia,serif;color:#c9a84c;font-size:28px;text-align:center">✝️ Bênção do Dia</h1>
+              <div style="background:#fff;border-radius:10px;padding:24px;border:1px solid #e8d49a;margin-top:20px">
+                <h2 style="color:#2a1a10">Confirme seu cadastro</h2>
+                <p style="color:#5a4030;font-size:15px">Use o código abaixo para ativar sua conta. Válido por <strong>15 minutos</strong>.</p>
+                <div style="text-align:center;margin:24px 0">
+                  <div style="background:#0f0d0a;color:#c9a84c;font-size:36px;font-weight:800;letter-spacing:10px;padding:20px;border-radius:10px;display:inline-block">${code}</div>
+                </div>
+              </div>
+              <p style="text-align:center;color:#8a8070;font-size:12px;margin-top:20px">🙏 Paz e Bem! — Bênção do Dia</p>
+            </div>`
+          }),
+        });
+      } catch(emailErr) {
+        console.error('Erro ao enviar email:', emailErr.message);
+      }
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
+    // ── CADASTRAR — gera código sem e-mail ──
     if (acao === 'cadastrar') {
       if (db.usuarios[email] && !db.usuarios[email].pendente) {
         return { statusCode: 409, headers, body: JSON.stringify({ error: 'E-mail já cadastrado' }) };
