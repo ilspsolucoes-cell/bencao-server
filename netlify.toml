@@ -1,6 +1,6 @@
 [build]
   publish = "."
-  functions = "deploy-bencao/bencao-deploy-final/deploy-bencao/netlify/functions"
+  functions = "netlify/functions"
 
 [[redirects]]
   from = "/api/*"
