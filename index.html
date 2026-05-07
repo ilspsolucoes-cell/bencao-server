@@ -365,7 +365,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 
   <div class="trial-banner">
     <h3>🎁 3 dias grátis para você!</h3>
-    <p>Experimente todas as funcionalidades sem pagar nada.<br>Depois escolha o plano que cabe no seu bolso.</p>
+    <p>Experimente todas as funcionalidades sem pagar nada.<br>Depois assine o plano anual com parcelas a partir de R$10/mês.</p>
   </div>
 
   <div class="pgrid">
@@ -382,43 +382,30 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       <button class="btn-plan">Começar grátis agora</button>
     </div>
 
-    <div class="pcard" onclick="goMP('fiel_mensal')">
-      <div class="ptop"><div><div class="pname">Fiel Mensal</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Uso pessoal</div></div><div class="pemoji">⭐</div></div>
-      <div class="ptop"><div><div class="pval">R$10</div><div class="pper">/mês</div></div></div>
+    <div class="pcard" onclick="goMP('fiel')">
+      <div class="ptop"><div><div class="pname">Fiel</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Uso pessoal</div></div><div class="pemoji">⭐</div></div>
+      <div class="ptop"><div><div class="pval">R$120</div><div class="pper">/ano — 12x R$10</div></div></div>
       <div class="pfeats">
-        <div class="feat">✅ Tudo do Trial</div>
-        <div class="feat">✅ Acesso completo</div>
+        <div class="feat">✅ Acesso completo por 1 ano</div>
+        <div class="feat">✅ Todos os tipos de card</div>
         <div class="feat">✅ PIX, cartão ou boleto</div>
-        <div class="feat">✅ Cancele quando quiser</div>
+        <div class="feat">✅ Parcela em até 12x</div>
         <div class="feat" style="opacity:.4">❌ Logo personalizada</div>
       </div>
-      <button class="btn-plan">Assinar por R$10/mês</button>
+      <button class="btn-plan">Assinar por R$120/ano</button>
     </div>
 
-    <div class="pcard pop" onclick="goMP('fiel_anual')">
-      <div class="ptop"><div><div class="pname">Fiel Anual</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Melhor custo-benefício</div></div><div class="pemoji">🌟</div></div>
-      <div class="ptop"><div><div class="pval">R$99</div><div class="pper">/ano — R$8,25/mês</div></div></div>
+    <div class="pcard pop" onclick="goMP('paroquia')">
+      <div class="ptop"><div><div class="pname">Paróquia/Empresa</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Igrejas e empresas</div></div><div class="pemoji">⛪</div></div>
+      <div class="ptop"><div><div class="pval">R$684</div><div class="pper">/ano — 12x R$57</div></div></div>
       <div class="pfeats">
-        <div class="feat">✅ Tudo do Fiel Mensal</div>
-        <div class="feat">✅ Economia de R$21/ano</div>
-        <div class="feat">✅ PIX, cartão ou boleto</div>
-        <div class="feat">✅ Suporte prioritário</div>
-        <div class="feat" style="opacity:.4">❌ Logo personalizada</div>
-      </div>
-      <button class="btn-plan">Assinar por R$99/ano</button>
-    </div>
-
-    <div class="pcard" onclick="goMP('paroquia')">
-      <div class="ptop"><div><div class="pname">Paróquia</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Igrejas e empresas</div></div><div class="pemoji">⛪</div></div>
-      <div class="ptop"><div><div class="pval">R$57</div><div class="pper">/mês</div></div></div>
-      <div class="pfeats">
-        <div class="feat">✅ Tudo do Fiel</div>
+        <div class="feat">✅ Tudo do plano Fiel</div>
         <div class="feat">✅ Logo da paróquia no card</div>
-        <div class="feat">✅ Até 5 usuários</div>
-        <div class="feat">✅ Suporte WhatsApp</div>
-        <div class="feat">✅ Relatórios de uso</div>
+        <div class="feat">✅ PIX, cartão ou boleto</div>
+        <div class="feat">✅ Parcela em até 12x</div>
+        <div class="feat">✅ Suporte prioritário</div>
       </div>
-      <button class="btn-plan">Assinar Paróquia</button>
+      <button class="btn-plan">Assinar por R$684/ano</button>
     </div>
   </div>
 
@@ -1385,11 +1372,17 @@ function startTrial(){
   updateAppUI();
 }
 
+const MP_LINKS = {
+  fiel:     'https://pay.hotmart.com/G105735508U',
+  paroquia: 'https://pay.hotmart.com/L105735744A',
+};
+
 function goMP(plano){
-  const email=encodeURIComponent(curUser.email||'');
-  const url=`/.netlify/functions/assinar?plano=${plano}&email=${email}`;
-  window.open(url,'_blank');
-  toast('✦ Abrindo pagamento seguro do Mercado Pago...');
+  const base = MP_LINKS[plano] || MP_LINKS.fiel;
+  const email = encodeURIComponent(curUser.email || '');
+  const url = email ? `${base}?email=${email}` : base;
+  window.open(url, '_blank');
+  toast('✦ Abrindo pagamento seguro Hotmart...');
 }
 
 async function verificarPagamento(){
