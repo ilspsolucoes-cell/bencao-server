@@ -1821,20 +1821,43 @@ async function saveCard(){
   toast('⏳ Gerando imagem...');
   const el=document.getElementById('cardV');
   try{
-    const c=await html2canvas(el,{scale:3,useCORS:true,allowTaint:true,backgroundColor:null,logging:false});
+    const c=await html2canvas(el,{
+      scale:3,
+      useCORS:true,
+      allowTaint:true,
+      backgroundColor:null,
+      logging:false,
+      imageTimeout:15000
+    });
     const url=c.toDataURL('image/jpeg',.95);
     const a=document.createElement('a');
-    a.href=url;a.download=`bencao-${curMode}-${dShort.replace(/\//g,'-')}.jpg`;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    a.href=url;
+    a.download=`bencao-${curMode}-${dShort.replace(/\//g,'-')}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>document.body.removeChild(a),100);
     toast('✦ Card salvo! Envie pelo WhatsApp.');
   }catch(e){
+    // Fallback — abre em nova aba para salvar manualmente
     try{
-      const c=await html2canvas(el,{scale:2,backgroundColor:'#0f0d0a'});
+      const c=await html2canvas(el,{scale:2,backgroundColor:'#0f0d0a',useCORS:true});
       const url=c.toDataURL('image/jpeg',.9);
       const w=window.open('','_blank');
-      w.document.write(`<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Card</title></head><body style="margin:0;background:#111;display:flex;flex-direction:column;align-items:center;padding:20px;gap:16px"><img src="${url}" style="width:100%;max-width:500px;border-radius:14px"><p style="color:#c9a84c;font-family:sans-serif;font-size:16px;text-align:center;font-weight:700">📲 Pressione e segure para salvar</p></body></html>`);
-      toast('Pressione e segure para salvar.');
-    }catch{setErr('Faça uma captura de tela do card.');}
+      if(w){
+        w.document.write(`<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Card</title></head><body style="margin:0;background:#111;display:flex;flex-direction:column;align-items:center;padding:20px;gap:16px"><img src="${url}" style="width:100%;max-width:500px;border-radius:14px"><p style="color:#c9a84c;font-family:sans-serif;font-size:16px;text-align:center;font-weight:700">📲 Pressione e segure a imagem para salvar</p></body></html>`);
+        toast('📲 Pressione e segure para salvar a imagem.');
+      } else {
+        // Popup bloqueado — cria link de download direto
+        const a=document.createElement('a');
+        a.href=url;
+        a.download=`bencao-${dShort.replace(/\//g,'-')}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(()=>document.body.removeChild(a),100);
+      }
+    }catch(e2){
+      toast('📸 Faça uma captura de tela do card.');
+    }
   }
 }
 
