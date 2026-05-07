@@ -75,6 +75,27 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, usuario: usuarioSemSenha, sessaoId: sid }) };
     }
 
+    // ── DEBUG ──
+    if (acao === 'debug') {
+      const hasKey = !!JSONBIN_KEY;
+      const hasBin = !!JSONBIN_BIN_ID;
+      let dbStatus = 'erro';
+      let dbData = null;
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+          headers: { 'X-Master-Key': JSONBIN_KEY }
+        });
+        dbData = await res.json();
+        dbStatus = res.ok ? 'ok' : `erro_${res.status}`;
+      } catch(e) {
+        dbStatus = 'excecao: ' + e.message;
+      }
+      return {
+        statusCode: 200, headers,
+        body: JSON.stringify({ hasKey, hasBin, dbStatus, record_keys: dbData?.record ? Object.keys(dbData.record) : null })
+      };
+    }
+
     // ── CADASTRAR com envio de e-mail ──
     if (acao === 'cadastrar_com_email') {
       if (db.usuarios[email] && !db.usuarios[email].pendente) {
