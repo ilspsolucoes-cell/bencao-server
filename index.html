@@ -1065,22 +1065,20 @@ let pendingEmail='', pendingPass='';
 
 async function enviarCodigoVerificacao(email){
   try{
-    // Solicita ao servidor gerar e enviar o código
+    // Gera código no db.js E envia e-mail em uma só chamada
     const res=await fetch('/.netlify/functions/db',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({acao:'cadastrar', email, senha:btoa(pendingPass)})
+      body:JSON.stringify({
+        acao:'cadastrar_com_email',
+        email,
+        senha:btoa(pendingPass),
+        device:navigator.userAgent.substr(0,80)
+      })
     });
     const data=await res.json();
-    if(data.success){
-      // Servidor gerou o código — agora envia por e-mail via recuperar.js
-      const resEmail=await fetch('/.netlify/functions/recuperar',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({acao:'enviar_cadastro', contato:email})
-      });
-      return true;
-    } else if(data.error==='E-mail já cadastrado'){
+    if(data.success) return true;
+    if(data.error==='E-mail já cadastrado'){
       toast('⚠️ E-mail já cadastrado. Faça login.');
       return false;
     }
