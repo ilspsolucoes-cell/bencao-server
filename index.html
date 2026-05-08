@@ -432,10 +432,35 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 
     <div class="sect" id="cfg">
       <div class="stit">Momento do dia</div>
-      <div class="g3">
+      <div class="g3" style="margin-bottom:10px">
         <button class="selbtn on" onclick="setMode('dia',this)"><span class="ic">☀️</span>Bom Dia</button>
         <button class="selbtn" onclick="setMode('tarde',this)"><span class="ic">🌤️</span>Boa Tarde</button>
         <button class="selbtn" onclick="setMode('noite',this)"><span class="ic">🌙</span>Boa Noite</button>
+      </div>
+      <div class="g2">
+        <button class="selbtn" onclick="setMode('livre',this)" style="grid-column:1/-1"><span class="ic">🎉</span>Livre — Aniversário, Conquistas e outras ocasiões</button>
+      </div>
+
+      <!-- Campo ocasião (só modo Livre) -->
+      <div id="ocasiaoBox" style="display:none;margin-top:12px">
+        <span class="flbl">Qual é a ocasião?</span>
+        <select class="iapp" id="ocasiao">
+          <option value="aniversario">🎂 Aniversário</option>
+          <option value="promocao">💼 Promoção no trabalho</option>
+          <option value="formatura">🎓 Formatura</option>
+          <option value="casamento">💒 Casamento</option>
+          <option value="nascimento">👶 Nascimento de bebê</option>
+          <option value="casa-nova">🏠 Casa nova</option>
+          <option value="batizado">✝️ Batizado / Crisma / Primeira Comunhão</option>
+          <option value="conquista">🌟 Conquista pessoal</option>
+          <option value="recuperacao">🙏 Recuperação de saúde</option>
+          <option value="natal">🎄 Natal</option>
+          <option value="pascoa-fest">🐣 Páscoa</option>
+          <option value="ano-novo">🎆 Ano Novo</option>
+          <option value="dia-maes">💐 Dia das Mães</option>
+          <option value="dia-pais">👨 Dia dos Pais</option>
+          <option value="outra">✨ Outra ocasião</option>
+        </select>
       </div>
 
       <div class="stit" style="margin-top:22px">Tipo de mensagem</div>
@@ -466,6 +491,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
           <span class="flbl">Tema</span>
           <select id="theme">
             <option value="automatico">✨ Automático</option>
+            <option value="felicitacoes">🎉 Felicitações</option>
             <option value="fé">Fé</option>
             <option value="esperança">Esperança</option>
             <option value="amor">Amor ao próximo</option>
@@ -807,6 +833,7 @@ const modeData = {
   dia:  {title:'Bom Dia',   emoji:'☀️', cor:'#f5d78a'},
   tarde:{title:'Boa Tarde', emoji:'🌤️', cor:'#f5c46a'},
   noite:{title:'Boa Noite', emoji:'🌙', cor:'#c5b8f5'},
+  livre:{title:'',          emoji:'🎉', cor:'#f5e88a'},
 };
 
 // ════════════════════════════════════════
@@ -1618,8 +1645,16 @@ function copyCode(code){navigator.clipboard?.writeText(code).then(()=>toast('✦
 // ════════════════════════════════════════
 function setMode(m,btn){
   curMode=m;
-  document.querySelectorAll('.g3 .selbtn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.g3 .selbtn, .g2 .selbtn[onclick*="setMode"]').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
+  // Mostra/esconde campo de ocasião
+  const ob=document.getElementById('ocasiaoBox');
+  if(ob) ob.style.display=m==='livre'?'block':'none';
+  // No modo livre seleciona tema Felicitações automaticamente
+  if(m==='livre'){
+    const th=document.getElementById('theme');
+    if(th) th.value='felicitacoes';
+  }
 }
 function setType(t,btn){
   curType=t;
@@ -1680,7 +1715,26 @@ async function gen(){
 
   const theme=document.getElementById('theme').value;
   const sig=document.getElementById('sig').value.trim()||'🙏 Paz e Bem!';
-  const md=modeData[curMode];
+  const ocasiaoVal=document.getElementById('ocasiao')?.value||'aniversario';
+
+  // Título dinâmico para modo Livre
+  const ocasiaoLabels={
+    aniversario:'Feliz Aniversário', promocao:'Parabéns pela Promoção',
+    formatura:'Parabéns pela Formatura', casamento:'Feliz Casamento',
+    nascimento:'Bem-vindo ao Mundo', 'casa-nova':'Feliz Casa Nova',
+    batizado:'Parabéns pelo Batizado', conquista:'Parabéns pela Conquista',
+    recuperacao:'Feliz Recuperação', natal:'Feliz Natal',
+    'pascoa-fest':'Feliz Páscoa', 'ano-novo':'Feliz Ano Novo',
+    'dia-maes':'Feliz Dia das Mães', 'dia-pais':'Feliz Dia dos Pais',
+    outra:'Felicitações'
+  };
+
+  const md={...modeData[curMode]};
+  if(curMode==='livre'){
+    md.title=ocasiaoLabels[ocasiaoVal]||'Felicitações';
+    md.emoji='🎉';
+    md.cor='#f5e88a';
+  }
 
   setErr('');
   const tTxt=theme==='automatico'?'Escolha o tema mais adequado.':`Tema: ${theme}.`;
@@ -1745,6 +1799,12 @@ Retorne APENAS JSON: {"text":"mensagem de autocuidado","ref":"🌿","sig":"${sig
 Máx 3 linhas. Tom leve, alegre, com humor saudável. NÃO inicie com "${md.title}".
 Pode incluir trocadilho ou algo que faça sorrir. Pode ser secular.
 Retorne APENAS JSON: {"text":"mensagem divertida","ref":"😄","sig":"${sig}"}`,
+
+    livre:`Hoje é ${dFull}. Crie uma mensagem especial de felicitações para: "${md.title}".
+Tom alegre, caloroso e comemorativo. Máx 3 linhas.
+Pode incluir uma bênção ou desejo especial com perspectiva cristã se adequado.
+NÃO inicie com "${md.title}".
+Retorne APENAS JSON: {"text":"mensagem de felicitações","ref":"🎉","sig":"${sig}"}`,
   };
 
   try{
@@ -1785,8 +1845,9 @@ Retorne APENAS JSON: {"text":"mensagem divertida","ref":"😄","sig":"${sig}"}`,
       document.getElementById('cardV').style.background={
         dia:'linear-gradient(160deg,#1a3a1a,#2a5a2a,#1a2a10)',
         tarde:'linear-gradient(160deg,#3a1a0a,#5a3010,#2a2010)',
-        noite:'linear-gradient(160deg,#0a0a2a,#1a1050,#0a0820)'
-      }[curMode];
+        noite:'linear-gradient(160deg,#0a0a2a,#1a1050,#0a0820)',
+        livre:'linear-gradient(160deg,#2a1a3a,#4a2060,#1a0a2a)'
+      }[curMode]||'linear-gradient(160deg,#1a3a1a,#2a5a2a,#1a2a10)';
     }
 
     document.getElementById('load').classList.remove('on');
