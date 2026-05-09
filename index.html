@@ -346,10 +346,20 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       <!-- Código de cortesia -->
       <div class="code-box">
         <div class="div-or">ou use um código de cortesia</div>
+        <div style="background:rgba(74,158,237,.08);border:1px solid rgba(74,158,237,.25);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+          <p style="font-size:13px;font-weight:700;color:#4a9eed;margin-bottom:6px">🎁 Como usar seu código:</p>
+          <p style="font-size:12px;color:var(--text3);line-height:1.7;margin:0">
+            1️⃣ Digite seu <strong style="color:var(--text2)">e-mail</strong> no campo acima<br>
+            2️⃣ Cole o código no campo abaixo<br>
+            3️⃣ Clique em <strong style="color:var(--text2)">"Usar código"</strong><br>
+            4️⃣ Pronto! Acesso liberado pelo prazo do código ✅
+          </p>
+        </div>
         <div class="code-row">
           <input type="text" class="code-input" id="codeInput" placeholder="BENCAO-XXXX-XXXX" maxlength="20">
           <button class="btn-code" onclick="useCode()">Usar código</button>
         </div>
+        <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px;line-height:1.5">Após o primeiro acesso, entre normalmente com seu e-mail e senha</p>
       </div>
       <div class="lnote">Ao entrar você concorda com os<br><span class="llink">Termos de Uso</span> e <span class="llink">Política de Privacidade</span></div>
     </div>
@@ -1309,7 +1319,7 @@ function updateAppUI(){
   ti.style.display='none';
   lb.style.display='none';
 
-  if(curUser.plan==='Paróquia'||curUser.plan==='Admin'||curUser.plan==='Fiel'||curUser.plan==='Cortesia'){
+  if(curUser.plan==='Paróquia'||curUser.plan==='Admin'){
     ls.style.display='block';
   } else {
     ls.style.display='none';
@@ -1322,12 +1332,37 @@ function updateAppUI(){
     } else if(ts==='expired'){
       lb.style.display='flex';
     }
+  } else if(curUser.plan==='Cortesia'){
+    const cs=checkCortesia();
+    if(cs==='active'){
+      const dias=cortesiaDiasRestantes();
+      ti.style.display='flex';
+      document.getElementById('trialDays').innerHTML=`<span style="color:#4a9eed">🎁 ${dias} dia(s) de cortesia restantes</span>`;
+    } else {
+      lb.innerHTML='<span class="ic">⏰</span><div><p>Seu acesso de cortesia <strong>expirou</strong>.<br>Assine para continuar usando.</p><button class="btn-up" onclick="goScreen(\'sPlanos\')">Ver planos →</button></div>';
+      lb.style.display='flex';
+    }
   }
+}
+
+function checkCortesia(){
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  const c=contas[curUser.email];
+  if(!c?.cortesiaExpires) return 'active'; // sem data = acesso livre
+  return new Date()<new Date(c.cortesiaExpires)?'active':'expired';
+}
+
+function cortesiaDiasRestantes(){
+  const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  const c=contas[curUser.email];
+  if(!c?.cortesiaExpires) return 0;
+  return Math.max(0,Math.ceil((new Date(c.cortesiaExpires)-new Date())/(1000*60*60*24)));
 }
 
 function canUseApp(){
   if(curUser.plan==='Admin') return true;
-  if(curUser.plan==='Fiel'||curUser.plan==='Paróquia'||curUser.plan==='Cortesia') return true;
+  if(curUser.plan==='Fiel'||curUser.plan==='Paróquia') return true;
+  if(curUser.plan==='Cortesia') return checkCortesia()==='active';
   const ts=checkTrial();
   return ts==='active';
 }
@@ -1343,30 +1378,45 @@ function useCode(){
   const c=codes[code];
 
   if(!c){toast('❌ Código inválido.');return;}
+  if(c.usosUsados>=c.usosMax&&c.usosMax!==999){toast('❌ Código esgotado.');return;}
   if(c.used&&c.singleUse){toast('❌ Código já utilizado.');return;}
   if(new Date()>new Date(c.expires)){toast('❌ Código expirado.');return;}
+
+  // Calcula validade do acesso baseada nos dias do código
+  const diasAcesso = c.days || 30;
+  const cortesiaExpires = new Date(Date.now() + diasAcesso*24*60*60*1000).toISOString();
 
   // Aplica o código
   const email=document.getElementById('ei').value.trim()||'cortesia@bencaododia.app.br';
   curUser.email=email;
-  curUser.name='Usuário';
+  curUser.name=email.split('@')[0]||'Usuário';
   curUser.plan='Cortesia';
   curUser.trialStart=null;
+  curUser.cortesiaExpires=cortesiaExpires;
 
-  if(c.singleUse){
-    codes[code].used=true;
-    localStorage.setItem('bd_codes',JSON.stringify(codes));
-  }
+  // Marca uso do código
+  codes[code].usosUsados=(codes[code].usosUsados||0)+1;
+  if(c.singleUse) codes[code].used=true;
+  localStorage.setItem('bd_codes',JSON.stringify(codes));
 
-  // Salva conta
+  // Salva conta com data de expiração
   const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
-  contas[email]={nome:'Usuário',senha:'',plano:'Cortesia',trialStart:null,codeUsed:code};
+  contas[email]={
+    nome:curUser.name,
+    senha:'',
+    plano:'Cortesia',
+    trialStart:null,
+    codeUsed:code,
+    cortesiaExpires,
+    diasAcesso
+  };
   localStorage.setItem('bd_contas',JSON.stringify(contas));
 
   document.getElementById('topbar').style.display='flex';
-  document.getElementById('avbtn').textContent='U';
+  document.getElementById('avbtn').textContent=curUser.name.charAt(0).toUpperCase();
   updateBadge('Cortesia 🎁');
-  toast('🎁 Código aplicado! Bem-vindo!');
+  toast(`🎁 Acesso liberado por ${diasAcesso} dias! Bem-vindo ao Bênção do Dia!`);
+  setTimeout(()=>toast('💡 Dica: guarde seu e-mail e senha para entrar novamente.'),3500);
   goScreen('sApp');
   updateAppUI();
 }
@@ -1515,7 +1565,13 @@ function renderUserTable(){
     let prazoTxt='', isActive=false;
     if(plano==='Trial'){if(ti.status==='active'){prazoTxt=`⏳ ${ti.dias}d restantes`;isActive=true;}else{prazoTxt='❌ Expirado';}}
     else if(plano==='Bloqueado'){prazoTxt='🚫 Bloqueado';}
-    else if(plano==='Cortesia'){prazoTxt='🎁 Cortesia';isActive=true;}
+    else if(plano==='Cortesia'){
+      if(c.cortesiaExpires){
+        const diff=Math.ceil((new Date(c.cortesiaExpires)-new Date())/(1000*60*60*24));
+        if(diff>0){prazoTxt=`🎁 ${diff} dia(s) de cortesia`;isActive=true;}
+        else{prazoTxt='❌ Cortesia expirada';isActive=false;}
+      } else {prazoTxt='🎁 Cortesia ativa';isActive=true;}
+    }
     else{prazoTxt='✅ Ativo';isActive=true;}
     return `<div class="user-row">
       <div style="min-width:0"><div class="user-email-cell">${email}</div><div class="user-email-sub">${prazoTxt}${c.obs?` · ${c.obs}`:''}</div></div>
