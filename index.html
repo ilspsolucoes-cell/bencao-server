@@ -1374,28 +1374,53 @@ async function useCode(){
   if(!code){toast('⚠️ Digite o código.');document.getElementById('codeInput').focus();return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast('⚠️ E-mail inválido.');return;}
 
-  const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
-  const c=codes[code];
+  toast('⏳ Verificando código...');
 
-  if(!c){toast('❌ Código inválido. Verifique e tente novamente.');return;}
-  if(c.used&&c.singleUse){toast('❌ Este código já foi utilizado.');return;}
-  if((c.usosUsados||0)>=(c.usosMax||1)&&(c.usosMax||1)!==999){toast('❌ Código esgotado.');return;}
-  if(new Date()>new Date(c.expires)){toast('❌ Código expirado.');return;}
+  // Verifica E marca uso no servidor de uma vez
+  let diasAcesso=30;
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'verificar_codigo_cortesia',code})
+    });
+    const data=await res.json();
+    if(!data.success){
+      toast('❌ '+(data.error||'Código inválido.'));
+      return;
+    }
+    diasAcesso=data.days||30;
+  }catch(e){
+    toast('⚠️ Erro de conexão. Tente novamente.');
+    console.error(e);
+    return;
+  }
 
-  // Gera senha provisória
+  // Gera senha provisória e define expiração
   const senhaProvisoria=Math.random().toString(36).substr(2,8).toUpperCase();
-  const diasAcesso=c.days||30;
   const cortesiaExpires=new Date(Date.now()+diasAcesso*24*60*60*1000).toISOString();
   const ts=new Date().toISOString();
 
-  // Marca uso do código
-  codes[code].usosUsados=(codes[code].usosUsados||0)+1;
-  if(c.singleUse||(c.usosMax||1)===1) codes[code].used=true;
-  localStorage.setItem('bd_codes',JSON.stringify(codes));
+  // Salva conta no banco centralizado
+  try{
+    await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        acao:'confirmar',
+        email,
+        codigo:'CORTESIA_BYPASS',
+        device:navigator.userAgent.substr(0,80),
+        senhaOverride:btoa(senhaProvisoria),
+        planoOverride:'Cortesia',
+        cortesiaExpires,
+        diasAcesso
+      })
+    });
+  }catch(e){console.log('Salvando localmente:', e.message);}
 
-  // Cria/atualiza conta
+  // Salva também localmente como backup
   const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
-  const jaCadastrado=!!contas[email];
   contas[email]={
     nome:email.split('@')[0],
     senha:btoa(senhaProvisoria),
@@ -1404,13 +1429,12 @@ async function useCode(){
     codeUsed:code,
     cortesiaExpires,
     diasAcesso,
-    criadoEm:contas[email]?.criadoEm||ts,
-    senhaProvisoria:!jaCadastrado
+    criadoEm:contas[email]?.criadoEm||ts
   };
   localStorage.setItem('bd_contas',JSON.stringify(contas));
 
   // Envia e-mail com senha provisória
-  toast('⏳ Liberando acesso...');
+  toast('📧 Enviando sua senha por e-mail...');
   try{
     await fetch('/.netlify/functions/recuperar',{
       method:'POST',
@@ -1422,9 +1446,7 @@ async function useCode(){
         dias:diasAcesso
       })
     });
-  }catch(e){
-    console.log('Erro ao enviar e-mail:', e.message);
-  }
+  }catch(e){console.log('Erro ao enviar e-mail:', e.message);}
 
   // Entra direto no app
   curUser={
@@ -1689,39 +1711,65 @@ function renderCharts(){
   document.getElementById('chartCadastros').innerHTML=`<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Total de cadastros: <strong style="color:var(--primary)">${entries.length}</strong></p>`;
 }
 
-function genCode(){
+async function genCode(){
   const days=parseInt(document.getElementById('codeDays').value);
   const usos=parseInt(document.getElementById('codeUsos').value);
-  const code='BENCAO-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-'+Math.random().toString(36).substr(2,4).toUpperCase();
-  const expires=new Date(Date.now()+days*24*60*60*1000).toISOString();
-  const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
-  codes[code]={expires,days,usosMax:usos,usosUsados:0,singleUse:usos===1,createdAt:new Date().toISOString()};
-  localStorage.setItem('bd_codes',JSON.stringify(codes));
-  renderCodes();
-  toast(`✦ Código: ${code}`);
+  toast('⏳ Gerando código...');
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'admin_gerar_codigo',adminPass:ADMIN_PASS,days,usosMax:usos})
+    });
+    const data=await res.json();
+    if(data.success){
+      toast(`✦ Código gerado: ${data.code}`);
+      await renderCodes();
+    } else {
+      toast('⚠️ Erro ao gerar código no servidor.');
+    }
+  }catch(e){
+    toast('⚠️ Erro de conexão ao gerar código.');
+    console.error(e);
+  }
 }
 
-function renderCodes(){
-  const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
+async function renderCodes(){
   const el=document.getElementById('codeList');
-  const entries=Object.entries(codes).reverse();
-  if(!entries.length){el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum código gerado ainda.</p>';return;}
-  el.innerHTML=entries.map(([code,c])=>{
-    const expired=new Date()>new Date(c.expires);
-    const exp=new Date(c.expires).toLocaleDateString('pt-BR');
-    const usos=c.usosUsados||0;
-    const max=c.usosMax||1;
-    return `<div class="code-item">
-      <div><div class="code-val">${code}</div><div class="code-meta">${c.days}d • Expira: ${exp} • Usos: ${usos}/${max==='999'?'∞':max}</div></div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="code-used ${usos>=max||expired?'yes':'no'}">${usos>=max||expired?'Esgotado':'Livre'}</span>
-        <button class="btn-copy-code" onclick="copyCode('${code}')">📋</button>
-      </div>
-    </div>`;
-  }).join('');
+  if(!el) return;
+  el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Carregando...</p>';
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'admin_listar_codigos',adminPass:ADMIN_PASS})
+    });
+    const data=await res.json();
+    const codigos=data.codigos||[];
+    if(!codigos.length){
+      el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Nenhum código gerado ainda.</p>';
+      return;
+    }
+    el.innerHTML=codigos.reverse().map(c=>{
+      const expired=new Date()>new Date(c.expires);
+      const exp=new Date(c.expires).toLocaleDateString('pt-BR');
+      const usos=c.usosUsados||0;
+      const max=c.usosMax||1;
+      return `<div class="code-item">
+        <div><div class="code-val">${c.code}</div><div class="code-meta">${c.days}d • Expira: ${exp} • Usos: ${usos}/${max===999?'∞':max}</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="code-used ${usos>=max||expired?'yes':'no'}">${usos>=max||expired?'Esgotado':'Livre'}</span>
+          <button class="btn-copy-code" onclick="copyCode('${c.code}')">📋</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:10px">Erro ao carregar códigos.</p>';
+  }
 }
 
 function copyCode(code){navigator.clipboard?.writeText(code).then(()=>toast('✦ Código copiado!'));}
+
 
 // ════════════════════════════════════════
 // APP — Modo / Tipo
