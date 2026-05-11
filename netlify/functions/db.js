@@ -75,6 +75,38 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, usuario: usuarioSemSenha, sessaoId: sid }) };
     }
 
+    // ── SALVAR CÓDIGO ──
+    if (acao === 'salvar_codigo') {
+      if (body.adminPass !== ADMIN_PASS) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Não autorizado' }) };
+      if (!db.codigos) db.codigos = {};
+      db.codigos[body.code] = body.dados;
+      await salvarDB(db);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
+    // ── LISTAR CÓDIGOS ──
+    if (acao === 'listar_codigos') {
+      if (body.adminPass !== ADMIN_PASS) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Não autorizado' }) };
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, codigos: db.codigos || {} }) };
+    }
+
+    // ── BUSCAR CÓDIGO ESPECÍFICO ──
+    if (acao === 'buscar_codigo') {
+      const c = db.codigos?.[body.code];
+      if (!c) return { statusCode: 404, headers, body: JSON.stringify({ success: false, error: 'Código não encontrado' }) };
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, codigo: c }) };
+    }
+
+    // ── USAR CÓDIGO (marcar uso) ──
+    if (acao === 'usar_codigo') {
+      const c = db.codigos?.[body.code];
+      if (!c) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Código não encontrado' }) };
+      db.codigos[body.code].usosUsados = (c.usosUsados || 0) + 1;
+      if (c.singleUse || (c.usosMax || 1) === 1) db.codigos[body.code].used = true;
+      await salvarDB(db);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
     // ── DEBUG ──
     if (acao === 'debug') {
       const hasKey = !!JSONBIN_KEY;
@@ -188,6 +220,42 @@ exports.handler = async (event) => {
       if (body.adminPass !== ADMIN_PASS) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Não autorizado' }) };
       const lista = Object.entries(db.usuarios).map(([em, u]) => ({ email: em, ...u, senha: undefined }));
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, usuarios: lista }) };
+    }
+
+    // ── ADMIN: listar códigos ──
+    if (acao === 'admin_listar_codigos') {
+      if (body.adminPass !== ADMIN_PASS) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Não autorizado' }) };
+      // Filtra só códigos de cortesia (não cadastro/recuperação)
+      const codigos_cortesia = Object.entries(db.codigos)
+        .filter(([k]) => k.startsWith('BENCAO-'))
+        .map(([k, v]) => ({ code: k, ...v }));
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, codigos: codigos_cortesia }) };
+    }
+
+    // ── ADMIN: gerar código de cortesia ──
+    if (acao === 'admin_gerar_codigo') {
+      if (body.adminPass !== ADMIN_PASS) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Não autorizado' }) };
+      const days = body.days || 30;
+      const usosMax = body.usosMax || 1;
+      const code = 'BENCAO-' + Math.random().toString(36).substr(2,4).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
+      const expires = new Date(Date.now() + days*24*60*60*1000).toISOString();
+      db.codigos[code] = { expires, days, usosMax, usosUsados: 0, singleUse: usosMax===1, createdAt: new Date().toISOString() };
+      await salvarDB(db);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, code }) };
+    }
+
+    // ── VERIFICAR código de cortesia ──
+    if (acao === 'verificar_codigo_cortesia') {
+      const c = db.codigos?.[body.code];
+      if (!c) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Código inválido. Verifique e tente novamente.' }) };
+      if (c.used && c.singleUse) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Este código já foi utilizado.' }) };
+      if ((c.usosUsados||0) >= (c.usosMax||1) && (c.usosMax||1) !== 999) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código esgotado.' }) };
+      if (new Date() > new Date(c.expires)) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Código expirado.' }) };
+      // Marca uso
+      db.codigos[body.code].usosUsados = (c.usosUsados||0) + 1;
+      if (c.singleUse || (c.usosMax||1) === 1) db.codigos[body.code].used = true;
+      await salvarDB(db);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, days: c.days||30 }) };
     }
 
     // ── ADMIN: atualizar ──
