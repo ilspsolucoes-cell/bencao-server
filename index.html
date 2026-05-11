@@ -345,21 +345,17 @@ select:focus,.iapp:focus{border-color:var(--primary)}
       </div>
       <!-- Código de cortesia -->
       <div class="code-box">
-        <div class="div-or">ou use um código de cortesia</div>
+        <div class="div-or">ou acesse com código de cortesia</div>
         <div style="background:rgba(74,158,237,.08);border:1px solid rgba(74,158,237,.25);border-radius:10px;padding:12px 14px;margin-bottom:12px">
-          <p style="font-size:13px;font-weight:700;color:#4a9eed;margin-bottom:6px">🎁 Como usar seu código:</p>
-          <p style="font-size:12px;color:var(--text3);line-height:1.7;margin:0">
-            1️⃣ Digite seu <strong style="color:var(--text2)">e-mail</strong> no campo acima<br>
-            2️⃣ Cole o código no campo abaixo<br>
-            3️⃣ Clique em <strong style="color:var(--text2)">"Usar código"</strong><br>
-            4️⃣ Pronto! Acesso liberado pelo prazo do código ✅
-          </p>
+          <p style="font-size:13px;font-weight:700;color:#4a9eed;margin-bottom:4px">🎁 Recebeu um código de cortesia?</p>
+          <p style="font-size:12px;color:var(--text3);line-height:1.6;margin:0">Digite seu e-mail e o código abaixo — acesso imediato, sem senha!</p>
         </div>
+        <input type="email" class="ifield" id="codeEmail" placeholder="Seu e-mail" style="margin-bottom:10px">
         <div class="code-row">
           <input type="text" class="code-input" id="codeInput" placeholder="BENCAO-XXXX-XXXX" maxlength="20">
-          <button class="btn-code" onclick="useCode()">Usar código</button>
+          <button class="btn-code" onclick="useCode()">Entrar</button>
         </div>
-        <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px;line-height:1.5">Após o primeiro acesso, entre normalmente com seu e-mail e senha</p>
+        <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px;line-height:1.5">Uma senha provisória será enviada para seu e-mail</p>
       </div>
       <div class="lnote">Ao entrar você concorda com os<br><span class="llink">Termos de Uso</span> e <span class="llink">Política de Privacidade</span></div>
     </div>
@@ -1370,55 +1366,86 @@ function canUseApp(){
 // ════════════════════════════════════════
 // CÓDIGO DE CORTESIA
 // ════════════════════════════════════════
-function useCode(){
+async function useCode(){
   const code=document.getElementById('codeInput').value.trim().toUpperCase();
-  if(!code){toast('⚠️ Digite o código.');return;}
+  const email=document.getElementById('codeEmail').value.trim().toLowerCase();
+
+  if(!email){toast('⚠️ Digite seu e-mail.');document.getElementById('codeEmail').focus();return;}
+  if(!code){toast('⚠️ Digite o código.');document.getElementById('codeInput').focus();return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast('⚠️ E-mail inválido.');return;}
 
   const codes=JSON.parse(localStorage.getItem('bd_codes')||'{}');
   const c=codes[code];
 
-  if(!c){toast('❌ Código inválido.');return;}
-  if(c.usosUsados>=c.usosMax&&c.usosMax!==999){toast('❌ Código esgotado.');return;}
-  if(c.used&&c.singleUse){toast('❌ Código já utilizado.');return;}
+  if(!c){toast('❌ Código inválido. Verifique e tente novamente.');return;}
+  if(c.used&&c.singleUse){toast('❌ Este código já foi utilizado.');return;}
+  if((c.usosUsados||0)>=(c.usosMax||1)&&(c.usosMax||1)!==999){toast('❌ Código esgotado.');return;}
   if(new Date()>new Date(c.expires)){toast('❌ Código expirado.');return;}
 
-  // Calcula validade do acesso baseada nos dias do código
-  const diasAcesso = c.days || 30;
-  const cortesiaExpires = new Date(Date.now() + diasAcesso*24*60*60*1000).toISOString();
-
-  // Aplica o código
-  const email=document.getElementById('ei').value.trim()||'cortesia@bencaododia.app.br';
-  curUser.email=email;
-  curUser.name=email.split('@')[0]||'Usuário';
-  curUser.plan='Cortesia';
-  curUser.trialStart=null;
-  curUser.cortesiaExpires=cortesiaExpires;
+  // Gera senha provisória
+  const senhaProvisoria=Math.random().toString(36).substr(2,8).toUpperCase();
+  const diasAcesso=c.days||30;
+  const cortesiaExpires=new Date(Date.now()+diasAcesso*24*60*60*1000).toISOString();
+  const ts=new Date().toISOString();
 
   // Marca uso do código
   codes[code].usosUsados=(codes[code].usosUsados||0)+1;
-  if(c.singleUse) codes[code].used=true;
+  if(c.singleUse||(c.usosMax||1)===1) codes[code].used=true;
   localStorage.setItem('bd_codes',JSON.stringify(codes));
 
-  // Salva conta com data de expiração
+  // Cria/atualiza conta
   const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+  const jaCadastrado=!!contas[email];
   contas[email]={
-    nome:curUser.name,
-    senha:'',
+    nome:email.split('@')[0],
+    senha:btoa(senhaProvisoria),
     plano:'Cortesia',
     trialStart:null,
     codeUsed:code,
     cortesiaExpires,
-    diasAcesso
+    diasAcesso,
+    criadoEm:contas[email]?.criadoEm||ts,
+    senhaProvisoria:!jaCadastrado
   };
   localStorage.setItem('bd_contas',JSON.stringify(contas));
+
+  // Envia e-mail com senha provisória
+  toast('⏳ Liberando acesso...');
+  try{
+    await fetch('/.netlify/functions/recuperar',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        acao:'enviar_senha_provisoria',
+        contato:email,
+        senha:senhaProvisoria,
+        dias:diasAcesso
+      })
+    });
+  }catch(e){
+    console.log('Erro ao enviar e-mail:', e.message);
+  }
+
+  // Entra direto no app
+  curUser={
+    name:email.split('@')[0],
+    email,
+    plan:'Cortesia',
+    trialStart:null,
+    cortesiaExpires,
+    cardsToday:0
+  };
 
   document.getElementById('topbar').style.display='flex';
   document.getElementById('avbtn').textContent=curUser.name.charAt(0).toUpperCase();
   updateBadge('Cortesia 🎁');
-  toast(`🎁 Acesso liberado por ${diasAcesso} dias! Bem-vindo ao Bênção do Dia!`);
-  setTimeout(()=>toast('💡 Dica: guarde seu e-mail e senha para entrar novamente.'),3500);
-  goScreen('sApp');
-  updateAppUI();
+  toast(`🎉 Acesso liberado por ${diasAcesso} dias!`);
+  setTimeout(()=>toast('📧 Sua senha foi enviada por e-mail!'),2000);
+
+  if(sessaoInterval) clearInterval(sessaoInterval);
+  sessaoInterval=setInterval(()=>verificarSessaoServidor(email),30000);
+
+  afterLogin(false);
 }
 
 // ════════════════════════════════════════
