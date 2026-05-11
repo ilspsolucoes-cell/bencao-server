@@ -4,6 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Bênção do Dia — Cards Católicos</title>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#c9a84c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bênção do Dia">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+
+<!-- SEO -->
+<meta name="description" content="Crie e compartilhe cards católicos inspiradores para WhatsApp com inteligência artificial. Versículos bíblicos CNBB, mensagens marianas e muito mais.">
+<meta property="og:title" content="Bênção do Dia — Cards Católicos para WhatsApp">
+<meta property="og:description" content="Crie cards católicos inspiradores com IA. Experimente grátis por 3 dias!">
+<meta property="og:image" content="/icons/icon-512x512.png">
+<meta property="og:url" content="https://bencaododia.app.br">
+<meta name="twitter:card" content="summary_large_image">
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lora:ital,wght@0,400;1,400&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -818,6 +836,68 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Banner de instalação PWA -->
+<div id="pwaInstall" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:998;width:calc(100% - 32px);max-width:420px;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:16px;box-shadow:0 8px 40px rgba(0,0,0,.5);animation:fadeUp .4s ease">
+  <div style="display:flex;align-items:center;gap:14px">
+    <img src="/icons/icon-96x96.png" style="width:52px;height:52px;border-radius:12px;flex-shrink:0" alt="Ícone">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:15px;font-weight:800;color:var(--text2)">Instalar Bênção do Dia</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:2px">Adicione à tela inicial — acesso rápido!</div>
+    </div>
+    <button onclick="installPWA()" style="padding:10px 16px;background:linear-gradient(135deg,var(--accent),var(--primary));border:none;border-radius:10px;color:var(--bg);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0">Instalar</button>
+    <button onclick="document.getElementById('pwaInstall').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;padding:4px;flex-shrink:0">✕</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// PWA — Service Worker e instalação
+// ════════════════════════════════════════
+let deferredPrompt = null;
+
+// Registra service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('SW registrado:', reg.scope))
+      .catch(err => console.log('SW erro:', err));
+  });
+}
+
+// Captura evento de instalação
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Mostra banner após 3 segundos
+  setTimeout(() => {
+    const banner = document.getElementById('pwaInstall');
+    if (banner) banner.style.display = 'block';
+  }, 3000);
+});
+
+function installPWA() {
+  const banner = document.getElementById('pwaInstall');
+  if (banner) banner.style.display = 'none';
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(result => {
+      if (result.outcome === 'accepted') {
+        toast('✅ App instalado com sucesso!');
+      }
+      deferredPrompt = null;
+    });
+  }
+}
+
+// App instalado
+window.addEventListener('appinstalled', () => {
+  toast('🎉 Bênção do Dia instalado na sua tela inicial!');
+  deferredPrompt = null;
+  const banner = document.getElementById('pwaInstall');
+  if (banner) banner.style.display = 'none';
+});
+</script>
 
 <script>
 // ════════════════════════════════════════
