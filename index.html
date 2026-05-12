@@ -387,13 +387,13 @@ select:focus,.iapp:focus{border-color:var(--primary)}
     <p>3 dias grátis com acesso completo — sem cartão</p>
   </div>
 
-  <div class="trial-banner">
+  <div id="trialBanner" class="trial-banner">
     <h3>🎁 3 dias grátis para você!</h3>
     <p>Experimente todas as funcionalidades sem pagar nada.<br>Depois assine o plano anual com parcelas a partir de R$10/mês.</p>
   </div>
 
   <div class="pgrid">
-    <div class="pcard pop" onclick="startTrial()">
+    <div class="pcard pop" id="trialCard" onclick="startTrial()">
       <div class="ptop"><div><div class="pname">Trial Grátis</div><div style="font-size:13px;color:var(--text3);margin-top:2px;font-weight:600">Experimente tudo</div></div><div class="pemoji">🎁</div></div>
       <div class="ptop"><div class="pval" style="color:var(--green)">R$ 0</div><div class="pper">por 3 dias</div></div>
       <div class="pfeats">
@@ -929,6 +929,21 @@ function goScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   window.scrollTo({top:0,behavior:'smooth'});
+
+  // Na tela de planos, esconde trial se já foi usado
+  if(id==='sPlanos'){
+    const jaUsouTrial = curUser.trialStart !== null;
+    const trialCard = document.getElementById('trialCard');
+    const trialBanner = document.getElementById('trialBanner');
+    if(trialCard) trialCard.style.display = jaUsouTrial ? 'none' : 'block';
+    if(trialBanner) trialBanner.style.display = jaUsouTrial ? 'none' : 'block';
+
+    // Se já usou trial mostra mensagem diferente
+    if(jaUsouTrial){
+      const ph = document.querySelector('#sPlanos .ph p');
+      if(ph) ph.textContent = 'Seu período de teste expirou. Assine um plano para continuar.';
+    }
+  }
 }
 
 // ════════════════════════════════════════
@@ -1581,6 +1596,11 @@ async function useCode(){
 // PLANOS / PAGAMENTO
 // ════════════════════════════════════════
 function startTrial(){
+  // Bloqueia se já usou trial
+  if(curUser.trialStart){
+    toast('⚠️ Seu período de teste já foi utilizado. Escolha um plano para continuar.');
+    return;
+  }
   if(!curUser.email){
     toast('⚠️ Faça login primeiro.');
     goScreen('sLogin');
