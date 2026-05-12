@@ -1110,11 +1110,18 @@ async function verificarSessaoServidor(email){
     } else if(data.sessaoInvalida){
       clearInterval(sessaoInterval);
       sairForcado('⚠️ Sua conta foi acessada em outro dispositivo. Por segurança, você foi desconectado.');
-    } else if(data.success && data.plano && data.plano!==curUser.plan){
-      // Atualiza plano se mudou
-      curUser.plan=data.plano;
-      updateBadge(data.plano);
-      updateAppUI();
+    } else if(data.success){
+      // Sincroniza plano se mudou
+      if(data.plano && data.plano !== curUser.plan){
+        curUser.plan=data.plano;
+        updateBadge(data.plano);
+        updateAppUI();
+        toast(`✦ Plano atualizado: ${data.plano}`);
+        // Atualiza localStorage
+        const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+        if(contas[email]) contas[email].plano=data.plano;
+        localStorage.setItem('bd_contas',JSON.stringify(contas));
+      }
     }
   }catch(e){
     console.log('Erro ao verificar sessão:', e.message);
@@ -1312,9 +1319,20 @@ async function loginEmail(){
     } else if(data.success){
       curUser.name=data.usuario?.nome||e.split('@')[0];
       curUser.email=e;
+      // Sempre usa o plano do SERVIDOR — nunca do localStorage
       curUser.plan=data.usuario?.plano||'Trial';
       curUser.trialStart=data.usuario?.trialStart||null;
+      curUser.cortesiaExpires=data.usuario?.cortesiaExpires||null;
       sessaoId=data.sessaoId||gerarSessaoId();
+      // Sincroniza localStorage com dados do servidor
+      const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
+      contas[e]={
+        ...contas[e],
+        plano:curUser.plan,
+        trialStart:curUser.trialStart,
+        cortesiaExpires:curUser.cortesiaExpires
+      };
+      localStorage.setItem('bd_contas',JSON.stringify(contas));
       localStorage.setItem('bd_sessao',JSON.stringify({email:e,sessaoId,ts:Date.now()}));
       if(sessaoInterval) clearInterval(sessaoInterval);
       sessaoInterval=setInterval(()=>verificarSessaoServidor(e),30000);
