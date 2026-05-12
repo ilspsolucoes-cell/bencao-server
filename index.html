@@ -272,6 +272,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
   <div class="tright">
     <div class="pbadge" id="pbadge">Grátis</div>
     <div class="ibtn" onclick="toggleTP()" title="Temas">🎨</div>
+    <div class="ibtn" onclick="abrirSuporte()" title="Suporte" style="font-size:15px">❓</div>
     <div class="ibtn" onclick="sairApp()" title="Sair" style="font-size:15px">🚪</div>
     <div class="avbtn" id="avbtn" onclick="goAdmin()">?</div>
   </div>
@@ -733,8 +734,19 @@ select:focus,.iapp:focus{border-color:var(--primary)}
   <!-- Tabs -->
   <div class="dash-tabs">
     <button class="dash-tab on" onclick="showTab('tabUsuarios',this)">👥 Usuários</button>
+    <button class="dash-tab" onclick="showTab('tabMensagens',this)">📩 Mensagens</button>
     <button class="dash-tab" onclick="showTab('tabCodigos',this)">🎟️ Códigos</button>
     <button class="dash-tab" onclick="showTab('tabGraficos',this)">📊 Distribuição</button>
+  </div>
+
+  <!-- Tab Mensagens -->
+  <div id="tabMensagens" style="display:none">
+    <div class="admin-sect">
+      <h3>📩 Mensagens dos Usuários</h3>
+      <div id="msgList">
+        <p style="color:var(--text3);font-size:14px;text-align:center;padding:20px">Carregando mensagens...</p>
+      </div>
+    </div>
   </div>
 
   <!-- Tab Usuários -->
@@ -833,6 +845,56 @@ select:focus,.iapp:focus{border-color:var(--primary)}
     </div>
   </div>
 </div>
+</div>
+
+<!-- Modal Suporte — Canal de Comunicação -->
+<div class="modal-overlay" id="modalSuporte">
+  <div class="modal-box" style="max-width:500px;max-height:90vh;overflow-y:auto">
+
+    <!-- Tela inicial: nova mensagem ou ver conversa -->
+    <div id="suporteInicio">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h3 style="margin:0">💬 Suporte</h3>
+        <button onclick="fecharSuporte()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer">✕</button>
+      </div>
+
+      <!-- Minhas conversas -->
+      <div id="minhasConversas"></div>
+
+      <!-- Nova mensagem -->
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
+        <p style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:12px">📨 Nova mensagem</p>
+        <select id="suporteAssunto" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-family:'Nunito',sans-serif;font-size:14px;padding:10px 12px;outline:none;margin-bottom:10px;-webkit-appearance:none">
+          <option value="problema-tecnico">🔧 Problema técnico</option>
+          <option value="pagamento">💳 Dúvida sobre pagamento</option>
+          <option value="plano">⭐ Dúvida sobre plano</option>
+          <option value="card">🖼️ Problema com card</option>
+          <option value="conta">👤 Problema com minha conta</option>
+          <option value="sugestao">💡 Sugestão de melhoria</option>
+          <option value="outro">📝 Outro assunto</option>
+        </select>
+        <textarea id="suporteMensagem" placeholder="Descreva seu problema ou dúvida..." style="width:100%;min-height:90px;resize:vertical;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text2);font-family:'Nunito',sans-serif;font-size:14px;line-height:1.6;outline:none;margin-bottom:10px"></textarea>
+        <div id="suporteErro" style="display:none;color:#e8a0a0;font-size:13px;margin-bottom:8px"></div>
+        <button onclick="enviarMensagemSuporte()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--primary));border:none;border-radius:10px;color:var(--bg);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer">📨 Enviar mensagem</button>
+      </div>
+    </div>
+
+    <!-- Tela de conversa -->
+    <div id="suporteConversa" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <button onclick="voltarSuporte()" style="background:none;border:none;color:var(--primary);font-size:20px;cursor:pointer">←</button>
+        <h3 style="margin:0;flex:1" id="conversaTitulo">Conversa</h3>
+        <button onclick="fecharSuporte()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer">✕</button>
+      </div>
+      <div id="conversaMsgs" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;max-height:50vh;overflow-y:auto"></div>
+      <!-- Campo de resposta do usuário -->
+      <div id="usuarioResposta" style="border-top:1px solid var(--border);padding-top:12px">
+        <textarea id="novaResposta" placeholder="Escreva uma resposta..." style="width:100%;min-height:70px;resize:none;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text2);font-family:'Nunito',sans-serif;font-size:14px;outline:none;margin-bottom:8px"></textarea>
+        <button onclick="enviarRespostaUsuario()" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--accent),var(--primary));border:none;border-radius:10px;color:var(--bg);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer">Enviar resposta</button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1662,14 +1724,307 @@ function goAdmin(){
 }
 
 // ════════════════════════════════════════
-// DASHBOARD ADMIN
+// SUPORTE — Canal Bidirecional
 // ════════════════════════════════════════
+let conversaAtualIdx = null;
+
+const assuntoLabels = {
+  'problema-tecnico':'🔧 Problema técnico',
+  'pagamento':'💳 Pagamento',
+  'plano':'⭐ Plano',
+  'card':'🖼️ Card',
+  'conta':'👤 Conta',
+  'sugestao':'💡 Sugestão',
+  'outro':'📝 Outro'
+};
+
+async function abrirSuporte(){
+  document.getElementById('modalSuporte').classList.add('on');
+  document.getElementById('suporteInicio').style.display='block';
+  document.getElementById('suporteConversa').style.display='none';
+  document.getElementById('suporteMensagem').value='';
+  document.getElementById('suporteErro').style.display='none';
+  await carregarMinhasConversas();
+}
+
+function fecharSuporte(){
+  document.getElementById('modalSuporte').classList.remove('on');
+  conversaAtualIdx=null;
+}
+
+function voltarSuporte(){
+  document.getElementById('suporteInicio').style.display='block';
+  document.getElementById('suporteConversa').style.display='none';
+  conversaAtualIdx=null;
+  carregarMinhasConversas();
+}
+
+async function carregarMinhasConversas(){
+  const el=document.getElementById('minhasConversas');
+  if(!el) return;
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'minhas_mensagens', email:curUser.email})
+    });
+    const data=await res.json();
+    const msgs=data.mensagens||[];
+    if(!msgs.length){
+      el.innerHTML='<p style="font-size:13px;color:var(--text3);text-align:center;padding:8px 0">Nenhuma conversa ainda.</p>';
+      atualizarIconeSuporte(false);
+      return;
+    }
+    // Verifica se tem resposta não lida
+    const temNova = msgs.some(m=>m.resposta && !m.respostaLida);
+    atualizarIconeSuporte(temNova);
+
+    el.innerHTML='<p style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Minhas conversas</p>'+
+    msgs.map((m,i)=>{
+      const temResposta=!!m.resposta;
+      const naoLida=temResposta&&!m.respostaLida;
+      const dt=new Date(m.ts).toLocaleDateString('pt-BR');
+      return `<div onclick="abrirConversa(${i})" style="background:var(--bg3);border:1px solid ${naoLida?'var(--primary)':'var(--border)'};border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <span style="font-size:13px;font-weight:700;color:var(--text2)">${assuntoLabels[m.assunto]||m.assunto}</span>
+          ${naoLida?'<span style="background:var(--primary);color:var(--bg);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap">NOVA RESPOSTA</span>':''}
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">${dt} · ${temResposta?'<span style="color:#4a9eed">Respondida ✓</span>':'Aguardando resposta...'}</div>
+        <div style="font-size:13px;color:var(--text3);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.mensagem}</div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    el.innerHTML='';
+  }
+}
+
+function atualizarIconeSuporte(temNova){
+  const btn=document.querySelector('.ibtn[onclick*="abrirSuporte"]');
+  if(btn) btn.textContent=temNova?'📩':'❓';
+}
+
+async function abrirConversa(idx){
+  conversaAtualIdx=idx;
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'minhas_mensagens', email:curUser.email})
+    });
+    const data=await res.json();
+    const m=data.mensagens[idx];
+    if(!m) return;
+
+    // Marca resposta como lida
+    if(m.resposta && !m.respostaLida){
+      await fetch('/.netlify/functions/db',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({acao:'marcar_resposta_lida', email:curUser.email, idx})
+      });
+    }
+
+    document.getElementById('conversaTitulo').textContent=assuntoLabels[m.assunto]||m.assunto;
+    document.getElementById('suporteInicio').style.display='none';
+    document.getElementById('suporteConversa').style.display='block';
+
+    // Monta o chat
+    const msgsEl=document.getElementById('conversaMsgs');
+    let html='';
+    // Mensagem do usuário
+    html+=bolhaChat(m.mensagem, new Date(m.ts).toLocaleString('pt-BR'), false, curUser.name);
+    // Resposta do admin (se houver)
+    if(m.resposta){
+      html+=bolhaChat(m.resposta, new Date(m.respostaTs).toLocaleString('pt-BR'), true, 'Suporte');
+    }
+    // Respostas adicionais (thread)
+    if(m.thread){
+      m.thread.forEach(t=>{
+        const isAdmin=t.de==='admin';
+        html+=bolhaChat(t.texto, new Date(t.ts).toLocaleString('pt-BR'), isAdmin, isAdmin?'Suporte':curUser.name);
+      });
+    }
+    msgsEl.innerHTML=html;
+    msgsEl.scrollTop=msgsEl.scrollHeight;
+    atualizarIconeSuporte(false);
+  }catch(e){
+    toast('⚠️ Erro ao abrir conversa.');
+  }
+}
+
+function bolhaChat(texto, hora, isAdmin, nome){
+  return `<div style="display:flex;flex-direction:column;align-items:${isAdmin?'flex-start':'flex-end'}">
+    <div style="font-size:11px;color:var(--text3);margin-bottom:3px;padding:0 4px">${nome}</div>
+    <div style="max-width:85%;background:${isAdmin?'var(--bg3)':'linear-gradient(135deg,var(--accent),var(--primary))'};color:${isAdmin?'var(--text2)':'var(--bg)'};padding:10px 14px;border-radius:${isAdmin?'4px 14px 14px 14px':'14px 4px 14px 14px'};font-size:14px;line-height:1.6">
+      ${texto}
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-top:3px;padding:0 4px">${hora}</div>
+  </div>`;
+}
+
+async function enviarRespostaUsuario(){
+  const texto=document.getElementById('novaResposta').value.trim();
+  if(!texto){toast('⚠️ Digite sua resposta.');return;}
+  if(conversaAtualIdx===null){return;}
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        acao:'resposta_usuario',
+        email:curUser.email,
+        idx:conversaAtualIdx,
+        texto,
+        ts:new Date().toISOString()
+      })
+    });
+    const data=await res.json();
+    if(data.success){
+      document.getElementById('novaResposta').value='';
+      abrirConversa(conversaAtualIdx);
+      toast('✅ Resposta enviada!');
+    }
+  }catch(e){
+    toast('⚠️ Erro ao enviar resposta.');
+  }
+}
+
+async function enviarMensagemSuporte(){
+  const assunto=document.getElementById('suporteAssunto').value;
+  const mensagem=document.getElementById('suporteMensagem').value.trim();
+  const erroEl=document.getElementById('suporteErro');
+  if(!mensagem){erroEl.textContent='⚠️ Escreva sua mensagem.';erroEl.style.display='block';return;}
+  if(mensagem.length<10){erroEl.textContent='⚠️ Mensagem muito curta.';erroEl.style.display='block';return;}
+  erroEl.style.display='none';
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        acao:'enviar_mensagem',
+        email:curUser.email,
+        nome:curUser.name,
+        plano:curUser.plan,
+        assunto,
+        mensagem,
+        ts:new Date().toISOString()
+      })
+    });
+    const data=await res.json();
+    if(data.success){
+      document.getElementById('suporteMensagem').value='';
+      toast('✅ Mensagem enviada! Responderemos em breve.');
+      await carregarMinhasConversas();
+    }else{
+      erroEl.textContent='⚠️ Erro ao enviar. Tente novamente.';
+      erroEl.style.display='block';
+    }
+  }catch(e){
+    erroEl.textContent='⚠️ Erro de conexão.';
+    erroEl.style.display='block';
+  }
+}
+
+async function carregarMensagens(){
+  const el=document.getElementById('msgList');
+  if(!el) return;
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'listar_mensagens',adminPass:ADMIN_PASS})
+    });
+    const data=await res.json();
+    const msgs=data.mensagens||[];
+    if(!msgs.length){
+      el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:20px">Nenhuma mensagem ainda.</p>';
+      return;
+    }
+    msgs.sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+    el.innerHTML=msgs.map((m,i)=>{
+      const dt=new Date(m.ts).toLocaleString('pt-BR');
+      const respondida=!!m.resposta;
+      const temThread=m.thread&&m.thread.length>0;
+      let threadHtml='';
+      // Thread de respostas
+      if(temThread){
+        threadHtml=m.thread.map(t=>`
+          <div style="margin-top:8px;padding:8px 12px;background:${t.de==='admin'?'rgba(201,168,76,.1)':'var(--bg2)'};border-radius:8px;border-left:3px solid ${t.de==='admin'?'var(--primary)':'var(--border2)'}">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${t.de==='admin'?'👤 Suporte':'👤 '+m.email} · ${new Date(t.ts).toLocaleString('pt-BR')}</div>
+            <div style="font-size:13px;color:var(--text2)">${t.texto}</div>
+          </div>`).join('');
+      }
+      return `<div style="background:var(--bg3);border:1px solid ${!respondida?'var(--primary)':'var(--border)'};border-radius:12px;padding:16px;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <div>
+            <span style="font-size:13px;font-weight:800;color:var(--primary)">${assuntoLabels[m.assunto]||m.assunto}</span>
+            ${!respondida?'<span style="background:var(--primary);color:var(--bg);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:8px">NOVA</span>':'<span style="background:rgba(74,158,237,.2);color:#4a9eed;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:8px">RESPONDIDA</span>'}
+          </div>
+          <span style="font-size:11px;color:var(--text3)">${dt}</span>
+        </div>
+        <div style="font-size:13px;color:var(--text3);margin-bottom:8px">👤 ${m.email} · ${m.plano||'?'}</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.6;padding:10px;background:var(--bg2);border-radius:8px;margin-bottom:8px">${m.mensagem}</div>
+        ${respondida?`<div style="padding:10px;background:rgba(201,168,76,.08);border-radius:8px;border-left:3px solid var(--primary);margin-bottom:8px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">✅ Sua resposta · ${new Date(m.respostaTs).toLocaleString('pt-BR')}</div>
+          <div style="font-size:13px;color:var(--text2)">${m.resposta}</div>
+        </div>`:''}
+        ${threadHtml}
+        <!-- Campo resposta admin -->
+        <div style="margin-top:10px">
+          <textarea id="respAdmin_${i}" placeholder="Digite sua resposta para o usuário..." style="width:100%;min-height:70px;resize:none;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text2);font-family:'Nunito',sans-serif;font-size:13px;outline:none;margin-bottom:8px"></textarea>
+          <button onclick="responderMensagem(${i})" style="padding:8px 18px;background:linear-gradient(135deg,var(--accent),var(--primary));border:none;border-radius:8px;color:var(--bg);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer">📨 Responder</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;padding:20px">Erro ao carregar.</p>';
+  }
+}
+
+async function responderMensagem(idx){
+  const texto=document.getElementById(`respAdmin_${idx}`)?.value.trim();
+  if(!texto){toast('⚠️ Digite a resposta.');return;}
+  try{
+    const res=await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        acao:'responder_mensagem',
+        adminPass:ADMIN_PASS,
+        idx,
+        resposta:texto,
+        ts:new Date().toISOString()
+      })
+    });
+    const data=await res.json();
+    if(data.success){
+      toast('✅ Resposta enviada!');
+      carregarMensagens();
+    }
+  }catch(e){
+    toast('⚠️ Erro ao responder.');
+  }
+}
+
+async function marcarLida(idx){
+  try{
+    await fetch('/.netlify/functions/db',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({acao:'marcar_lida',adminPass:ADMIN_PASS,idx})
+    });
+    carregarMensagens();
+  }catch(e){}
+}
 let filtroAtual='todos', editandoEmail='';
 
 function showTab(id,btn){
-  ['tabUsuarios','tabCodigos','tabGraficos'].forEach(t=>{document.getElementById(t).style.display=t===id?'block':'none';});
+  ['tabUsuarios','tabMensagens','tabCodigos','tabGraficos'].forEach(t=>{
+    document.getElementById(t).style.display=t===id?'block':'none';
+  });
   document.querySelectorAll('.dash-tab').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
+  if(id==='tabMensagens') carregarMensagens();
 }
 function setFiltro(f,btn){
   filtroAtual=f;
