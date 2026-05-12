@@ -58,6 +58,13 @@ exports.handler = async (event) => {
       if (u.pendente) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Pendente', pendente: true }) };
       if (u.senha !== btoa_node(senha)) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Senha incorreta' }) };
 
+      // Verifica expiração da cortesia
+      if (u.plano === 'Cortesia' && u.cortesiaExpires) {
+        if (new Date() > new Date(u.cortesiaExpires)) {
+          return { statusCode: 403, headers, body: JSON.stringify({ error: 'Seu acesso de cortesia expirou. Assine um plano para continuar.', cortesiaExpirada: true }) };
+        }
+      }
+
       // Verifica sessão ativa
       const s = db.sessoes[email];
       if (s && s.sessaoId !== sessaoId) {
@@ -213,6 +220,25 @@ exports.handler = async (event) => {
       delete db.sessoes[email];
       await salvarDB(db);
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
+    // ── SALVAR CORTESIA (acesso via código) ──
+    if (acao === 'salvar_cortesia') {
+      const ts = new Date().toISOString();
+      const sid = Math.random().toString(36).substr(2) + Date.now().toString(36);
+      db.usuarios[email] = {
+        nome: email.split('@')[0],
+        senha: body.senha,
+        plano: 'Cortesia',
+        trialStart: null,
+        cortesiaExpires: body.cortesiaExpires,
+        diasAcesso: body.diasAcesso,
+        pendente: false,
+        criadoEm: db.usuarios[email]?.criadoEm || ts
+      };
+      db.sessoes[email] = { sessaoId: sid, ts: Date.now(), device: body.device || 'desconhecido' };
+      await salvarDB(db);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, sessaoId: sid }) };
     }
 
     // ── ADMIN: listar ──
