@@ -1058,33 +1058,39 @@ function togglePassRec(){
 }
 
 async function enviarCodigo(){
-  const contato=document.getElementById('recContato').value.trim();
+  const contato=document.getElementById('recContato').value.trim().toLowerCase();
   if(!contato){toast('⚠️ Informe seu e-mail.');return;}
 
   toast('⏳ Enviando código...');
   try{
-    const res=await fetch('/.netlify/functions/recuperar',{
+    // Gera e salva código no db.js (JSONBin)
+    const res=await fetch('/.netlify/functions/db',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({acao:'enviar',contato})
+      body:JSON.stringify({acao:'recuperar_enviar', email:contato})
     });
     const data=await res.json();
     if(data.success){
+      // Envia o código por e-mail via recuperar.js
+      await fetch('/.netlify/functions/recuperar',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({acao:'enviar_codigo_externo', contato, codigo:data.code})
+      });
       document.getElementById('recStep1').style.display='none';
       document.getElementById('recStep2').style.display='block';
-      toast('✅ Código enviado!');
-      // Debug — remove em produção
-      if(data.code_debug) toast(`Código: ${data.code_debug}`);
+      toast('✅ Código enviado para seu e-mail!');
     } else {
-      toast('⚠️ '+(data.error||'Erro ao enviar.'));
+      toast('⚠️ '+(data.error||'E-mail não cadastrado.'));
     }
   }catch(e){
-    toast('⚠️ Erro ao enviar código.');
+    toast('⚠️ Erro ao enviar código. Tente novamente.');
+    console.error(e);
   }
 }
 
 async function redefinirSenha(){
-  const contato=document.getElementById('recContato').value.trim();
+  const contato=document.getElementById('recContato').value.trim().toLowerCase();
   const codigo=document.getElementById('recCodigo').value.trim();
   const novaSenha=document.getElementById('recNovaSenha').value.trim();
 
@@ -1092,28 +1098,33 @@ async function redefinirSenha(){
   if(!novaSenha||novaSenha.length<4){toast('⚠️ Senha deve ter mín. 4 caracteres.');return;}
 
   try{
-    const res=await fetch('/.netlify/functions/recuperar',{
+    // Verifica código e redefine senha direto no servidor (db.js)
+    const res=await fetch('/.netlify/functions/db',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({acao:'verificar',contato,codigo})
+      body:JSON.stringify({
+        acao:'recuperar_redefinir',
+        email:contato,
+        codigo,
+        novaSenha
+      })
     });
     const data=await res.json();
     if(data.success){
-      // Atualiza senha no localStorage
+      // Atualiza localStorage também
       const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
       if(contas[contato]){
         contas[contato].senha=btoa(novaSenha);
         localStorage.setItem('bd_contas',JSON.stringify(contas));
-        toast('✅ Senha redefinida com sucesso!');
-        setTimeout(()=>hideRecuperar(),1500);
-      } else {
-        toast('⚠️ Conta não encontrada.');
       }
+      toast('✅ Senha redefinida! Faça login com a nova senha.');
+      setTimeout(()=>hideRecuperar(),1500);
     } else {
       toast('⚠️ '+(data.error||'Código incorreto.'));
     }
   }catch(e){
-    toast('⚠️ Erro ao redefinir senha.');
+    toast('⚠️ Erro ao redefinir senha. Tente novamente.');
+    console.error(e);
   }
 }
 
