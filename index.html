@@ -1272,6 +1272,11 @@ async function loginEmail(){
 
     if(data.bloqueado){
       toast('🚫 Seu acesso foi bloqueado. Entre em contato com o suporte.');
+    } else if(data.cortesiaExpirada){
+      toast('⏰ Seu acesso de cortesia expirou. Redirecionando para os planos...');
+      curUser.email=e;
+      document.getElementById('topbar').style.display='flex';
+      setTimeout(()=>goScreen('sPlanos'),1500);
     } else if(data.pendente){
       toast('⚠️ Confirme seu e-mail antes de entrar.');
       pendingEmail=e; pendingPass=p;
@@ -1437,10 +1442,16 @@ function cortesiaDiasRestantes(){
 
 function canUseApp(){
   if(curUser.plan==='Admin') return true;
-  if(curUser.plan==='Fiel'||curUser.plan==='Paróquia') return true;
+  // Aceita todas as variantes de plano pago
+  const planosAtivos=['Fiel','Fiel Mensal','Fiel Anual','Paróquia'];
+  if(planosAtivos.includes(curUser.plan)) return true;
   if(curUser.plan==='Cortesia') return checkCortesia()==='active';
   const ts=checkTrial();
   return ts==='active';
+}
+
+function isPlanoPago(){
+  return ['Fiel','Fiel Mensal','Fiel Anual','Paróquia'].includes(curUser.plan);
 }
 
 // ════════════════════════════════════════
@@ -1481,20 +1492,18 @@ async function useCode(){
   const cortesiaExpires=new Date(Date.now()+diasAcesso*24*60*60*1000).toISOString();
   const ts=new Date().toISOString();
 
-  // Salva conta no banco centralizado
+  // Salva conta no servidor (JSONBin)
   try{
     await fetch('/.netlify/functions/db',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        acao:'confirmar',
+        acao:'salvar_cortesia',
         email,
-        codigo:'CORTESIA_BYPASS',
-        device:navigator.userAgent.substr(0,80),
-        senhaOverride:btoa(senhaProvisoria),
-        planoOverride:'Cortesia',
+        senha:btoa(senhaProvisoria),
         cortesiaExpires,
-        diasAcesso
+        diasAcesso,
+        device:navigator.userAgent.substr(0,80)
       })
     });
   }catch(e){console.log('Salvando localmente:', e.message);}
