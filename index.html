@@ -268,7 +268,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 
 <!-- TOPBAR -->
 <div class="topbar" id="topbar" style="display:none">
-  <div class="tlogo">✝️ Bênção do Dia<span>Cards Católicos</span></div>
+  <div class="tlogo"><img src="/icons/cruz-app.png" alt="✝" style="width:22px;height:22px;object-fit:contain;vertical-align:middle;margin-right:6px;filter:drop-shadow(0 1px 4px rgba(201,168,76,.5))"> Bênção do Dia<span>Cards Católicos</span></div>
   <div class="tright">
     <div class="pbadge" id="pbadge">Grátis</div>
     <div class="ibtn" onclick="toggleTP()" title="Temas">🎨</div>
@@ -293,7 +293,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 <!-- ══ LOGIN ══ -->
 <div id="sLogin" class="screen on">
   <div class="lhero">
-    <div class="licon">✝️</div>
+    <img src="/icons/cruz-app.png" alt="Cruz" style="width:80px;height:80px;object-fit:contain;margin-bottom:10px;filter:drop-shadow(0 4px 12px rgba(201,168,76,.4));animation:floatUp .8s ease both">
     <div class="lbrand">Bênção do Dia</div>
     <div class="ltag">Cards católicos inspiradores para WhatsApp</div>
     <div class="gline"></div>
@@ -2008,9 +2008,9 @@ Retorne APENAS JSON: {"text":"mensagem motivacional","ref":"","sig":"${sig}"}`,
     mariana:`Hoje é ${dFull}. Mensagem mariana de "${md.title}". ${tTxt}
 Máx 3 linhas. Tom devocional e amoroso. NÃO inicie com "${md.title}".
 Sobre Nossa Senhora ou devoção mariana.
-NÃO coloque nenhum nome de invocação mariana na referência (ex: não use "Nossa Senhora da Guia", "Nossa Senhora da Saúde", etc.)
-A referência deve ser apenas: 💙 Nossa Senhora
-Retorne APENAS JSON: {"text":"mensagem mariana","ref":"💙 Nossa Senhora","sig":"${sig}"}`,
+NÃO coloque NADA no campo ref — deixe vazio.
+NÃO mencione nenhum título ou invocação mariana (ex: não use "Nossa Senhora da Guia", "da Saúde", etc.)
+Retorne APENAS JSON: {"text":"mensagem mariana sem referência","ref":"","sig":"${sig}"}`,
 
     autocuidado:`Hoje é ${dFull}. Mensagem de autocuidado de "${md.title}". ${tTxt}
 Máx 3 linhas. Tom gentil e acolhedor. NÃO inicie com "${md.title}".
