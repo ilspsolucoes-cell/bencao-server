@@ -229,6 +229,96 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
+    // ── ENVIAR MENSAGEM DE SUPORTE ──
+    if (acao === 'enviar_mensagem') {
+      if (!db.mensagens) db.mensagens = [];
+      db.mensagens.push({
+        email: body.email,
+        nome: body.nome,
+        plano: body.plano,
+        assunto: body.assunto,
+        mensagem: body.mensagem,
+        ts: body.ts || new Date().toISOString(),
+        lida: false,
+        resposta: null,
+        respostaTs: null,
+        respostaLida: false,
+        thread: []
+      });
+      await salvarDB(db);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
+    // ── LISTAR MENSAGENS (admin) ──
+    if (acao === 'listar_mensagens') {
+      if (body.adminPass !== ADMIN_PASS) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Não autorizado' }) };
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, mensagens: db.mensagens || [] }) };
+    }
+
+    // ── MINHAS MENSAGENS (usuário) ──
+    if (acao === 'minhas_mensagens') {
+      const minhas = (db.mensagens || []).filter(m => m.email === email);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, mensagens: minhas }) };
+    }
+
+    // ── ADMIN RESPONDER MENSAGEM ──
+    if (acao === 'responder_mensagem') {
+      if (body.adminPass !== ADMIN_PASS) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Não autorizado' }) };
+      if (!db.mensagens || db.mensagens[body.idx] === undefined) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Mensagem não encontrada' }) };
+      const msg = db.mensagens[body.idx];
+      if (!msg.resposta) {
+        // Primeira resposta
+        msg.resposta = body.resposta;
+        msg.respostaTs = body.ts || new Date().toISOString();
+        msg.respostaLida = false;
+        msg.lida = true;
+      } else {
+        // Resposta adicional (thread)
+        if (!msg.thread) msg.thread = [];
+        msg.thread.push({ de: 'admin', texto: body.resposta, ts: body.ts || new Date().toISOString() });
+        msg.respostaLida = false;
+      }
+      await salvarDB(db);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
+    // ── USUÁRIO RESPONDER NA THREAD ──
+    if (acao === 'resposta_usuario') {
+      const minhas = (db.mensagens || []);
+      // Encontra a mensagem pelo email e idx nas mensagens do usuário
+      const userMsgs = minhas.filter(m => m.email === email);
+      const msg = userMsgs[body.idx];
+      const globalIdx = minhas.indexOf(msg);
+      if (globalIdx === -1) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Não encontrado' }) };
+      if (!minhas[globalIdx].thread) minhas[globalIdx].thread = [];
+      minhas[globalIdx].thread.push({ de: 'usuario', texto: body.texto, ts: body.ts || new Date().toISOString() });
+      minhas[globalIdx].lida = false; // Admin verá como nova
+      await salvarDB(db);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
+    // ── MARCAR RESPOSTA COMO LIDA (usuário) ──
+    if (acao === 'marcar_resposta_lida') {
+      const userMsgs = (db.mensagens || []).filter(m => m.email === email);
+      const msg = userMsgs[body.idx];
+      const globalIdx = (db.mensagens || []).indexOf(msg);
+      if (globalIdx !== -1) {
+        db.mensagens[globalIdx].respostaLida = true;
+        await salvarDB(db);
+      }
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
+    // ── MARCAR LIDA (admin) ──
+    if (acao === 'marcar_lida') {
+      if (body.adminPass !== ADMIN_PASS) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Não autorizado' }) };
+      if (db.mensagens && db.mensagens[body.idx] !== undefined) {
+        db.mensagens[body.idx].lida = true;
+        await salvarDB(db);
+      }
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
     // ── SALVAR CORTESIA (acesso via código) ──
     if (acao === 'salvar_cortesia') {
       const ts = new Date().toISOString();
