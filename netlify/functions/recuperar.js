@@ -57,6 +57,37 @@ exports.handler = async (event) => {
       throw new Error(data?.message || 'Erro ao enviar e-mail');
     }
 
+    // ── ENVIAR CÓDIGO EXTERNO (gerado pelo db.js) ──
+    if (acao === 'enviar_codigo_externo') {
+      if (!contato || !body.codigo) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Dados inválidos' }) };
+      const code = body.codigo;
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'Bênção do Dia <noreply@bencaododia.app.br>',
+          to: [contato],
+          subject: '🔑 Recuperação de Senha — Bênção do Dia',
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:30px;background:#f9f5ef;border-radius:12px">
+              <h1 style="font-family:Georgia,serif;color:#c9a84c;font-size:28px;text-align:center">✝️ Bênção do Dia</h1>
+              <div style="background:#fff;border-radius:10px;padding:24px;border:1px solid #e8d49a;margin-top:20px">
+                <h2 style="color:#2a1a10;font-size:18px;margin-top:0">🔑 Recuperação de Senha</h2>
+                <p style="color:#5a4030;font-size:15px;line-height:1.6">Use o código abaixo para redefinir sua senha. Válido por <strong>15 minutos</strong>.</p>
+                <div style="text-align:center;margin:24px 0">
+                  <div style="background:#0f0d0a;color:#c9a84c;font-size:36px;font-weight:800;letter-spacing:10px;padding:20px;border-radius:10px;display:inline-block">${code}</div>
+                </div>
+                <p style="color:#8a8070;font-size:13px">Se você não solicitou a recuperação de senha, ignore este e-mail.</p>
+              </div>
+              <p style="text-align:center;color:#8a8070;font-size:12px;margin-top:20px">🙏 Paz e Bem! — Bênção do Dia</p>
+            </div>`
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+      throw new Error(data?.message || 'Erro ao enviar e-mail');
+    }
+
     // ── ENVIAR CÓDIGO (cadastro ou recuperação) ──
     if (acao === 'enviar' || acao === 'enviar_cadastro') {
       if (!contato) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Informe seu e-mail' }) };
