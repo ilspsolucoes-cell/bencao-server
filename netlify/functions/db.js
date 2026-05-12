@@ -211,8 +211,15 @@ exports.handler = async (event) => {
       if (s && s.sessaoId !== sessaoId) {
         return { statusCode: 409, headers, body: JSON.stringify({ error: 'Sessão inválida', sessaoInvalida: true }) };
       }
+      // Atualiza timestamp da sessão
       if (s) { s.ts = Date.now(); await salvarDB(db); }
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, plano: u.plano }) };
+      // Retorna plano e dados atualizados do servidor
+      return { statusCode: 200, headers, body: JSON.stringify({
+        success: true,
+        plano: u.plano,
+        cortesiaExpires: u.cortesiaExpires || null,
+        trialStart: u.trialStart || null
+      })};
     }
 
     // ── LOGOUT ──
