@@ -462,8 +462,11 @@ select:focus,.iapp:focus{border-color:var(--primary)}
         <button class="selbtn" onclick="setMode('tarde',this)"><span class="ic">🌤️</span>Boa Tarde</button>
         <button class="selbtn" onclick="setMode('noite',this)"><span class="ic">🌙</span>Boa Noite</button>
       </div>
+      <div class="g2" style="margin-bottom:10px">
+        <button class="selbtn" onclick="setMode('livre',this)"><span class="ic">🎉</span>Livre — Aniversário e outras ocasiões</button>
+      </div>
       <div class="g2">
-        <button class="selbtn" onclick="setMode('livre',this)" style="grid-column:1/-1"><span class="ic">🎉</span>Livre — Aniversário, Conquistas e outras ocasiões</button>
+        <button class="selbtn" onclick="setMode('branco',this)"><span class="ic">✦</span>Só a Mensagem — sem título</button>
       </div>
 
       <!-- Campo ocasião (só modo Livre) -->
@@ -485,7 +488,6 @@ select:focus,.iapp:focus{border-color:var(--primary)}
           <option value="dia-maes">💐 Dia das Mães</option>
           <option value="dia-pais">👨 Dia dos Pais</option>
           <option value="outra">✨ Outra ocasião</option>
-          <option value="branco">⬜ Em branco (sem título)</option>
         </select>
       </div>
 
@@ -979,10 +981,11 @@ let curMode = 'dia', curType = 'versiculo';
 let imgDataUrl = null, logoDataUrl = null;
 
 const modeData = {
-  dia:  {title:'Bom Dia',   emoji:'☀️', cor:'#f5d78a'},
-  tarde:{title:'Boa Tarde', emoji:'🌤️', cor:'#f5c46a'},
-  noite:{title:'Boa Noite', emoji:'🌙', cor:'#c5b8f5'},
-  livre:{title:'',          emoji:'🎉', cor:'#f5e88a'},
+  dia:   {title:'Bom Dia',   emoji:'☀️', cor:'#f5d78a'},
+  tarde: {title:'Boa Tarde', emoji:'🌤️', cor:'#f5c46a'},
+  noite: {title:'Boa Noite', emoji:'🌙', cor:'#c5b8f5'},
+  livre: {title:'',          emoji:'🎉', cor:'#f5e88a'},
+  branco:{title:'',          emoji:'',   cor:'#e8d49a'},
 };
 
 // ════════════════════════════════════════
@@ -2270,12 +2273,10 @@ function copyCode(code){navigator.clipboard?.writeText(code).then(()=>toast('✦
 // ════════════════════════════════════════
 function setMode(m,btn){
   curMode=m;
-  document.querySelectorAll('.g3 .selbtn, .g2 .selbtn[onclick*="setMode"]').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.g3 .selbtn, .g2 .selbtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  // Mostra/esconde campo de ocasião
   const ob=document.getElementById('ocasiaoBox');
   if(ob) ob.style.display=m==='livre'?'block':'none';
-  // No modo livre seleciona tema Felicitações automaticamente
   if(m==='livre'){
     const th=document.getElementById('theme');
     if(th) th.value='felicitacoes';
@@ -2436,6 +2437,11 @@ Tom alegre, caloroso e comemorativo. Máx 3 linhas.
 Pode incluir uma bênção ou desejo especial com perspectiva cristã se adequado.
 NÃO inicie com "${md.title}".
 Retorne APENAS JSON: {"text":"mensagem de felicitações","ref":"🎉","sig":"${sig}"}`,
+
+    branco:`Hoje é ${dFull}. Crie uma mensagem de acordo com o tema: ${tTxt}
+Tom positivo e inspirador. Máx 3 linhas. Sem saudação inicial como "Bom Dia" ou similar.
+Pode ter perspectiva cristã se adequado ao tema.
+Retorne APENAS JSON: {"text":"mensagem sem título","ref":"","sig":"${sig}"}`,
   };
 
   try{
@@ -2477,7 +2483,8 @@ Retorne APENAS JSON: {"text":"mensagem de felicitações","ref":"🎉","sig":"${
         dia:'linear-gradient(160deg,#1a3a1a,#2a5a2a,#1a2a10)',
         tarde:'linear-gradient(160deg,#3a1a0a,#5a3010,#2a2010)',
         noite:'linear-gradient(160deg,#0a0a2a,#1a1050,#0a0820)',
-        livre:'linear-gradient(160deg,#2a1a3a,#4a2060,#1a0a2a)'
+        livre:'linear-gradient(160deg,#2a1a3a,#4a2060,#1a0a2a)',
+        branco:'linear-gradient(160deg,#1a1208,#2a1e0c,#0f0d0a)'
       }[curMode]||'linear-gradient(160deg,#1a3a1a,#2a5a2a,#1a2a10)';
     }
 
