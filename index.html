@@ -485,6 +485,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
           <option value="dia-maes">💐 Dia das Mães</option>
           <option value="dia-pais">👨 Dia dos Pais</option>
           <option value="outra">✨ Outra ocasião</option>
+          <option value="branco">⬜ Em branco (sem título)</option>
         </select>
       </div>
 
@@ -2350,13 +2351,13 @@ async function gen(){
     recuperacao:'Feliz Recuperação', natal:'Feliz Natal',
     'pascoa-fest':'Feliz Páscoa', 'ano-novo':'Feliz Ano Novo',
     'dia-maes':'Feliz Dia das Mães', 'dia-pais':'Feliz Dia dos Pais',
-    outra:'Felicitações'
+    outra:'Felicitações', branco:''
   };
 
   const md={...modeData[curMode]};
   if(curMode==='livre'){
     md.title=ocasiaoLabels[ocasiaoVal]||'Felicitações';
-    md.emoji='🎉';
+    md.emoji= ocasiaoVal==='branco' ? '' : '🎉';
     md.cor='#f5e88a';
   }
 
@@ -2426,7 +2427,11 @@ Máx 3 linhas. Tom leve, alegre, com humor saudável. NÃO inicie com "${md.titl
 Pode incluir trocadilho ou algo que faça sorrir. Pode ser secular.
 Retorne APENAS JSON: {"text":"mensagem divertida","ref":"😄","sig":"${sig}"}`,
 
-    livre:`Hoje é ${dFull}. Crie uma mensagem especial de felicitações para: "${md.title}".
+    livre: ocasiaoVal==='branco'
+      ? `Hoje é ${dFull}. Crie uma mensagem inspiradora e positiva. ${tTxt}
+Tom alegre e caloroso. Máx 3 linhas. Pode ter perspectiva cristã se adequado.
+Retorne APENAS JSON: {"text":"mensagem inspiradora","ref":"","sig":"${sig}"}`
+      : `Hoje é ${dFull}. Crie uma mensagem especial de felicitações para: "${md.title}".
 Tom alegre, caloroso e comemorativo. Máx 3 linhas.
 Pode incluir uma bênção ou desejo especial com perspectiva cristã se adequado.
 NÃO inicie com "${md.title}".
