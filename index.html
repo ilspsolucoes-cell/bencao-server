@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -31,7 +32,7 @@
   --text:#d4c9a8;--text2:#f5f0e8;--text3:#8a8070;
   --border:rgba(201,168,76,.2);--border2:rgba(201,168,76,.45);
   --green:#25d366;--shadow:rgba(201,168,76,.15);
-  --card-ov:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.62) 40%,rgba(0,0,0,.62) 72%,rgba(0,0,0,.2) 100%);
+  --card-ov:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.38) 40%,rgba(0,0,0,.42) 72%,rgba(0,0,0,.08) 100%);
 }
 body.tm{--bg:#08101e;--bg2:#0e1c38;--bg3:#152448;--primary:#7ba7e8;--primary2:#b8d4ff;--accent:#5c8fd4;--text:#a8c0e0;--text2:#e8f0ff;--text3:#4a6080;--border:rgba(123,167,232,.2);--border2:rgba(123,167,232,.5);--shadow:rgba(123,167,232,.15)}
 body.tr{--bg:#1a0f14;--bg2:#2a1820;--bg3:#35202a;--primary:#e88aac;--primary2:#f5c0d5;--accent:#f06292;--text:#d4a8bc;--text2:#fce8f0;--text3:#806070;--border:rgba(232,138,172,.2);--border2:rgba(232,138,172,.5);--shadow:rgba(232,138,172,.15)}
@@ -191,6 +192,10 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 #cardV{position:relative;width:100%;aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
 #cardBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
 #cardBg.on{display:block}
+.pos-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);cursor:pointer;color:var(--text3);font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;transition:all .2s}
+.pos-btn.on{border-color:var(--primary);color:var(--primary);background:rgba(201,168,76,.1)}
+.font-btn{padding:12px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);cursor:pointer;transition:all .2s;text-align:center}
+.font-btn.on{border-color:var(--primary);background:rgba(201,168,76,.1)}
 #cardOv{position:absolute;inset:0;background:var(--card-ov);z-index:1}
 #cardCt{position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:24px 20px 20px;text-align:center}
 .ctit{font-family:'Dancing Script',cursive;font-size:clamp(32px,9vw,48px);font-weight:700;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7);line-height:1.1}
@@ -598,6 +603,63 @@ select:focus,.iapp:focus{border-color:var(--primary)}
           <strong>📲 Como enviar</strong>
           Salve o card → abra o WhatsApp → envie a imagem para seus contatos.
         </div>
+
+        <!-- Posição do texto -->
+        <div style="margin-bottom:14px">
+          <span class="flbl">Posição do texto</span>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            <button class="pos-btn on" onclick="setPosicao('topo',this)" title="Topo">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div style="width:22px;height:3px;background:currentColor;border-radius:2px"></div>
+                <div style="width:22px;height:2px;background:currentColor;opacity:.4;border-radius:2px"></div>
+                <div style="width:22px;height:2px;background:currentColor;opacity:.2;border-radius:2px"></div>
+              </div>
+              <span>Topo</span>
+            </button>
+            <button class="pos-btn" onclick="setPosicao('centro',this)" title="Centro">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div style="width:22px;height:2px;background:currentColor;opacity:.2;border-radius:2px"></div>
+                <div style="width:22px;height:3px;background:currentColor;border-radius:2px"></div>
+                <div style="width:22px;height:2px;background:currentColor;opacity:.2;border-radius:2px"></div>
+              </div>
+              <span>Centro</span>
+            </button>
+            <button class="pos-btn" onclick="setPosicao('baixo',this)" title="Baixo">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div style="width:22px;height:2px;background:currentColor;opacity:.2;border-radius:2px"></div>
+                <div style="width:22px;height:2px;background:currentColor;opacity:.4;border-radius:2px"></div>
+                <div style="width:22px;height:3px;background:currentColor;border-radius:2px"></div>
+              </div>
+              <span>Baixo</span>
+            </button>
+            <button class="pos-btn" onclick="setPosicao('lateral',this)" title="Lateral">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div style="width:6px;height:14px;background:currentColor;border-radius:2px;margin:0 auto"></div>
+              </div>
+              <span>Lateral</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Fonte do texto -->
+        <div style="margin-bottom:20px">
+          <span class="flbl">Fonte do texto</span>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+            <button class="font-btn on" onclick="setFonte('classica',this)">
+              <span style="font-family:'Lora',serif;font-size:17px">Clássica</span>
+            </button>
+            <button class="font-btn" onclick="setFonte('elegante',this)">
+              <span style="font-family:'Dancing Script',cursive;font-size:19px">Elegante</span>
+            </button>
+            <button class="font-btn" onclick="setFonte('moderna',this)">
+              <span style="font-family:'Nunito',sans-serif;font-size:16px;font-weight:700">Moderna</span>
+            </button>
+            <button class="font-btn" onclick="setFonte('serifada',this)">
+              <span style="font-family:Georgia,serif;font-size:16px;font-style:italic">Serifada</span>
+            </button>
+          </div>
+        </div>
+
         <div class="arow">
           <button class="abtn abtn-s" onclick="saveCard()">💾 &nbsp;Salvar Card</button>
           <button class="abtn abtn-n" onclick="rst()">↺ &nbsp;Criar Novo</button>
@@ -990,6 +1052,11 @@ const modeData = {
 // TELAS
 // ════════════════════════════════════════
 function goScreen(id){
+  // Proteção: bloqueia acesso ao dashboard para não-admins
+  if(id==='sAdmin' && curUser.plan!=='Admin'){
+    toast('⚠️ Acesso restrito ao administrador.');
+    return;
+  }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1001,8 +1068,6 @@ function goScreen(id){
     const trialBanner = document.getElementById('trialBanner');
     if(trialCard) trialCard.style.display = jaUsouTrial ? 'none' : 'block';
     if(trialBanner) trialBanner.style.display = jaUsouTrial ? 'none' : 'block';
-
-    // Se já usou trial mostra mensagem diferente
     if(jaUsouTrial){
       const ph = document.querySelector('#sPlanos .ph p');
       if(ph) ph.textContent = 'Seu período de teste expirou. Assine um plano para continuar.';
@@ -1242,11 +1307,13 @@ async function encerrarSessao(){
 function sairApp(){
   if(!confirm('Deseja sair do aplicativo?')) return;
   encerrarSessao();
-  curUser={name:'',email:'',plan:'',trialStart:null,cardsToday:0};
-  sessaoId='';
+  limparSessaoCompleta();
   document.getElementById('topbar').style.display='none';
   document.getElementById('ei').value='';
   document.getElementById('pi').value='';
+  // Remove botão sair se existir
+  const sairBtn=document.getElementById('sairBtn');
+  if(sairBtn) sairBtn.remove();
   goScreen('sLogin');
   toast('✦ Você saiu com segurança.');
 }
@@ -1445,9 +1512,15 @@ function afterLogin(isAdmin){
     updateBadge('Admin');
     goScreen('sApp');
     updateAppUI();
+    // Admin: avbtn abre dashboard
     document.getElementById('avbtn').onclick=()=>{goScreen('sAdmin');loadAdmin();};
     return;
   }
+
+  // NÃO admin: garante que avbtn NÃO abre dashboard
+  document.getElementById('avbtn').onclick=()=>{
+    toast('⚠️ Área restrita ao administrador.');
+  };
 
   // Verifica bloqueio
   const contas=JSON.parse(localStorage.getItem('bd_contas')||'{}');
@@ -1728,12 +1801,26 @@ async function verificarPagamento(){
 }
 
 function goAdmin(){
-  if(curUser.plan==='Admin'){
+  // Verifica plano atual — nunca confia em dados antigos
+  if(curUser.plan==='Admin' && curUser.email){
     goScreen('sAdmin');
     loadAdmin();
   } else {
+    // Limpa qualquer resquício de sessão admin e vai para planos
+    curUser.plan='';
     goScreen('sPlanos');
   }
+}
+
+function limparSessaoCompleta(){
+  // Limpa TUDO do localStorage relacionado à sessão
+  localStorage.removeItem('bd_sessao');
+  localStorage.removeItem('bd_admin');
+  // Reseta curUser completamente
+  curUser={name:'',email:'',plan:'',trialStart:null,cardsToday:0,cortesiaExpires:null};
+  sessaoId='';
+  if(sessaoInterval) clearInterval(sessaoInterval);
+  sessaoInterval=null;
 }
 
 // ════════════════════════════════════════
@@ -2049,6 +2136,55 @@ function filtrarUsuarios(){renderUserTable();}
 function getContas(){return JSON.parse(localStorage.getItem('bd_contas')||'{}');}
 function getPlanClass(p){if(!p||p==='Trial')return 'trial';if(p==='Bloqueado')return 'bloqueado';if(p==='Cortesia')return 'cortesia';if(p==='Paróquia')return 'paroquia';return 'fiel';}
 function getTrialInfo(c){if(!c.trialStart)return{status:'none',dias:0};const diff=TRIAL_DAYS-((new Date()-new Date(c.trialStart))/(1000*60*60*24));return diff>0?{status:'active',dias:Math.ceil(diff)}:{status:'expired',dias:0};}
+
+// ════════════════════════════════════════
+// POSIÇÃO E FONTE DO CARD
+// ════════════════════════════════════════
+let curPosicao='topo';
+let curFonte='classica';
+
+const fonteMap={
+  classica:"'Lora',serif",
+  elegante:"'Dancing Script',cursive",
+  moderna:"'Nunito',sans-serif",
+  serifada:"Georgia,serif"
+};
+
+const posicaoMap={
+  topo:   {justify:'flex-start',textAlign:'center', padding:'24px 20px 20px'},
+  centro: {justify:'center',    textAlign:'center', padding:'20px'},
+  baixo:  {justify:'flex-end',  textAlign:'center', padding:'20px 20px 24px'},
+  lateral:{justify:'center',    textAlign:'left',   padding:'20px 16px 20px 24px'}
+};
+
+function setPosicao(pos,btn){
+  curPosicao=pos;
+  document.querySelectorAll('.pos-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  aplicarEstilosCard();
+}
+
+function setFonte(fonte,btn){
+  curFonte=fonte;
+  document.querySelectorAll('.font-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  aplicarEstilosCard();
+}
+
+function aplicarEstilosCard(){
+  const ct=document.getElementById('cardCt');
+  if(!ct) return;
+  const pos=posicaoMap[curPosicao];
+  ct.style.justifyContent=pos.justify;
+  ct.style.textAlign=pos.textAlign;
+  ct.style.padding=pos.padding;
+  ct.style.alignItems=curPosicao==='lateral'?'flex-start':'center';
+  const fonte=fonteMap[curFonte];
+  const txtEl=document.getElementById('cTxt');
+  if(txtEl) txtEl.style.fontFamily=fonte;
+  const refEl=document.getElementById('cRef');
+  if(refEl) refEl.style.fontFamily=curFonte==='moderna'?"'Nunito',sans-serif":fonte;
+}
 
 async function loadAdmin(){
   document.getElementById('dashDate').textContent=`Atualizando...`;
@@ -2489,6 +2625,7 @@ Retorne APENAS JSON: {"text":"mensagem sem título","ref":"","sig":"${sig}"}`,
     document.getElementById('load').classList.remove('on');
     document.getElementById('ddisp').textContent=`${md.emoji} ${dShort}`;
     document.getElementById('rcard').classList.add('on');
+    aplicarEstilosCard(); // Aplica posição e fonte escolhidas
     window.scrollTo({top:0,behavior:'smooth'});
 
   }catch(e){
