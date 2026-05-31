@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -197,7 +196,9 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 .font-btn{padding:12px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);cursor:pointer;transition:all .2s;text-align:center}
 .font-btn.on{border-color:var(--primary);background:rgba(201,168,76,.1)}
 #cardOv{position:absolute;inset:0;background:var(--card-ov);z-index:1}
-#cardCt{position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:24px 20px 20px;text-align:center}
+#cardCt{position:absolute;z-index:2;width:auto;max-width:90%;display:flex;flex-direction:column;align-items:center;padding:16px;text-align:center;cursor:grab;user-select:none;touch-action:none;border-radius:8px;transition:outline .1s}
+#cardCt:active{cursor:grabbing;outline:2px dashed rgba(201,168,76,.5)}
+#cardCt.dragging{outline:2px dashed rgba(201,168,76,.7)}
 .ctit{font-family:'Dancing Script',cursive;font-size:clamp(32px,9vw,48px);font-weight:700;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7);line-height:1.1}
 .cbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:8px 0}
 .ctxt{font-family:'Lora',serif;font-size:clamp(15px,4.5vw,21px);color:#fff;line-height:1.7;text-shadow:0 2px 12px rgba(0,0,0,.8);font-weight:400}
@@ -604,46 +605,9 @@ select:focus,.iapp:focus{border-color:var(--primary)}
           Salve o card → abra o WhatsApp → envie a imagem para seus contatos.
         </div>
 
-        <!-- Posição do texto -->
-        <div style="margin-bottom:14px">
-          <span class="flbl">Posição do texto</span>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-            <button class="pos-btn on" onclick="setPosicao('topo',this)" title="Topo">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-                <div style="width:22px;height:3px;background:currentColor;border-radius:2px"></div>
-                <div style="width:22px;height:2px;background:currentColor;opacity:.4;border-radius:2px"></div>
-                <div style="width:22px;height:2px;background:currentColor;opacity:.2;border-radius:2px"></div>
-              </div>
-              <span>Topo</span>
-            </button>
-            <button class="pos-btn" onclick="setPosicao('centro',this)" title="Centro">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-                <div style="width:22px;height:2px;background:currentColor;opacity:.2;border-radius:2px"></div>
-                <div style="width:22px;height:3px;background:currentColor;border-radius:2px"></div>
-                <div style="width:22px;height:2px;background:currentColor;opacity:.2;border-radius:2px"></div>
-              </div>
-              <span>Centro</span>
-            </button>
-            <button class="pos-btn" onclick="setPosicao('baixo',this)" title="Baixo">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-                <div style="width:22px;height:2px;background:currentColor;opacity:.2;border-radius:2px"></div>
-                <div style="width:22px;height:2px;background:currentColor;opacity:.4;border-radius:2px"></div>
-                <div style="width:22px;height:3px;background:currentColor;border-radius:2px"></div>
-              </div>
-              <span>Baixo</span>
-            </button>
-            <button class="pos-btn" onclick="setPosicao('lateral',this)" title="Lateral">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-                <div style="width:6px;height:14px;background:currentColor;border-radius:2px;margin:0 auto"></div>
-              </div>
-              <span>Lateral</span>
-            </button>
-          </div>
-        </div>
-
         <!-- Fonte do texto -->
         <div style="margin-bottom:20px">
-          <span class="flbl">Fonte do texto</span>
+          <span class="flbl">Fonte</span>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
             <button class="font-btn on" onclick="setFonte('classica',this)">
               <span style="font-family:'Lora',serif;font-size:17px">Clássica</span>
@@ -658,6 +622,9 @@ select:focus,.iapp:focus{border-color:var(--primary)}
               <span style="font-family:Georgia,serif;font-size:16px;font-style:italic">Serifada</span>
             </button>
           </div>
+        </div>
+        <div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--text3);text-align:center">
+          ✋ <strong style="color:var(--primary)">Arraste o texto</strong> para reposicioná-lo no card
         </div>
 
         <div class="arow">
@@ -2138,9 +2105,8 @@ function getPlanClass(p){if(!p||p==='Trial')return 'trial';if(p==='Bloqueado')re
 function getTrialInfo(c){if(!c.trialStart)return{status:'none',dias:0};const diff=TRIAL_DAYS-((new Date()-new Date(c.trialStart))/(1000*60*60*24));return diff>0?{status:'active',dias:Math.ceil(diff)}:{status:'expired',dias:0};}
 
 // ════════════════════════════════════════
-// POSIÇÃO E FONTE DO CARD
+// FONTE GLOBAL E ARRASTAR TEXTO
 // ════════════════════════════════════════
-let curPosicao='topo';
 let curFonte='classica';
 
 const fonteMap={
@@ -2150,20 +2116,6 @@ const fonteMap={
   serifada:"Georgia,serif"
 };
 
-const posicaoMap={
-  topo:   {justify:'flex-start',textAlign:'center', padding:'24px 20px 20px'},
-  centro: {justify:'center',    textAlign:'center', padding:'20px'},
-  baixo:  {justify:'flex-end',  textAlign:'center', padding:'20px 20px 24px'},
-  lateral:{justify:'center',    textAlign:'left',   padding:'20px 16px 20px 24px'}
-};
-
-function setPosicao(pos,btn){
-  curPosicao=pos;
-  document.querySelectorAll('.pos-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  aplicarEstilosCard();
-}
-
 function setFonte(fonte,btn){
   curFonte=fonte;
   document.querySelectorAll('.font-btn').forEach(b=>b.classList.remove('on'));
@@ -2172,18 +2124,78 @@ function setFonte(fonte,btn){
 }
 
 function aplicarEstilosCard(){
-  const ct=document.getElementById('cardCt');
-  if(!ct) return;
-  const pos=posicaoMap[curPosicao];
-  ct.style.justifyContent=pos.justify;
-  ct.style.textAlign=pos.textAlign;
-  ct.style.padding=pos.padding;
-  ct.style.alignItems=curPosicao==='lateral'?'flex-start':'center';
   const fonte=fonteMap[curFonte];
-  const txtEl=document.getElementById('cTxt');
-  if(txtEl) txtEl.style.fontFamily=fonte;
-  const refEl=document.getElementById('cRef');
-  if(refEl) refEl.style.fontFamily=curFonte==='moderna'?"'Nunito',sans-serif":fonte;
+  // Aplica fonte em TODOS os elementos do card
+  ['cTit','cTxt','cRef','cSig'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.fontFamily=fonte;
+  });
+}
+
+function iniciarDrag(){
+  const ct=document.getElementById('cardCt');
+  const card=document.getElementById('cardV');
+  if(!ct||!card) return;
+
+  // Posição inicial — centro do card
+  const cardRect=card.getBoundingClientRect();
+  const ctRect=ct.getBoundingClientRect();
+  let posX=ctRect.left-cardRect.left+(ctRect.width/2);
+  let posY=ctRect.top-cardRect.top+(ctRect.height/2);
+
+  // Define posição absoluta inicial
+  ct.style.left=posX+'px';
+  ct.style.top=posY+'px';
+  ct.style.transform='translate(-50%,-50%)';
+
+  let isDragging=false;
+  let startX,startY,startLeft,startTop;
+
+  function onStart(e){
+    isDragging=true;
+    ct.classList.add('dragging');
+    const point=e.touches?e.touches[0]:e;
+    startX=point.clientX;
+    startY=point.clientY;
+    const style=window.getComputedStyle(ct);
+    startLeft=parseFloat(ct.style.left)||posX;
+    startTop=parseFloat(ct.style.top)||posY;
+    e.preventDefault();
+  }
+
+  function onMove(e){
+    if(!isDragging) return;
+    const point=e.touches?e.touches[0]:e;
+    const dx=point.clientX-startX;
+    const dy=point.clientY-startY;
+    const cardR=card.getBoundingClientRect();
+    const newLeft=startLeft+dx*(card.offsetWidth/cardR.width);
+    const newTop=startTop+dy*(card.offsetHeight/cardR.height);
+    // Limites
+    const margin=20;
+    ct.style.left=Math.max(margin,Math.min(card.offsetWidth-margin,newLeft))+'px';
+    ct.style.top=Math.max(margin,Math.min(card.offsetHeight-margin,newTop))+'px';
+    e.preventDefault();
+  }
+
+  function onEnd(){
+    isDragging=false;
+    ct.classList.remove('dragging');
+  }
+
+  // Remove listeners anteriores
+  ct.removeEventListener('mousedown',ct._onMouseDown);
+  ct.removeEventListener('touchstart',ct._onTouchStart);
+
+  ct._onMouseDown=onStart;
+  ct._onTouchStart=onStart;
+
+  ct.addEventListener('mousedown',onStart);
+  ct.addEventListener('touchstart',onStart,{passive:false});
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('touchmove',onMove,{passive:false});
+  document.addEventListener('mouseup',onEnd);
+  document.addEventListener('touchend',onEnd);
 }
 
 async function loadAdmin(){
@@ -2520,6 +2532,8 @@ async function gen(){
       document.getElementById('load').classList.remove('on');
       document.getElementById('ddisp').textContent=`${md.emoji} ${dShort}`;
       document.getElementById('rcard').classList.add('on');
+      aplicarEstilosCard();
+      iniciarDrag();
       window.scrollTo({top:0,behavior:'smooth'});
     },500);
     return;
@@ -2625,7 +2639,8 @@ Retorne APENAS JSON: {"text":"mensagem sem título","ref":"","sig":"${sig}"}`,
     document.getElementById('load').classList.remove('on');
     document.getElementById('ddisp').textContent=`${md.emoji} ${dShort}`;
     document.getElementById('rcard').classList.add('on');
-    aplicarEstilosCard(); // Aplica posição e fonte escolhidas
+    aplicarEstilosCard();
+    iniciarDrag();
     window.scrollTo({top:0,behavior:'smooth'});
 
   }catch(e){
