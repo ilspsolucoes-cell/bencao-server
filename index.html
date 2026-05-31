@@ -606,7 +606,7 @@ select:focus,.iapp:focus{border-color:var(--primary)}
         </div>
 
         <!-- Fonte do texto -->
-        <div style="margin-bottom:20px">
+        <div style="margin-bottom:14px">
           <span class="flbl">Fonte</span>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
             <button class="font-btn on" onclick="setFonte('classica',this)">
@@ -623,8 +623,35 @@ select:focus,.iapp:focus{border-color:var(--primary)}
             </button>
           </div>
         </div>
+
+        <!-- Tamanho do texto -->
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span class="flbl" style="margin:0">Tamanho do texto</span>
+            <span id="fontSizeLabel" style="font-size:12px;color:var(--primary);font-weight:700">100%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button onclick="setFontSize(Math.max(60,Math.round(curFontScale*100)-5))" style="width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--primary);font-size:18px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
+            <input type="range" id="fontSizeSlider" min="60" max="160" value="100" style="flex:1;accent-color:var(--primary);height:4px;cursor:pointer" oninput="setFontSize(this.value)">
+            <button onclick="setFontSize(Math.min(160,Math.round(curFontScale*100)+5))" style="width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--primary);font-size:18px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+          </div>
+        </div>
+
+        <!-- Opacidade da imagem (aparece só quando tem imagem) -->
+        <div id="opacityBox" style="display:none;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span class="flbl" style="margin:0">☀️ Claridade da imagem</span>
+            <span id="opacityLabel" style="font-size:12px;color:var(--primary);font-weight:700">70%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:14px">🌑</span>
+            <input type="range" id="opacitySlider" min="0" max="100" value="70" style="flex:1;accent-color:var(--primary);height:4px;cursor:pointer" oninput="setOpacidade(this.value)">
+            <span style="font-size:14px">🌕</span>
+          </div>
+        </div>
+
         <div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--text3);text-align:center">
-          ✋ <strong style="color:var(--primary)">Arraste o texto</strong> para reposicioná-lo no card
+          ✋ <strong style="color:var(--primary)">Arraste</strong> para mover · 🤏 <strong style="color:var(--primary)">Pince</strong> para redimensionar · 🖱️ <strong style="color:var(--primary)">Scroll</strong> no PC
         </div>
 
         <div class="arow">
@@ -2105,15 +2132,24 @@ function getPlanClass(p){if(!p||p==='Trial')return 'trial';if(p==='Bloqueado')re
 function getTrialInfo(c){if(!c.trialStart)return{status:'none',dias:0};const diff=TRIAL_DAYS-((new Date()-new Date(c.trialStart))/(1000*60*60*24));return diff>0?{status:'active',dias:Math.ceil(diff)}:{status:'expired',dias:0};}
 
 // ════════════════════════════════════════
-// FONTE GLOBAL E ARRASTAR TEXTO
+// FONTE GLOBAL, TAMANHO E OPACIDADE
 // ════════════════════════════════════════
 let curFonte='classica';
+let curFontScale=1.0;
 
 const fonteMap={
   classica:"'Lora',serif",
   elegante:"'Dancing Script',cursive",
   moderna:"'Nunito',sans-serif",
   serifada:"Georgia,serif"
+};
+
+// Tamanhos base de cada elemento
+const baseSizes={
+  cTit:{ min:20, max:52, base:38 },
+  cTxt:{ min:11, max:26, base:18 },
+  cRef:{ min:9,  max:16, base:11 },
+  cSig:{ min:14, max:32, base:23 }
 };
 
 function setFonte(fonte,btn){
@@ -2123,12 +2159,28 @@ function setFonte(fonte,btn){
   aplicarEstilosCard();
 }
 
+function setFontSize(val){
+  curFontScale=val/100;
+  document.getElementById('fontSizeLabel').textContent=val+'%';
+  aplicarEstilosCard();
+}
+
+function setOpacidade(val){
+  document.getElementById('opacityLabel').textContent=val+'%';
+  const overlay=document.getElementById('cardOv');
+  const opacity=1-(val/100)*0.95;
+  overlay.style.background=`rgba(0,0,0,${opacity.toFixed(2)})`;
+}
+
 function aplicarEstilosCard(){
   const fonte=fonteMap[curFonte];
-  // Aplica fonte em TODOS os elementos do card
-  ['cTit','cTxt','cRef','cSig'].forEach(id=>{
+  Object.keys(baseSizes).forEach(id=>{
     const el=document.getElementById(id);
-    if(el) el.style.fontFamily=fonte;
+    if(!el) return;
+    el.style.fontFamily=fonte;
+    const sz=baseSizes[id];
+    const newSize=Math.round(sz.base*curFontScale);
+    el.style.fontSize=Math.max(sz.min,Math.min(sz.max,newSize))+'px';
   });
 }
 
@@ -2138,57 +2190,89 @@ function iniciarDrag(){
   if(!ct||!card) return;
 
   // Posição inicial — centro do card
-  const cardRect=card.getBoundingClientRect();
-  const ctRect=ct.getBoundingClientRect();
-  let posX=ctRect.left-cardRect.left+(ctRect.width/2);
-  let posY=ctRect.top-cardRect.top+(ctRect.height/2);
-
-  // Define posição absoluta inicial
-  ct.style.left=posX+'px';
-  ct.style.top=posY+'px';
+  ct.style.left='50%';
+  ct.style.top='50%';
   ct.style.transform='translate(-50%,-50%)';
 
   let isDragging=false;
   let startX,startY,startLeft,startTop;
+  let lastPinchDist=0;
 
+  function getLeft(){ return parseFloat(ct.style.left)||card.offsetWidth/2; }
+  function getTop(){  return parseFloat(ct.style.top)||card.offsetHeight/2; }
+
+  // ── DRAG (mouse e touch simples) ──
   function onStart(e){
+    if(e.touches&&e.touches.length===2) return; // pinça — não inicia drag
     isDragging=true;
     ct.classList.add('dragging');
+    ct.style.transform='translate(-50%,-50%)';
     const point=e.touches?e.touches[0]:e;
+    const cardR=card.getBoundingClientRect();
     startX=point.clientX;
     startY=point.clientY;
-    const style=window.getComputedStyle(ct);
-    startLeft=parseFloat(ct.style.left)||posX;
-    startTop=parseFloat(ct.style.top)||posY;
+    startLeft=getLeft();
+    startTop=getTop();
     e.preventDefault();
   }
 
   function onMove(e){
+    // Pinça — zoom
+    if(e.touches&&e.touches.length===2){
+      isDragging=false;
+      ct.classList.remove('dragging');
+      const dx=e.touches[0].clientX-e.touches[1].clientX;
+      const dy=e.touches[0].clientY-e.touches[1].clientY;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(lastPinchDist>0){
+        const delta=(dist-lastPinchDist)/120;
+        const novoVal=Math.max(60,Math.min(160,Math.round(curFontScale*100+delta*40)));
+        curFontScale=novoVal/100;
+        document.getElementById('fontSizeSlider').value=novoVal;
+        document.getElementById('fontSizeLabel').textContent=novoVal+'%';
+        aplicarEstilosCard();
+      }
+      lastPinchDist=dist;
+      e.preventDefault();
+      return;
+    }
+    lastPinchDist=0;
+
     if(!isDragging) return;
     const point=e.touches?e.touches[0]:e;
-    const dx=point.clientX-startX;
-    const dy=point.clientY-startY;
     const cardR=card.getBoundingClientRect();
-    const newLeft=startLeft+dx*(card.offsetWidth/cardR.width);
-    const newTop=startTop+dy*(card.offsetHeight/cardR.height);
-    // Limites
-    const margin=20;
-    ct.style.left=Math.max(margin,Math.min(card.offsetWidth-margin,newLeft))+'px';
-    ct.style.top=Math.max(margin,Math.min(card.offsetHeight-margin,newTop))+'px';
+    const scaleX=card.offsetWidth/cardR.width;
+    const scaleY=card.offsetHeight/cardR.height;
+    const dx=(point.clientX-startX)*scaleX;
+    const dy=(point.clientY-startY)*scaleY;
+    const margin=30;
+    const newLeft=Math.max(margin,Math.min(card.offsetWidth-margin,startLeft+dx));
+    const newTop=Math.max(margin,Math.min(card.offsetHeight-margin,startTop+dy));
+    ct.style.left=newLeft+'px';
+    ct.style.top=newTop+'px';
     e.preventDefault();
   }
 
-  function onEnd(){
+  function onEnd(e){
     isDragging=false;
     ct.classList.remove('dragging');
+    if(!e.touches||e.touches.length<2) lastPinchDist=0;
+  }
+
+  // Scroll do mouse = zoom no computador
+  function onWheel(e){
+    if(!document.getElementById('rcard').classList.contains('on')) return;
+    e.preventDefault();
+    const delta=e.deltaY>0?-5:5;
+    const novoVal=Math.max(60,Math.min(160,Math.round(curFontScale*100+delta)));
+    curFontScale=novoVal/100;
+    document.getElementById('fontSizeSlider').value=novoVal;
+    document.getElementById('fontSizeLabel').textContent=novoVal+'%';
+    aplicarEstilosCard();
   }
 
   // Remove listeners anteriores
-  ct.removeEventListener('mousedown',ct._onMouseDown);
-  ct.removeEventListener('touchstart',ct._onTouchStart);
-
-  ct._onMouseDown=onStart;
-  ct._onTouchStart=onStart;
+  if(ct._dragCleanup) ct._dragCleanup();
 
   ct.addEventListener('mousedown',onStart);
   ct.addEventListener('touchstart',onStart,{passive:false});
@@ -2196,6 +2280,17 @@ function iniciarDrag(){
   document.addEventListener('touchmove',onMove,{passive:false});
   document.addEventListener('mouseup',onEnd);
   document.addEventListener('touchend',onEnd);
+  card.addEventListener('wheel',onWheel,{passive:false});
+
+  ct._dragCleanup=()=>{
+    ct.removeEventListener('mousedown',onStart);
+    ct.removeEventListener('touchstart',onStart);
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('touchmove',onMove);
+    document.removeEventListener('mouseup',onEnd);
+    document.removeEventListener('touchend',onEnd);
+    card.removeEventListener('wheel',onWheel);
+  };
 }
 
 async function loadAdmin(){
@@ -2625,8 +2720,15 @@ Retorne APENAS JSON: {"text":"mensagem sem título","ref":"","sig":"${sig}"}`,
     if(imgDataUrl){
       const bg=document.getElementById('cardBg');
       bg.src=imgDataUrl;bg.classList.add('on');
+      // Mostra slider de opacidade e aplica valor atual
+      document.getElementById('opacityBox').style.display='block';
+      const ov=document.getElementById('opacitySlider').value;
+      setOpacidade(ov);
     } else {
       document.getElementById('cardBg').classList.remove('on');
+      document.getElementById('opacityBox').style.display='none';
+      // Reseta overlay para gradiente padrão
+      document.getElementById('cardOv').style.background='';
       document.getElementById('cardV').style.background={
         dia:'linear-gradient(160deg,#1a3a1a,#2a5a2a,#1a2a10)',
         tarde:'linear-gradient(160deg,#3a1a0a,#5a3010,#2a2010)',
@@ -2723,6 +2825,17 @@ function rst(){
   document.getElementById('rcard').classList.remove('on');
   document.getElementById('cfg').style.display='block';
   document.getElementById('genbtn').disabled=false;
+  // Reseta sliders
+  curFontScale=1.0;
+  document.getElementById('fontSizeSlider').value=100;
+  document.getElementById('fontSizeLabel').textContent='100%';
+  document.getElementById('opacitySlider').value=70;
+  document.getElementById('opacityLabel').textContent='70%';
+  document.getElementById('opacityBox').style.display='none';
+  document.getElementById('cardOv').style.background='';
+  // Limpa drag cleanup
+  const ct=document.getElementById('cardCt');
+  if(ct&&ct._dragCleanup) ct._dragCleanup();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
