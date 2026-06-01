@@ -196,9 +196,9 @@ select:focus,.iapp:focus{border-color:var(--primary)}
 .font-btn{padding:12px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);cursor:pointer;transition:all .2s;text-align:center}
 .font-btn.on{border-color:var(--primary);background:rgba(201,168,76,.1)}
 #cardOv{position:absolute;inset:0;background:var(--card-ov);z-index:1}
-#cardCt{position:absolute;z-index:2;width:auto;max-width:90%;display:flex;flex-direction:column;align-items:center;padding:16px;text-align:center;cursor:grab;user-select:none;touch-action:none;border-radius:8px;transition:outline .1s}
-#cardCt:active{cursor:grabbing;outline:2px dashed rgba(201,168,76,.5)}
-#cardCt.dragging{outline:2px dashed rgba(201,168,76,.7)}
+#cardCt{position:absolute;z-index:2;width:80%;max-width:80%;display:flex;flex-direction:column;align-items:center;padding:12px;text-align:center;cursor:grab;user-select:none;touch-action:none;border-radius:8px;transition:outline .15s;box-sizing:border-box;word-wrap:break-word;overflow-wrap:break-word}
+#cardCt:active{cursor:grabbing}
+#cardCt.dragging{outline:2px dashed rgba(201,168,76,.6)}
 .ctit{font-family:'Dancing Script',cursive;font-size:clamp(32px,9vw,48px);font-weight:700;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7);line-height:1.1}
 .cbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:8px 0}
 .ctxt{font-family:'Lora',serif;font-size:clamp(15px,4.5vw,21px);color:#fff;line-height:1.7;text-shadow:0 2px 12px rgba(0,0,0,.8);font-weight:400}
@@ -2189,152 +2189,181 @@ function iniciarDrag(){
   const card=document.getElementById('cardV');
   if(!ct||!card) return;
 
-  // Posição inicial — centro superior
+  // Limpa listeners anteriores
+  if(ct._dragCleanup) ct._dragCleanup();
+
+  // Posição inicial
   ct.style.left='50%';
   ct.style.top='30%';
   ct.style.transform='translate(-50%,-50%)';
 
-  // Estado separado para drag e pinch — nunca os dois ao mesmo tempo
-  let mode='none'; // 'drag' | 'pinch' | 'none'
-  let startX,startY,startLeft,startTop;
-  let lastPinchDist=0;
+  // Garante largura fixa para não distorcer
+  ct.style.width='82%';
+  ct.style.maxWidth='82%';
 
-  function getLeft(){ return parseFloat(ct.style.left)||card.offsetWidth/2; }
-  function getTop(){  return parseFloat(ct.style.top)||card.offsetHeight/2; }
+  let dragAtivo=false;
+  let pinchAtivo=false;
+  let startX=0,startY=0,startLeft=0,startTop=0;
+  let lastDist=0;
+  // Guarda timestamp do touchstart para ignorar pinch que virou drag
+  let touchStartTime=0;
+  let touchStartCount=0;
 
-  function setPos(left,top){
-    const margin=20;
-    ct.style.left=Math.max(margin,Math.min(card.offsetWidth-margin,left))+'px';
-    ct.style.top=Math.max(margin,Math.min(card.offsetHeight-margin,top))+'px';
+  function posAtual(){
+    const l=parseFloat(ct.style.left);
+    const t=parseFloat(ct.style.top);
+    return{
+      left: isNaN(l)?card.offsetWidth/2:l,
+      top:  isNaN(t)?card.offsetHeight*0.3:t
+    };
+  }
+
+  function moverPara(left,top){
+    const m=16;
+    ct.style.left=Math.max(m,Math.min(card.offsetWidth-m,left))+'px';
+    ct.style.top=Math.max(m,Math.min(card.offsetHeight-m,top))+'px';
     ct.style.transform='translate(-50%,-50%)';
   }
 
   // ── TOUCH ──
   function onTouchStart(e){
+    e.preventDefault();
+    touchStartCount=e.touches.length;
+    touchStartTime=Date.now();
+
     if(e.touches.length===1){
-      // Só inicia drag se não estava em pinch
-      if(mode==='pinch') return;
-      mode='drag';
+      // 1 dedo — DRAG
+      pinchAtivo=false;
+      lastDist=0;
+      dragAtivo=true;
       ct.classList.add('dragging');
+      const p=posAtual();
       startX=e.touches[0].clientX;
       startY=e.touches[0].clientY;
-      startLeft=getLeft();
-      startTop=getTop();
-    } else if(e.touches.length===2){
-      // Inicia pinch — cancela drag imediatamente
-      mode='pinch';
+      startLeft=p.left;
+      startTop=p.top;
+
+    }else if(e.touches.length===2){
+      // 2 dedos — PINCH, cancela qualquer drag
+      dragAtivo=false;
+      pinchAtivo=true;
       ct.classList.remove('dragging');
-      lastPinchDist=Math.hypot(
+      lastDist=Math.hypot(
         e.touches[0].clientX-e.touches[1].clientX,
         e.touches[0].clientY-e.touches[1].clientY
       );
     }
-    e.preventDefault();
   }
 
   function onTouchMove(e){
-    if(mode==='drag'&&e.touches.length===1){
-      // Drag puro — sem redimensionamento
+    e.preventDefault();
+
+    // Se começou com 1 dedo e ainda é 1 dedo → DRAG
+    if(dragAtivo&&!pinchAtivo&&e.touches.length===1){
       const cardR=card.getBoundingClientRect();
-      const scaleX=card.offsetWidth/cardR.width;
-      const scaleY=card.offsetHeight/cardR.height;
-      setPos(
-        startLeft+(e.touches[0].clientX-startX)*scaleX,
-        startTop+(e.touches[0].clientY-startY)*scaleY
+      const sx=card.offsetWidth/cardR.width;
+      const sy=card.offsetHeight/cardR.height;
+      moverPara(
+        startLeft+(e.touches[0].clientX-startX)*sx,
+        startTop+(e.touches[0].clientY-startY)*sy
       );
-    } else if(mode==='pinch'&&e.touches.length===2){
-      // Pinch puro — sem drag
+      return;
+    }
+
+    // Se está em pinch → REDIMENSIONA
+    if(pinchAtivo&&e.touches.length===2){
       const dist=Math.hypot(
         e.touches[0].clientX-e.touches[1].clientX,
         e.touches[0].clientY-e.touches[1].clientY
       );
-      if(lastPinchDist>0){
-        const delta=(dist-lastPinchDist)/100;
-        const novoVal=Math.max(60,Math.min(160,Math.round(curFontScale*100+delta*30)));
-        curFontScale=novoVal/100;
+      if(lastDist>0){
+        const delta=(dist-lastDist)/90;
+        const novo=Math.max(60,Math.min(160,Math.round(curFontScale*100+delta*25)));
+        curFontScale=novo/100;
         const sl=document.getElementById('fontSizeSlider');
         const lb=document.getElementById('fontSizeLabel');
-        if(sl) sl.value=novoVal;
-        if(lb) lb.textContent=novoVal+'%';
+        if(sl) sl.value=novo;
+        if(lb) lb.textContent=novo+'%';
         aplicarEstilosCard();
       }
-      lastPinchDist=dist;
+      lastDist=dist;
     }
-    e.preventDefault();
   }
 
   function onTouchEnd(e){
+    e.preventDefault();
     if(e.touches.length===0){
-      // Todos os dedos levantados — reseta modo
-      mode='none';
-      lastPinchDist=0;
+      // Todos os dedos levantados
+      dragAtivo=false;
+      pinchAtivo=false;
+      lastDist=0;
       ct.classList.remove('dragging');
-    } else if(e.touches.length===1&&mode==='pinch'){
-      // Saiu do pinch mas ainda tem 1 dedo — não inicia drag automaticamente
-      // Usuário precisa levantar todos os dedos e recomeçar
-      mode='none';
-      lastPinchDist=0;
+    }else if(e.touches.length===1){
+      // Saiu de pinch para 1 dedo — NÃO retoma drag automaticamente
+      // Evita redimensionamento ao soltar 1 dedo do pinch
+      pinchAtivo=false;
+      dragAtivo=false;
+      lastDist=0;
+      ct.classList.remove('dragging');
     }
   }
 
   // ── MOUSE ──
   function onMouseDown(e){
-    mode='drag';
+    e.preventDefault();
+    dragAtivo=true;
     ct.classList.add('dragging');
+    const p=posAtual();
     startX=e.clientX;
     startY=e.clientY;
-    startLeft=getLeft();
-    startTop=getTop();
-    e.preventDefault();
+    startLeft=p.left;
+    startTop=p.top;
   }
 
   function onMouseMove(e){
-    if(mode!=='drag') return;
+    if(!dragAtivo) return;
     const cardR=card.getBoundingClientRect();
-    const scaleX=card.offsetWidth/cardR.width;
-    const scaleY=card.offsetHeight/cardR.height;
-    setPos(
-      startLeft+(e.clientX-startX)*scaleX,
-      startTop+(e.clientY-startY)*scaleY
+    moverPara(
+      startLeft+(e.clientX-startX)*(card.offsetWidth/cardR.width),
+      startTop+(e.clientY-startY)*(card.offsetHeight/cardR.height)
     );
   }
 
   function onMouseUp(){
-    mode='none';
+    dragAtivo=false;
     ct.classList.remove('dragging');
   }
 
-  // ── SCROLL (zoom no PC) ──
+  // ── SCROLL = zoom no PC ──
   function onWheel(e){
     e.preventDefault();
-    const delta=e.deltaY>0?-3:3;
-    const novoVal=Math.max(60,Math.min(160,Math.round(curFontScale*100+delta)));
-    curFontScale=novoVal/100;
+    const novo=Math.max(60,Math.min(160,
+      Math.round(curFontScale*100+(e.deltaY>0?-3:3))
+    ));
+    curFontScale=novo/100;
     const sl=document.getElementById('fontSizeSlider');
     const lb=document.getElementById('fontSizeLabel');
-    if(sl) sl.value=novoVal;
-    if(lb) lb.textContent=novoVal+'%';
+    if(sl) sl.value=novo;
+    if(lb) lb.textContent=novo+'%';
     aplicarEstilosCard();
   }
 
-  // Remove listeners anteriores
-  if(ct._dragCleanup) ct._dragCleanup();
-
+  // Registra
   ct.addEventListener('touchstart',onTouchStart,{passive:false});
-  ct.addEventListener('touchmove',onTouchMove,{passive:false});
-  ct.addEventListener('touchend',onTouchEnd,{passive:false});
-  ct.addEventListener('mousedown',onMouseDown);
+  ct.addEventListener('touchmove', onTouchMove, {passive:false});
+  ct.addEventListener('touchend',  onTouchEnd,  {passive:false});
+  ct.addEventListener('mousedown', onMouseDown);
   document.addEventListener('mousemove',onMouseMove);
-  document.addEventListener('mouseup',onMouseUp);
+  document.addEventListener('mouseup',  onMouseUp);
   card.addEventListener('wheel',onWheel,{passive:false});
 
   ct._dragCleanup=()=>{
     ct.removeEventListener('touchstart',onTouchStart);
-    ct.removeEventListener('touchmove',onTouchMove);
-    ct.removeEventListener('touchend',onTouchEnd);
-    ct.removeEventListener('mousedown',onMouseDown);
+    ct.removeEventListener('touchmove', onTouchMove);
+    ct.removeEventListener('touchend',  onTouchEnd);
+    ct.removeEventListener('mousedown', onMouseDown);
     document.removeEventListener('mousemove',onMouseMove);
-    document.removeEventListener('mouseup',onMouseUp);
+    document.removeEventListener('mouseup',  onMouseUp);
     card.removeEventListener('wheel',onWheel);
   };
 }
